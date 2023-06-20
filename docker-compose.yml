@@ -1,0 +1,41 @@
+version: '3.6'
+
+services:
+  db:
+    restart: always
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    volumes:
+      - ./media/:/media/
+      - ./dbdata:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: sms-panel
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    command: >
+      sh -c "
+        migrate -path database/migrations -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSLMODE}" up;
+        go run main.go;
+      "
+    depends_on:
+      db:
+        condition: "service_healthy"
+  
