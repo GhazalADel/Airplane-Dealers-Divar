@@ -11,3 +11,7 @@ type Transaction struct {
 	CreatedAt time.Time `gorm:"type:datetime"`
 	User      User
 }
+
+func (Transaction) TableName() string {
+	return "transactions"
+}

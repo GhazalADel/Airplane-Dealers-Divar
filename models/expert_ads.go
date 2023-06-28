@@ -7,7 +7,7 @@ type ExpertAds struct {
 	Expert   User   `gorm:"foreignKey:ExpertID"`
 	ExpertID uint   `gorm:"type:uint"`
 	AdsID    uint   `gorm:"type:uint;not null"`
-	Ads      Ads
+	Ad       Ad
 }
 
 func (ExpertAds) TableName() string {

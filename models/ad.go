@@ -16,6 +16,8 @@ type Ad struct {
 	RepairCheck   bool      `gorm:"type:boolean"`
 	ExpertCheck   bool      `gorm:"type:boolean"`
 	PlaneAge      int       `gorm:"type:int"`
+	User          User
+	Category      Category
 }
 
 func (Ad) TableName() string {
