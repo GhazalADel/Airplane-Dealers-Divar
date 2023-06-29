@@ -4,7 +4,8 @@ import (
 	"log"
 
 	database "Airplane-Divar/database"
-	"Airplane-Divar/handlers"
+	adsDatastore "Airplane-Divar/datastore/ads"
+	adsHandler "Airplane-Divar/handlers/ads"
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -26,7 +27,8 @@ func StartServer() {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Ads
-	adsHandler := handlers.NewAdsHandler(db)
+	datastore := adsDatastore.New(db)
+	adsHandler := adsHandler.New(datastore)
 	adsRoutes(e, adsHandler)
 
 	log.Fatal(e.Start(":8080"))
