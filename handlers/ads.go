@@ -32,4 +32,23 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
+	//check ad properties validation
+	adFormatValidationMsg, ad, adFormatErr := utils.ValidateAd(jsonBody, a.db)
+	if adFormatErr != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: adFormatValidationMsg})
+	}
+
+	//set user id
+	// user := c.Get("user")
+	// user = user.(models.User)
+	// id := uint(user.(models.User).ID)
+	// ad.UserID = id
+
+	createdAd := a.db.Create(&ad)
+	if createdAd.Error != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
+	}
+
+	return c.JSON(http.StatusOK, ad)
+
 }

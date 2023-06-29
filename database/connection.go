@@ -41,11 +41,18 @@ func GetConnection() (*gorm.DB, error) {
 }
 
 func initializeDatabase() {
-	//insert categories
-	categories := []string{"small-passenger", "big-passenger"}
-	for _, v := range categories {
-		var c models.Category
-		c.Name = v
-		dbConn.Save(&c)
+	//check categories table for tuples
+	var categories []models.Category
+	dbConn.Select("id").Find(&categories)
+	if len(categories) == 0 {
+		//insert categories
+		categories := []string{"small-passenger", "big-passenger"}
+		for _, v := range categories {
+			var c models.Category
+			c.Name = v
+			dbConn.Save(&c)
+		}
+
 	}
+
 }
