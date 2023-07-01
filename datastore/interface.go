@@ -11,5 +11,6 @@ type User interface {
 type Account interface {
 	Get(id int) ([]models.Account, error)
 	Create(user_id int, username string, is_admin bool, password string) (string, models.Account, error)
+	Login(username, password string, is_admin bool) (string, models.Account, error)
 	CheckUnique(username string) (string, error)
 }

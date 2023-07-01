@@ -88,3 +88,62 @@ func (a AccountStore) CheckUnique(username string) (string, error) {
 	}
 	return msg, nil
 }
+
+func (a AccountStore) Login(username, password string, is_admin bool) (string, models.Account, error) {
+	msg := "OK"
+	// Find account based on input username
+	var account models.Account
+
+	a.db.Where("username = ?", username).First(&account)
+
+	// Account Not Found
+	if account.ID == 0 {
+		msg = "Invalid Username"
+		return msg, models.Account{}, errors.New("")
+	}
+
+	// Incorrect Password
+	err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(password))
+	if err != nil {
+		msg = "Wrong Password"
+		return msg, models.Account{}, errors.New("")
+	}
+
+	if is_admin {
+		if !account.IsAdmin {
+			msg = "You are not admin!"
+			return msg, models.Account{}, errors.New("")
+		}
+	}
+	//Account isn't active
+	if !account.IsActive {
+		msg = "Your Account Isn't Active"
+		return msg, models.Account{}, errors.New("")
+	}
+
+	var token *jwt.Token
+	if is_admin {
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"id":    account.ID,
+			"exp":   time.Now().Add(time.Hour).Unix(),
+			"admin": true,
+		})
+	} else {
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"id":    account.ID,
+			"exp":   time.Now().Add(time.Hour).Unix(),
+			"admin": false,
+		})
+	}
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		msg = "Failed To Create Token"
+		return msg, models.Account{}, errors.New("")
+	}
+
+	// Update Account's Token In Database
+	account.Token = tokenString
+	a.db.Save(&account)
+	return msg, account, nil
+}

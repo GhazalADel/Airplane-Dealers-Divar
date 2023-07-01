@@ -111,3 +111,37 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, account)
 }
+
+// LoginHandler handles user login
+// @Summary User login
+// @Description Login with username and password
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body LoginRequest true "Login request body"
+// @Success 200 {object} AccountResponse
+// @Failure 400 {object} ErrorResponseRegisterLogin
+// @Failure 422 {object} ErrorResponseRegisterLogin
+// @Router  /accounts/login [post]
+func (a UserHandler) LoginHandler(c echo.Context) error {
+	// Read Request Body
+	jsonBody := make(map[string]interface{})
+	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
+	}
+
+	//check json format
+	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password")
+	if jsonFormatErr != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
+	}
+
+	//find account based on username and check password correction
+	findAccountMsg, account, findAccountErr := a.data_account.Login(jsonBody["username"].(string), jsonBody["password"].(string), false)
+	if findAccountErr != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: findAccountMsg})
+	}
+
+	return c.JSON(http.StatusOK, account)
+}
