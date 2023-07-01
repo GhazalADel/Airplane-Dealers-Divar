@@ -9,5 +9,5 @@ import (
 
 func paymentRoutes(e *echo.Echo, handlers *handlers.PaymentHandler) {
 	e.POST("/accounts/payment/request", handlers.PaymentRequestHandler, middlewares.IsLoggedIn)
-	// e.GET("/accounts/payment/verify", handlers.PaymentVerifyHandler)
+	e.GET("/accounts/payment/verify", handlers.PaymentVerifyHandler)
 }

@@ -171,3 +171,96 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// Todo: Talk about handling payments
+
+// @Summary Verify budget payment and add budget
+// @Description Verify Zarinpal Payment to add budget to account
+// @Tags payment
+// @Accept json
+// @Produce json
+// @Param body body VerifyResponse true "Payment verify details"
+// @Success 200 {string} string
+// @Failure 400 {string} ErrorResponse
+// @Failure 422 {string} ErrorResponse
+// @Failure 500 {string} ErrorResponse
+// @Router /accounts/payment/verify [get]
+func PaymentVerifyHandler(c echo.Context) error {
+	// Connect To The Datebase
+	db, err := database.GetConnection()
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, models.Response{ResponseCode: 502, Message: "Can't Connect To Database"})
+	}
+
+	authority := c.QueryParam("Authority")
+	status := c.QueryParam("Status")
+
+	var transaction models.Transaction
+	if err := db.Where(&models.Transaction{Authority: authority}).First(&transaction).Error; err != nil {
+		// Handle the error (e.g., transaction not found)
+		return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "Transaction Not Founded"})
+	}
+
+	if status == "NOK" {
+		transaction.Status = "Failed"
+		db.Save(&transaction)
+		return c.JSON(http.StatusBadRequest, "Failed Payment")
+	}
+
+	data := map[string]interface{}{
+		"merchant_id": merchantID,
+		"amount":      transaction.Amount,
+		"authority":   transaction.Authority,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{
+			ResponseCode: 500,
+			Message:      "Failed to marshal JSON data",
+		})
+	}
+
+	resp, err := http.Post(zarinpalVerify, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, models.Response{
+			ResponseCode: 502,
+			Message:      "Failed to send POST request",
+		})
+	}
+	defer resp.Body.Close()
+
+	// Read Request Body
+	jsonBody := make(map[string]interface{})
+	err = json.NewDecoder(resp.Body).Decode(&jsonBody)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
+	}
+
+	if data, ok := jsonBody["data"]; ok {
+		if dataMap, ok := data.(map[string]interface{}); ok {
+			if code, ok := dataMap["code"]; ok {
+				if code == float64(100) {
+					transaction.Status = "Okay"
+					db.Save(&transaction)
+
+					accountID := transaction.UserID
+					var account models.Account
+					if err := db.First(&account, accountID).Error; err != nil {
+						// Handle the error (e.g., account not found)
+						return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "Account Not Founded"})
+					}
+
+					return c.JSON(http.StatusOK, "Successful Payment")
+				} else if code == float64(101) {
+					return c.JSON(http.StatusOK, "Transaction had verified")
+				}
+			}
+		}
+
+	}
+
+	transaction.Status = "Failed"
+	db.Save(&transaction)
+	return c.JSON(http.StatusBadRequest, "Failed Payment")
+}
