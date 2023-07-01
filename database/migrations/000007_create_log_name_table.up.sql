@@ -1,0 +1,4 @@
+CREATE TABLE log_name (
+    id BIGINT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL
+);
