@@ -185,7 +185,7 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 // @Failure 422 {string} ErrorResponse
 // @Failure 500 {string} ErrorResponse
 // @Router /accounts/payment/verify [get]
-func PaymentVerifyHandler(c echo.Context) error {
+func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 	// Connect To The Datebase
 	db, err := database.GetConnection()
 	if err != nil {
