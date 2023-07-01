@@ -45,13 +45,13 @@ type SenderNumbersResponse struct {
 	Numbers []string `json:"numbers"`
 }
 
-type UserHandler struct {
+type AccountHandler struct {
 	data_user    datastore.User
 	data_account datastore.Account
 }
 
-func NewUserHandler(user datastore.User, account datastore.Account) UserHandler {
-	return UserHandler{data_user: user, data_account: account}
+func NewAccountHandler(user datastore.User, account datastore.Account) *AccountHandler {
+	return &AccountHandler{data_user: user, data_account: account}
 }
 
 // @Summary Register a new user
@@ -65,7 +65,7 @@ func NewUserHandler(user datastore.User, account datastore.Account) UserHandler 
 // @Failure 422 {object} ErrorResponseRegisterLogin
 // @Failure 500 {object} ErrorResponseRegisterLogin
 // @Router /accounts/register [post]
-func (a UserHandler) RegisterHandler(c echo.Context) error {
+func (a AccountHandler) RegisterHandler(c echo.Context) error {
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
@@ -123,7 +123,7 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 // @Failure 400 {object} ErrorResponseRegisterLogin
 // @Failure 422 {object} ErrorResponseRegisterLogin
 // @Router  /accounts/login [post]
-func (a UserHandler) LoginHandler(c echo.Context) error {
+func (a AccountHandler) LoginHandler(c echo.Context) error {
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
