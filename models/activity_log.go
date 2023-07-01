@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type ActionLog struct {
+type ActivityLog struct {
 	ID          uint      `gorm:"primary_key"`
 	CreatedAt   time.Time `gorm:"type:datetime"`
 	SubjectType string    `gorm:"type:varchar(50);not null"`
@@ -14,6 +14,6 @@ type ActionLog struct {
 	Description string    `gorm:"type:varchar(255)"`
 }
 
-func (ActionLog) TableName() string {
+func (ActivityLog) TableName() string {
 	return "activity_log"
 }
