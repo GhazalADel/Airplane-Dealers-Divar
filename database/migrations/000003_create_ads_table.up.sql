@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS ads (
     status VARCHAR(255),
     fly_time TIMESTAMP,
     airplane_model VARCHAR(255),
-    repair_check boolean,
-    expert_check boolean,
+    repair_check BOOLEAN,
+    expert_check BOOLEAN,
     plane_age INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (category_id) REFERENCES categories(id)

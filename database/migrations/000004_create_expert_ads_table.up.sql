@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS expert_ads (
     expert_id INT,
     ads_id INT NOT NULL,
     report VARCHAR,
-    status boolean,
+    status BOOLEAN,
     FOREIGN KEY (expert_id) REFERENCES users(id),
     FOREIGN KEY (ads_id) REFERENCES ads(id)
 );

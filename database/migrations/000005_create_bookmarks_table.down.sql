@@ -1,1 +1,1 @@
-DROP TABLE bookmarks;
+DROP TABLE IF EXISTS bookmarks;
