@@ -3,6 +3,7 @@ package server
 import (
 	database "Airplane-Divar/database"
 	"Airplane-Divar/datastore/account"
+	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
 	"log"
@@ -27,13 +28,15 @@ func StartServer() {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Account
-	account_datastore := account.New(db)
-	user_datastore := user.New(db)
-	accountHandler := handlers.NewAccountHandler(user_datastore, account_datastore)
+	accountDatastore := account.New(db)
+	userDatastore := user.New(db)
+	accountHandler := handlers.NewAccountHandler(userDatastore, accountDatastore)
 	accountRoutes(e, accountHandler)
 
 	// Payment
-	paymentRoutes(e)
+	paymentDatastore := payment.New(db)
+	paymentHandler := handlers.NewPaymentHandler(paymentDatastore)
+	paymentRoutes(e, paymentHandler)
 
 	log.Fatal(e.Start(":8080"))
 }

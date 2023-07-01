@@ -14,3 +14,7 @@ type Account interface {
 	Login(username, password string, is_admin bool) (string, models.Account, error)
 	CheckUnique(username string) (string, error)
 }
+
+type Payment interface {
+	Create(userID uint, fee int64, authority string) (string, error)
+}
