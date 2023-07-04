@@ -2,6 +2,7 @@ package ads
 
 import (
 	"Airplane-Divar/datastore"
+	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
 	"encoding/json"
@@ -51,9 +52,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	// if createdAd.Error != nil {
 	// 	return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
 	// }
-
 	return c.JSON(http.StatusOK, ad)
-
 }
 
 // Get retrieves an ad by ID.
@@ -82,27 +81,29 @@ func (a AdsHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-// Get retrieves all ads.
-// @Summary Get ads.
-// @Description Retrieves all ads from database.
+// List retrieves all ads.
+// @Summary List of ads.
+// @Description Retrieves ads from database and accept query params.
 // @Tags ads
 // @Accept json
 // @Produce json
 // @Success 200 {object} []models.Ad
-// @Failure 400 {string} string "Invalid parameter id"
 // @Failure 500 {string} string "Could not retrieve ads"
 // @Router /ads [get]
-func (a AdsHandler) GetAll(c echo.Context) error {
-	resp, err := a.datastore.Get(0)
+func (a AdsHandler) List(c echo.Context) error {
+	filter := filter.NewAdsFilter(c.QueryParams())
+
+	if len(filter.Base.Sort) != 0 {
+		resp, err := a.datastore.ListFilterSort(&filter.Base)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, "could not retrieve ads")
+		}
+		return c.JSON(http.StatusOK, resp)
+	}
+
+	resp, err := a.datastore.ListFilterByColumn(filter)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "could not retrieve ads")
 	}
 	return c.JSON(http.StatusOK, resp)
-}
-
-func defaultIfEmpty(value, defaultValue string) string {
-	if value == "" {
-		return defaultValue
-	}
-	return value
 }
