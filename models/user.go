@@ -1,7 +1,7 @@
 package models
 
 type User struct {
-	ID        uint        `gorm:"primary_key"`
+	ID        uint        `gorm:"primaryKey"`
 	Username  string      `gorm:"type:varchar(255);unique;not null"`
 	Password  string      `gorm:"type:varchar(255);not null"`
 	Role      int         `gorm:"type:int;not null"`

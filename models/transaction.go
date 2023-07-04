@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Transaction struct {
-	ID        uint      `gorm:"primary_key"`
+	ID        uint      `gorm:"primaryKey"`
 	UserID    uint      `gorm:"not null"`
 	Amount    int64     `gorm:"type:bigint"`
 	Status    string    `gorm:"type:varchar(255)"`

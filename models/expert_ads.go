@@ -1,13 +1,13 @@
 package models
 
 type ExpertAds struct {
-	ID       uint   `gorm:"primary_key"`
-	Report   string `gorm:"type:varchar()"`
+	ID       uint   `gorm:"primaryKey"`
+	Report   string `gorm:"type:varchar(255)"`
 	Status   int    `gorm:"type:int"`
-	Expert   User   `gorm:"foreignKey:ExpertID"`
 	ExpertID uint   `gorm:"type:uint"`
 	AdsID    uint   `gorm:"type:uint;not null"`
-	Ad       Ad
+	Ad       Ad     `gorm:"foreignKey:AdsID"`
+	Expert   User   `gorm:"foreginKey:ExpertID"`
 }
 
 func (ExpertAds) TableName() string {
