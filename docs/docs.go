@@ -23,7 +23,351 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/expert/ads/{adID}": {
+            "get": {
+                "description": "retrieve expert check request for expert or user",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "retrieve expert check request for expert or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetExpertRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete expert check request for expert or user",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "delete expert check request for expert or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/ads/{adID}/check-request": {
+            "post": {
+                "description": "Request to expert check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expert"
+                ],
+                "summary": "Request to expert check",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/check-request/{expertRequestID}": {
+            "put": {
+                "description": "Update expert check request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expert"
+                ],
+                "summary": "Update expert check request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "expert request ID",
+                        "name": "expertRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Expert check object",
+                        "name": "expertCheckRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateExpertCheckRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExpertRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/check-requests": {
+            "get": {
+                "description": "ListExpertRequest retrieves all expert requests for an expert",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "ListExpertRequest retrieves all expert requests for an expert",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "ads_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ExpertRequestResponse"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExpertRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "expertID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.GetExpertRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adSubject": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "expertID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.UpdateExpertCheckRequest": {
+            "type": "object",
+            "properties": {
+                "report": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/utils.ExpertStatus"
+                }
+            }
+        },
+        "utils.ExpertStatus": {
+            "type": "string",
+            "enum": [
+                "Wait for payment status",
+                "Pending for expert",
+                "In progress",
+                "Confirmed"
+            ],
+            "x-enum-varnames": [
+                "EXPERT_WAIT_FOR_PAYMENT_STATUS",
+                "EXPERT_PENDING_STATUS",
+                "EXPERT_IN_PROGRESS_STATUS",
+                "EXPERT_CONFIRMED_STATUS"
+            ]
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

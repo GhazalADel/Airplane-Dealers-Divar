@@ -1,4 +1,64 @@
 basePath: /
+definitions:
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.ExpertRequestResponse:
+    properties:
+      adID:
+        type: integer
+      createdAt:
+        type: string
+      expertID:
+        type: integer
+      id:
+        type: integer
+      status:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.GetExpertRequestResponse:
+    properties:
+      adSubject:
+        type: string
+      createdAt:
+        type: string
+      expertID:
+        type: integer
+      id:
+        type: integer
+      status:
+        type: string
+      userName:
+        type: integer
+    type: object
+  models.SuccessResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  models.UpdateExpertCheckRequest:
+    properties:
+      report:
+        type: string
+      status:
+        $ref: '#/definitions/utils.ExpertStatus'
+    type: object
+  utils.ExpertStatus:
+    enum:
+    - Wait for payment status
+    - Pending for expert
+    - In progress
+    - Confirmed
+    type: string
+    x-enum-varnames:
+    - EXPERT_WAIT_FOR_PAYMENT_STATUS
+    - EXPERT_PENDING_STATUS
+    - EXPERT_IN_PROGRESS_STATUS
+    - EXPERT_CONFIRMED_STATUS
 host: localhost:8080
 info:
   contact:
@@ -11,5 +71,172 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Airplane-Divar
   version: "1.0"
-paths: {}
+paths:
+  /expert/ads/{adID}:
+    delete:
+      description: delete expert check request for expert or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: delete expert check request for expert or user
+      tags:
+      - expert
+    get:
+      description: retrieve expert check request for expert or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetExpertRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve expert check request for expert or user
+      tags:
+      - expert
+  /expert/ads/{adID}/check-request:
+    post:
+      consumes:
+      - application/json
+      description: Request to expert check
+      parameters:
+      - description: Ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request to expert check
+      tags:
+      - expert
+  /expert/check-request/{expertRequestID}:
+    put:
+      consumes:
+      - application/json
+      description: Update expert check request
+      parameters:
+      - description: expert request ID
+        in: path
+        name: expertRequestID
+        required: true
+        type: integer
+      - description: Expert check object
+        in: body
+        name: expertCheckRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateExpertCheckRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExpertRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update expert check request
+      tags:
+      - expert
+  /expert/check-requests:
+    get:
+      description: ListExpertRequest retrieves all expert requests for an expert
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: integer
+      - description: Ad ID
+        in: query
+        name: ads_id
+        type: integer
+      - description: From date
+        in: query
+        name: from_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ExpertRequestResponse'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: ListExpertRequest retrieves all expert requests for an expert
+      tags:
+      - expert
 swagger: "2.0"
