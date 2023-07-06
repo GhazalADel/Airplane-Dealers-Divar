@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS transactions (
     status VARCHAR(255),
     authority VARCHAR(255),
     created_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );

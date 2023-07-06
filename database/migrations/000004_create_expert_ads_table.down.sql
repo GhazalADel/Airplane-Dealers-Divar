@@ -1,1 +1,1 @@
-DROP TABLE expert_ads;
+DROP TABLE IF EXISTS expert_ads;
