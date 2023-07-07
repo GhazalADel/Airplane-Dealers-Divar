@@ -69,7 +69,21 @@ func (logDL *LoggingImplementation) ReportActivity(al models.ActivityLog) error 
 	return nil
 }
 
-func (logDL *LoggingImplementation) GetAdsActivity(ID int) ([]models.ActivityLog, error) {
-	// TODO
-	return nil, nil
+func (logDL *LoggingImplementation) GetAdsActivity(id int) ([]models.ActivityLog, error) {
+
+	var dbResult *gorm.DB
+	var activityResult []models.ActivityLog
+	// no need for payment, bookmark and buy logs
+	excludeLogID := []uint{9, 10, 11, 12, 13}
+
+	dbResult = logDL.db.
+		Where("SubjectType = ? AND SubjectID = ? AND LogID NOT IN ?", "Ads", id, excludeLogID).
+		Order("CreatedAt").
+		Find(&activityResult)
+
+	if dbResult.Error != nil {
+		return []models.ActivityLog{}, fmt.Errorf("database error: select activity log from database")
+	}
+
+	return activityResult, nil
 }
