@@ -3,6 +3,7 @@ package ads
 import (
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -199,6 +200,554 @@ func TestAdsHandler_ListFilterSort(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestAdHandler_AddAd(t *testing.T) {
+	e := echo.New()
+
+	t.Run("Invalid JSON", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte("invalid_Json")))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err := a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Invalid JSON", response.Message)
+	})
+
+	t.Run("JSON Without Price", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "XYZ123",
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Input Json doesn't include price", response.Message)
+	})
+
+	t.Run("JSON Without Category", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "XYZ123",
+			"price":        500000,
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Input Json doesn't include category", response.Message)
+	})
+
+	t.Run("non-string category", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "XYZ123",
+			"price":        500000,
+			"category":     54,
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Category should be string !", response.Message)
+	})
+
+	t.Run("invalid category name", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "XYZ123",
+			"price":        500000,
+			"category":     "Hello",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Invalid Category Name", response.Message)
+	})
+
+	t.Run("non-string model", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        24,
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Plane Model should be string !", response.Message)
+	})
+
+	t.Run("non-number price", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "something",
+			"price":        "548000",
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Price should be a number !", response.Message)
+	})
+
+	t.Run("non-integer price", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     1000,
+			"model":        "something",
+			"price":        54.5,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Price should be an integer !", response.Message)
+	})
+
+	t.Run("non-integer fly time", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78.5,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "fly_time should be an integer !", response.Message)
+	})
+
+	t.Run("non-boolean repair_check", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": "hello",
+			"expert_check": false,
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Repair Check should be boolean !", response.Message)
+	})
+
+	t.Run("non-boolean expert_check", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": false,
+			"expert_check": "bye",
+			"age":          7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Expert Check should be boolean !", response.Message)
+	})
+
+	t.Run("non-integer age", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          7.25,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Age should be an integer !", response.Message)
+	})
+	t.Run("invalid age", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "example1.jpg",
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          123,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "The year of the invention of the airplane was 1903 !", response.Message)
+	})
+
+	t.Run("non-string image", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        8745,
+			"description":  "This is example ad 1.",
+			"subject":      "Example Ad 1",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          23,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Image should be an url !", response.Message)
+	})
+
+	t.Run("non-string subject", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "image",
+			"description":  "This is example ad 1.",
+			"subject":      7852,
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          23,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "subject should be string !", response.Message)
+	})
+
+	t.Run("non-string description", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "image",
+			"description":  55,
+			"subject":      "Subject",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          23,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "description should be string !", response.Message)
+	})
+
 }
 
 var (
