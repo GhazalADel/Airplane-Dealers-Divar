@@ -24,10 +24,18 @@ func TestDatastore(t *testing.T) {
 	cleanup2 := createAds(t, db)
 	defer cleanup2()
 
+	cleanup3 := createCategories(t, db)
+	defer cleanup3()
+
+	cleanup4 := createAdminAd(t, db)
+	defer cleanup4()
+
 	a := New(db)
 	testAdStorer_Get(t, a)
 	testAdStorer_ListFilterByColumn(t, a)
 	testAdStorer_ListFilterSort(t, a)
+	testAdStorer_GetCategoryByName(t, a)
+	testAdStorer_CreateAdminAd(t, a)
 }
 
 func testAdStorer_Get(t *testing.T, db AdDatastorer) {
@@ -215,6 +223,72 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 	}
 }
 
+func testAdStorer_GetCategoryByName(t *testing.T, db AdDatastorer) {
+	testcases := []struct {
+		name string
+		res  models.Category
+	}{
+		{"small-passenger", models.Category{ID: 1, Name: "small-passenger"}},
+		{"big-passenger", models.Category{ID: 2, Name: "big-passenger"}},
+	}
+
+	for i, v := range testcases {
+		resp, _ := db.GetCategoryByName(v.name)
+
+		if !reflect.DeepEqual(resp, v.res) {
+			t.Errorf("[GetCategoryByName() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.res)
+		} else {
+			fmt.Println("[GetCategoryByName() TEST", i+1, "]Pass.")
+		}
+	}
+}
+
+func testAdStorer_CreateAdminAd(t *testing.T, db AdDatastorer) {
+	testcases := []struct {
+		ad  models.AdminAds
+		res models.AdminAds
+	}{
+		{models.AdminAds{
+			UserID:        1,
+			Image:         "",
+			Description:   "Description2",
+			Subject:       "Subject2",
+			Price:         100000,
+			CategoryID:    1,
+			FlyTime:       50,
+			AirplaneModel: "Good Model2",
+			RepairCheck:   true,
+			ExpertCheck:   false,
+			PlaneAge:      3,
+		},
+			models.AdminAds{
+				ID:            2,
+				UserID:        1,
+				Image:         "",
+				Description:   "Description2",
+				Subject:       "Subject2",
+				Price:         100000,
+				CategoryID:    1,
+				FlyTime:       50,
+				AirplaneModel: "Good Model2",
+				RepairCheck:   true,
+				ExpertCheck:   false,
+				PlaneAge:      3,
+			},
+		},
+	}
+
+	for i, v := range testcases {
+		resp, _ := db.CreateAdminAd(&v.ad)
+
+		if !reflect.DeepEqual(resp, v.res) {
+			t.Errorf("[CreateAdminAd() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.res)
+		} else {
+			fmt.Println("[CreateAdminAd() TEST", i+1, "]Pass.")
+		}
+	}
+}
+
 func createUser(t *testing.T, db *gorm.DB) func() {
 	user := models.User{
 		ID:       1,
@@ -289,5 +363,53 @@ func createAds(t *testing.T, db *gorm.DB) func() {
 
 	return func() {
 		db.Exec("DELETE FROM ads")
+	}
+}
+
+func createCategories(t *testing.T, db *gorm.DB) func() {
+	categories := []models.Category{
+		{
+			ID:   1,
+			Name: "small-passenger",
+		},
+		{
+			ID:   2,
+			Name: "big-passenger",
+		},
+	}
+
+	for _, cat := range categories {
+		if err := db.Create(&cat).Error; err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	return func() {
+		db.Exec("DELETE FROM categories")
+	}
+}
+
+func createAdminAd(t *testing.T, db *gorm.DB) func() {
+	ad := models.AdminAds{
+		ID:            1,
+		UserID:        1,
+		Image:         "",
+		Description:   "Description",
+		Subject:       "Subject",
+		Price:         50000,
+		CategoryID:    1,
+		FlyTime:       100,
+		AirplaneModel: "Good Model",
+		RepairCheck:   true,
+		ExpertCheck:   true,
+		PlaneAge:      5,
+	}
+
+	if err := db.Create(&ad).Error; err != nil {
+		t.Fatal(err)
+	}
+
+	return func() {
+		db.Exec("DELETE FROM admin_ads")
 	}
 }

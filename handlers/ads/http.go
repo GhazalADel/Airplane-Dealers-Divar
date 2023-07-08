@@ -33,7 +33,24 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	if jsonFormatErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
-	var ad models.Ad
+
+	//validate and initialize categoryID in ad object
+	category_name := ""
+	if cat, ok := jsonBody["category"].(string); ok {
+		category_name = cat
+	} else {
+		msg := "Category should be string !"
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: msg})
+	}
+
+	var categoryObj models.Category
+	db.Where("name = ?", category_name).First(&categoryObj)
+	if categoryObj.ID == 0 {
+		msg := "Undefined Category Name !"
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: msg})
+	}
+
+	var ad models.AdminAds
 	// TODO
 	//check ad properties validation
 	// adFormatValidationMsg, ad, adFormatErr := utils.ValidateAd(jsonBody, a.db)
