@@ -28,8 +28,6 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 
 	ad.CategoryID = cat.ID
 
-	//create admin ad object and check validation of its data types
-
 	if model, ok := jsonBody["model"].(string); ok {
 		ad.AirplaneModel = model
 	} else {
