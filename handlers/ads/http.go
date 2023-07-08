@@ -42,21 +42,18 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		msg := "Category should be string !"
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: msg})
 	}
-
-	var categoryObj models.Category
-	db.Where("name = ?", category_name).First(&categoryObj)
-	if categoryObj.ID == 0 {
-		msg := "Undefined Category Name !"
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: msg})
+	categoryObj, err := a.datastore.GetCategoryByName(category_name)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid Category Name"})
 	}
 
 	var ad models.AdminAds
-	// TODO
+
 	//check ad properties validation
-	// adFormatValidationMsg, ad, adFormatErr := utils.ValidateAd(jsonBody, a.db)
-	// if adFormatErr != nil {
-	// 	return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: adFormatValidationMsg})
-	// }
+	adFormatValidationMsg, ad, adFormatErr := utils.ValidateAd(jsonBody, categoryObj)
+	if adFormatErr != nil {
+		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: adFormatValidationMsg})
+	}
 
 	//set user id
 	// user := c.Get("user")
@@ -64,12 +61,12 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	// id := uint(user.(models.User).ID)
 	// ad.UserID = id
 
-	// TODO
-	// createdAd := a.datastore.Create(&ad)
-	// if createdAd.Error != nil {
-	// 	return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
-	// }
-	return c.JSON(http.StatusOK, ad)
+	//Create Admin Ad
+	createdAd, err := a.datastore.CreateAdminAd(&ad)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
+	}
+	return c.JSON(http.StatusOK, createdAd)
 }
 
 // Get retrieves an ad by ID.
