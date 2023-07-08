@@ -35,12 +35,12 @@ func TestAdsHandler_Get(t *testing.T) {
 		},
 		{
 			id:           "0",
-			response:     mockData,
+			response:     mockAdData,
 			expectedCode: http.StatusOK,
 		},
 		{
 			id:           "1",
-			response:     mockData[:1],
+			response:     mockAdData[:1],
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -87,22 +87,22 @@ func TestAdsHandler_ListFilter(t *testing.T) {
 	}{
 		{
 			query:        "plane_age=7",
-			response:     mockData[:1],
+			response:     mockAdData[:1],
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "category_id=1",
-			response:     mockData[1:],
+			response:     mockAdData[1:],
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "",
-			response:     mockData,
+			response:     mockAdData,
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "category_id=2&price=1000",
-			response:     mockData[1:],
+			response:     mockAdData[1:],
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -146,22 +146,22 @@ func TestAdsHandler_ListFilterSort(t *testing.T) {
 	}{
 		{
 			query:        "sort=price,desc",
-			response:     mockData[:1],
+			response:     mockAdData[:1],
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "sort=price,asc&sort=category_id,desc",
-			response:     mockData,
+			response:     mockAdData,
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "sort=price",
-			response:     mockData[1:],
+			response:     mockAdData[1:],
 			expectedCode: http.StatusOK,
 		},
 		{
 			query:        "",
-			response:     mockData,
+			response:     mockAdData,
 			expectedCode: http.StatusOK,
 		},
 		{
@@ -202,7 +202,47 @@ func TestAdsHandler_ListFilterSort(t *testing.T) {
 }
 
 var (
-	mockData = []models.Ad{
+	mockCategoryData = []models.Category{
+		{
+			ID:   1,
+			Name: "small-passenger",
+		},
+		{
+			ID:   2,
+			Name: "big-passenger",
+		},
+	}
+	mockAdminAdData = []models.AdminAds{
+		{
+			ID:            1,
+			UserID:        1,
+			Image:         "example1.jpg",
+			Description:   "This is example ad 1.",
+			Subject:       "Example Ad 1",
+			Price:         1000,
+			CategoryID:    2,
+			FlyTime:       1000,
+			AirplaneModel: "XYZ123",
+			RepairCheck:   true,
+			ExpertCheck:   false,
+			PlaneAge:      7,
+		},
+		{
+			ID:            2,
+			UserID:        1,
+			Image:         "example2.jpg",
+			Description:   "This is example ad 2.",
+			Subject:       "Example Ad 2",
+			Price:         2000,
+			CategoryID:    1,
+			FlyTime:       1000,
+			AirplaneModel: "ABC456",
+			RepairCheck:   true,
+			ExpertCheck:   true,
+			PlaneAge:      3,
+		},
+	}
+	mockAdData = []models.Ad{
 		{
 			ID:            1,
 			UserID:        1,
@@ -240,26 +280,26 @@ type mockDatastore struct{}
 
 func (m mockDatastore) Get(id int) ([]models.Ad, error) {
 	if id == 1 {
-		return mockData[:1], nil
+		return mockAdData[:1], nil
 	} else if id == 2 {
 		return nil, errors.New("db error")
 	}
 
-	return mockData, nil
+	return mockAdData, nil
 }
 
 func (m mockDatastore) ListFilterByColumn(f *filter.AdsFilter) ([]models.Ad, error) {
 	if f.PlaneAge == 7 {
-		return mockData[:1], nil
+		return mockAdData[:1], nil
 	}
 	if f.CategoryID == 1 {
-		return mockData[1:], nil
+		return mockAdData[1:], nil
 	}
 	if f.CategoryID == 2 && f.Price == 1000 {
-		return mockData[1:], nil
+		return mockAdData[1:], nil
 	}
 
-	return mockData, nil
+	return mockAdData, nil
 }
 
 func (m mockDatastore) ListFilterSort(f *filter.Filter) ([]models.Ad, error) {
@@ -270,19 +310,32 @@ func (m mockDatastore) ListFilterSort(f *filter.Filter) ([]models.Ad, error) {
 	order := strings.Join(orderClause, ",")
 
 	if order == "price DESC" {
-		return mockData[:1], nil
+		return mockAdData[:1], nil
 	}
 
 	if order == "price ASC" {
-		return mockData[1:], nil
+		return mockAdData[1:], nil
 	}
 
 	if order == "price ASC,category_id DESC" {
-		return mockData, nil
+		return mockAdData, nil
 	}
 	if order == "" {
-		return mockData, nil
+		return mockAdData, nil
 	}
 
 	return nil, fmt.Errorf("no such column: age")
+}
+
+func (m mockDatastore) GetCategoryByName(name string) (models.Category, error) {
+	if name == "small-passenger" {
+		return mockCategoryData[0], nil
+	} else if name == "big-passenger" {
+		return mockCategoryData[1], nil
+	}
+	return models.Category{}, errors.New("Database Error")
+}
+
+func (m mockDatastore) CreateAdminAd(*models.AdminAds) (models.AdminAds, error) {
+	return models.AdminAds{}, nil
 }
