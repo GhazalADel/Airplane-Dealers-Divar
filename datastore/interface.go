@@ -52,12 +52,11 @@ type (
 			ctx context.Context, repairRequestID int,
 			user models.User, body models.UpdateRepairRequest,
 		) (models.RepairRequest, error)
-		// Get(ctx context.Context, repairRequestID int) (models.RepairRequest, error)
-		// Delete(
-		// 	ctx context.Context,
-		// 	adID int,
-		// 	user models.User,
-		// ) error
+		Delete(
+			ctx context.Context,
+			adID int,
+			user models.User,
+		) error
 	}
 
 	User interface {

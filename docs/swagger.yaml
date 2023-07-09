@@ -273,6 +273,34 @@ paths:
       tags:
       - expert
   /repair/ads/{adID}:
+    delete:
+      description: delete repair request for user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: delete repair request for user
+      tags:
+      - repair
     get:
       description: retrieve repair check request for repair or user
       parameters:

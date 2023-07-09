@@ -193,3 +193,28 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+// @Summary delete repair request for user
+// @Description delete repair request for user
+// @Tags repair
+// @Param adID path int true "ad ID"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 204 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /repair/ads/{adID} [delete]
+func (e *RepairHandler) DeleteRepairRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+	user, _ := e.UserDatastore.Get(ctx, 2)
+	adID, _ := strconv.Atoi(c.Param("adID"))
+
+	err := e.RepairDatastore.Delete(ctx, adID, user)
+	if err != nil {
+		return c.JSON(
+			http.StatusNotFound, models.ErrorResponse{Error: "Repair request not found!"},
+		)
+	}
+
+	return c.JSON(http.StatusNoContent, models.SuccessResponse{Success: true})
+
+}

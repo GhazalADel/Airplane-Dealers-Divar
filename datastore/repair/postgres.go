@@ -135,3 +135,24 @@ func (e RepairStorer) Update(
 
 	return tmpRepairRequest, result.Error
 }
+
+func (e RepairStorer) Delete(
+	ctx context.Context,
+	adID int,
+	user models.User,
+) error {
+	result := e.db.WithContext(ctx).
+		Where(
+			"user_id = ? AND ads_id = ? AND status = ?",
+			user.ID, adID, utils.WAIT_FOR_PAYMENT_STATUS,
+		).
+		Delete(&models.RepairRequest{})
+	if result.Error != nil {
+		return result.Error
+	} else if result.RowsAffected == 0 {
+		return errors.New("repair request not found")
+	}
+
+	return nil
+
+}

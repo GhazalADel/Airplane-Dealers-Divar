@@ -245,16 +245,17 @@ func (e ExpertStorer) Delete(
 	adID int,
 	user models.User,
 ) error {
-	err := e.db.WithContext(ctx).
+	result := e.db.WithContext(ctx).
 		Where(
 			"user_id = ? AND ads_id = ? AND status = ?",
 			user.ID, adID, utils.WAIT_FOR_PAYMENT_STATUS,
 		).
-		Delete(&models.ExpertAds{}).Error
-	if err != nil {
-		return err
+		Delete(&models.ExpertAds{})
+	if result.Error != nil {
+		return result.Error
+	} else if result.RowsAffected == 0 {
+		return errors.New("expert request not found")
 	}
-
 	return nil
 
 }
