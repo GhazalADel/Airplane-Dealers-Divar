@@ -41,14 +41,14 @@ type (
 			adID int,
 			user models.User,
 		) (models.RepairRequest, error)
+		GetAllRepairRequests(
+			ctx context.Context,
+			filterAndCondition clause.AndConditions,
+			filterOrCondition []clause.OrConditions,
+			filterNotCondtion clause.NotConditions,
+			page int,
+		) ([]models.RepairRequest, error)
 		// Get(ctx context.Context, repairRequestID int) (models.RepairRequest, error)
-		// GetAllRepairRequests(
-		// 	ctx context.Context,
-		// 	filterAndCondition clause.AndConditions,
-		// 	filterOrCondition []clause.OrConditions,
-		// 	filterNotCondtion clause.NotConditions,
-		// 	page int,
-		// ) ([]models.RepairRequest, error)
 		// Update(
 		// 	ctx context.Context, repairRequestID int,
 		// 	user models.User, body models.UpdateRepairRequest,

@@ -370,6 +370,64 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/repair/check-requests": {
+            "get": {
+                "description": "ListRepairRequest retrieves all repair requests for an repair",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "ListRepairRequest retrieves all repair requests for an repair",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "ads_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RepairRequestResponse"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -443,6 +501,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userID": {
                     "type": "integer"
                 }
             }

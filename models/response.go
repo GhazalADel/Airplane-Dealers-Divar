@@ -41,3 +41,11 @@ type GetRepairRequestResponse struct {
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+
+type RepairRequestResponse struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"userID"`
+	AdID      int       `json:"adID"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"createdAt"`
+}

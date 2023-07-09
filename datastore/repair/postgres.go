@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type RepairStorer struct {
@@ -25,7 +26,7 @@ func (e RepairStorer) GetByAd(
 	var repairRequest models.RepairRequest
 	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.ads_id = ?", adID)
 
-	if user.Role == 4 { // is advertiser
+	if user.Role == 4 { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&repairRequest)
@@ -77,4 +78,30 @@ func (e RepairStorer) RequestToRepairCheck(
 	}
 
 	return nil
+}
+
+func (e RepairStorer) GetAllRepairRequests(
+	ctx context.Context,
+	filterAndCondition clause.AndConditions,
+	filterOrCondition []clause.OrConditions,
+	filterNotCondtion clause.NotConditions,
+	page int,
+) ([]models.RepairRequest, error) {
+	repairRequests := []models.RepairRequest{}
+
+	query := e.db.WithContext(ctx).Scopes(utils.Paginate(page))
+	if len(filterAndCondition.Exprs) > 0 {
+		query.Where(filterAndCondition)
+	}
+	if len(filterOrCondition) > 0 {
+		for _, filter := range filterOrCondition {
+			query.Where(filter)
+		}
+	}
+	if len(filterNotCondtion.Exprs) > 0 {
+		query.Where(filterNotCondtion)
+	}
+
+	result := query.Find(&repairRequests)
+	return repairRequests, result.Error
 }

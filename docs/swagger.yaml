@@ -48,6 +48,19 @@ definitions:
       userName:
         type: integer
     type: object
+  models.RepairRequestResponse:
+    properties:
+      adID:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userID:
+        type: integer
+    type: object
   models.SuccessResponse:
     properties:
       success:
@@ -314,6 +327,44 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Request to repair check
+      tags:
+      - repair
+  /repair/check-requests:
+    get:
+      description: ListRepairRequest retrieves all repair requests for an repair
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: integer
+      - description: Ad ID
+        in: query
+        name: ads_id
+        type: integer
+      - description: From date
+        in: query
+        name: from_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RepairRequestResponse'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: ListRepairRequest retrieves all repair requests for an repair
       tags:
       - repair
 swagger: "2.0"

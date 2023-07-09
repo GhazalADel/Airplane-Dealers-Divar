@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"Airplane-Divar/datastore"
+	"Airplane-Divar/datastore/repair"
 	"Airplane-Divar/models"
+	"Airplane-Divar/utils"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm/clause"
 )
 
 type RepairHandler struct {
@@ -81,4 +84,71 @@ func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp)
+}
+
+// @Summary ListRepairRequest retrieves all repair requests for an repair
+// @Description ListRepairRequest retrieves all repair requests for an repair
+// @Tags repair
+// @Param user_id query int false "User ID"
+// @Param ads_id query int false "Ad ID"
+// @Param from_date query string false "From date"
+// @Success 200 {array} models.RepairRequestResponse
+// @Failure 204 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /repair/check-requests [get]
+func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	user, _ := e.UserDatastore.Get(ctx, 2)
+
+	// params
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	fromDate := c.QueryParam("from_date")
+	userID, _ := strconv.Atoi(c.QueryParam("user_id"))
+	adsID, _ := strconv.Atoi(c.QueryParam("ads_id"))
+
+	var (
+		queryAndCondition  clause.AndConditions
+		queryOrConditions  []clause.OrConditions
+		filterAndCondition repair.FilterAndConditionRepairRequest
+		filterNotCondtion  repair.FilterNotConditionRepairRequest
+	)
+	filterAndCondition = repair.FilterAndConditionRepairRequest{
+		FromDate: fromDate,
+		AdsID:    adsID,
+		UserID:   userID,
+	}
+	if user.Role == 2 {
+		filterNotCondtion = repair.FilterNotConditionRepairRequest{
+			Status: utils.WAIT_FOR_PAYMENT_STATUS,
+		}
+	} else if user.Role == 4 {
+		filterAndCondition.UserID = int(user.ID)
+	}
+
+	queryAndCondition, _ = filterAndCondition.ToQueryModel()
+	queryNotCondition := filterNotCondtion.ToQueryModel()
+
+	repairRequests, err := e.RepairDatastore.GetAllRepairRequests(
+		ctx, queryAndCondition, queryOrConditions, queryNotCondition, page,
+	)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
+
+	}
+
+	var resp []models.RepairRequestResponse
+
+	for _, v := range repairRequests {
+		resp = append(resp, models.RepairRequestResponse{
+			ID:        int(v.ID),
+			UserID:    int(v.UserID),
+			AdID:      int(v.AdsID),
+			Status:    string(v.Status),
+			CreatedAt: v.CreatedAt,
+		})
+	}
+
+	return c.JSON(200, resp)
 }
