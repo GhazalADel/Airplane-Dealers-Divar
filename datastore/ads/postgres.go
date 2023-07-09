@@ -109,3 +109,23 @@ func checkUserRole(role string, builder *gorm.DB) (*gorm.DB, error) {
 	}
 	return builder, nil
 }
+
+func (a AdDatastorer) GetCategoryByName(name string) (models.Category, error) {
+	var categoryObj models.Category
+	a.db.Where("name = ?", name).First(&categoryObj)
+	if categoryObj.ID == 0 {
+		msg := "Undefined Category Name !"
+		return models.Category{}, fmt.Errorf(msg)
+	}
+	return categoryObj, nil
+}
+
+func (a AdDatastorer) CreateAdminAd(ad *models.AdminAds) (models.AdminAds, error) {
+	var ad_ad *models.AdminAds
+	ad_ad = ad
+	createdAd := a.db.Create(&ad_ad)
+	if createdAd.Error != nil {
+		return models.AdminAds{}, fmt.Errorf("Admin Ad Creation Failed")
+	}
+	return *ad_ad, nil
+}

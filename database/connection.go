@@ -26,7 +26,7 @@ func Connect() error {
 	}
 
 	dbConn = db
-	initializeDatabase()
+	//initializeDatabase()
 	return nil
 }
 
@@ -38,6 +38,19 @@ func GetConnection() (*gorm.DB, error) {
 		}
 	}
 	return dbConn, nil
+}
+
+func CloseDatabase(db *gorm.DB) error {
+	postDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	err = postDB.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func initializeDatabase() {
