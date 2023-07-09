@@ -1,0 +1,1 @@
+psql -h localhost -U postgres -p 5432 -d divar_airplane -a -f ./database/data.sql
