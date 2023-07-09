@@ -32,19 +32,20 @@ func TestDatastore(t *testing.T) {
 
 func testAdStorer_Get(t *testing.T, db AdDatastorer) {
 	testcases := []struct {
-		id   int
-		resp []models.Ad
+		id       int
+		userRole string
+		resp     []models.Ad
 	}{
-		{0, []models.Ad{
+		{0, "Airline", []models.Ad{
 			{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
 			{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
 			// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
 		}},
-		{1, []models.Ad{{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}}}},
+		{1, "Airline", []models.Ad{{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}}}},
 	}
 
 	for i, v := range testcases {
-		resp, _ := db.Get(v.id)
+		resp, _ := db.Get(v.id, v.userRole)
 
 		if !reflect.DeepEqual(resp, v.resp) {
 			t.Errorf("[Get() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.resp)
@@ -55,10 +56,6 @@ func testAdStorer_Get(t *testing.T, db AdDatastorer) {
 }
 
 func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
-	base := &filter.Filter{
-		Offset: -10,
-		Limit:  10,
-	}
 
 	testcases := []struct {
 		filter filter.AdsFilter
@@ -66,25 +63,37 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 	}{
 		{
 			filter.AdsFilter{
-				Base:     *base,
+				Base: filter.Filter{
+					Offset:   -10,
+					Limit:    10,
+					UserRole: "Admin",
+				},
 				PlaneAge: 7,
 			},
 			[]models.Ad{{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}}},
 		},
 		{
 			filter.AdsFilter{
-				Base:       *base,
+				Base: filter.Filter{
+					Offset:   -10,
+					Limit:    10,
+					UserRole: "Airline",
+				},
 				CategoryID: 1,
 			},
 			[]models.Ad{
 				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
 				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
 			},
 		},
 		{
 			filter.AdsFilter{
-				Base:       *base,
+				Base: filter.Filter{
+					Offset:   -10,
+					Limit:    10,
+					UserRole: "Airline",
+				},
 				CategoryID: 1,
 				Price:      1000,
 			},
@@ -96,28 +105,32 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 		},
 		{
 			filter.AdsFilter{
-				Base:       *base,
+				Base: filter.Filter{
+					Offset:   -10,
+					Limit:    10,
+					UserRole: "Matin",
+				},
 				CategoryID: 1,
-				// Price:      1000,
-				FlyTime: 1000,
+				FlyTime:    1000,
 			},
 			[]models.Ad{
 				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
 				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
 			},
 		},
 		{
 			filter.AdsFilter{
-				Base: *base,
-				// CategoryID: 1,
-				// Price:      1000,
-				// FlyTime: 1000,
+				Base: filter.Filter{
+					Offset:   -10,
+					Limit:    10,
+					UserRole: "Expert",
+				},
 			},
 			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
+				// {1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
 				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
 			},
 		},
 	}
@@ -140,8 +153,9 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 	}{
 		{
 			filter.Filter{
-				Offset: -10,
-				Limit:  10,
+				Offset:   -10,
+				Limit:    10,
+				UserRole: "Airline",
 				Sort: map[string]string{
 					"price": "ASC",
 				},
@@ -149,13 +163,14 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 			[]models.Ad{
 				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
 				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
 			},
 		},
 		{
 			filter.Filter{
-				Offset: -10,
-				Limit:  10,
+				Offset:   -10,
+				Limit:    10,
+				UserRole: "Admin",
 				Sort: map[string]string{
 					"price": "DESC",
 				},
@@ -175,11 +190,7 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 					"plane_age": "ASC",
 				},
 			},
-			[]models.Ad{
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
-				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-			},
+			nil,
 		},
 		{
 			filter.Filter{
@@ -197,11 +208,7 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 				Offset: -10,
 				Limit:  10,
 			},
-			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
-			},
+			nil,
 		},
 	}
 	for i, v := range testcases {
@@ -220,7 +227,7 @@ func createUser(t *testing.T, db *gorm.DB) func() {
 		ID:       1,
 		Username: "john_doe",
 		Password: "password123",
-		Role:     1,
+		Role:     "Airline",
 	}
 
 	if err := db.Create(&user).Error; err != nil {

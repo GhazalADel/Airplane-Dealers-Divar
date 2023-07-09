@@ -238,8 +238,8 @@ var (
 
 type mockDatastore struct{}
 
-func (m mockDatastore) Get(id int) ([]models.Ad, error) {
-	if id == 1 {
+func (m mockDatastore) Get(id int, userRole string) ([]models.Ad, error) {
+	if id == 1 && userRole == "Airline" {
 		return mockData[:1], nil
 	} else if id == 2 {
 		return nil, errors.New("db error")
