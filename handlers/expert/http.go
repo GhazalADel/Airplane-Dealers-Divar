@@ -5,6 +5,7 @@ import (
 	"Airplane-Divar/datastore/expert"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -69,7 +70,7 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user, _ := e.UserDatastore.Get(ctx, 1)
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -82,13 +83,17 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 		queryOrConditions  []clause.OrConditions
 		filterAndCondition expert.FilterAndConditionExpertRequest
 		filterNotCondtion  expert.FilterNotConditionExpertRequest
+		filterOrCondition  expert.FilterOrConditionExpertRequest
 	)
 	filterAndCondition = expert.FilterAndConditionExpertRequest{
 		FromDate: fromDate,
 		AdsID:    adsID,
+		UserID:   userID,
 	}
 	if user.Role == 2 {
-		filterAndCondition.UserID = userID
+		filterOrCondition = expert.FilterOrConditionExpertRequest{
+			ExpertIDList: []interface{}{user.ID, nil},
+		}
 
 		filterNotCondtion = expert.FilterNotConditionExpertRequest{
 			Status: utils.EXPERT_WAIT_FOR_PAYMENT_STATUS,
@@ -99,6 +104,7 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 
 	queryAndCondition, _ = filterAndCondition.ToQueryModel()
 	queryNotCondition := filterNotCondtion.ToQueryModel()
+	queryOrConditions = append(queryOrConditions, filterOrCondition.ToQueryModel())
 
 	expertAds, err := e.ExpertDatastore.GetAllExpertRequests(
 		ctx, queryAndCondition, queryOrConditions, queryNotCondition, page,
@@ -138,7 +144,7 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 // @Router /expert/check-request/{expertRequestID} [put]
 func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user, _ := e.UserDatastore.Get(ctx, 1)
 
 	expertRequestID, _ := strconv.Atoi(c.Param("expertRequestID"))
 
@@ -149,7 +155,11 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 
 	expertAd, err := e.ExpertDatastore.Update(ctx, expertRequestID, user, updatedExpertCheck)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
+	} else if expertAd.ID == 0 {
+		return c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error: "expert check request does not exist!",
+		})
 	}
 
 	resp := models.ExpertRequestResponse{

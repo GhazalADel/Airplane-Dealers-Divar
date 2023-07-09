@@ -29,7 +29,7 @@ func (e ExpertStorer) GetByAd(
 
 	if user.Role == 2 { // is_expert
 		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
-	} else if user.Role == 4 { // is advertiser
+	} else if user.Role == 4 { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&expertAd)
@@ -234,7 +234,10 @@ func (e ExpertStorer) Update(
 	result := e.db.WithContext(ctx).
 		Clauses(clause.Returning{}).
 		Model(&tmpExpertAd).
-		Where("id = ?", expertAdID).
+		Where(
+			"id = ? AND (expert_id = ? OR expert_id IS NULL)",
+			expertAdID, user.ID,
+		).
 		Updates(updatedMap)
 
 	return tmpExpertAd, result.Error
