@@ -45,20 +45,22 @@ definitions:
       report:
         type: string
       status:
-        $ref: '#/definitions/utils.ExpertStatus'
+        $ref: '#/definitions/utils.Status'
     type: object
-  utils.ExpertStatus:
+  utils.Status:
     enum:
     - Wait for payment status
     - Pending for expert
+    - Pending for matin
     - In progress
-    - Confirmed
+    - Done
     type: string
     x-enum-varnames:
-    - EXPERT_WAIT_FOR_PAYMENT_STATUS
+    - WAIT_FOR_PAYMENT_STATUS
     - EXPERT_PENDING_STATUS
-    - EXPERT_IN_PROGRESS_STATUS
-    - EXPERT_CONFIRMED_STATUS
+    - MATIN_PENDING_STATUS
+    - IN_PROGRESS_STATUS
+    - DONE_STATUS
 host: localhost:8080
 info:
   contact:
@@ -239,4 +241,37 @@ paths:
       summary: ListExpertRequest retrieves all expert requests for an expert
       tags:
       - expert
+  /repair/ads/{adID}/check-request:
+    post:
+      consumes:
+      - application/json
+      description: Request to repair check
+      parameters:
+      - description: Ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request to repair check
+      tags:
+      - repair
 swagger: "2.0"

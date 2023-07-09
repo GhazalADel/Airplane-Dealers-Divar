@@ -91,7 +91,7 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 		filterAndCondition.UserID = userID
 
 		filterNotCondtion = expert.FilterNotConditionExpertRequest{
-			Status: utils.EXPERT_WAIT_FOR_PAYMENT_STATUS,
+			Status: utils.WAIT_FOR_PAYMENT_STATUS,
 		}
 	} else if user.Role == 4 {
 		filterAndCondition.UserID = int(user.ID)

@@ -84,7 +84,7 @@ func (e ExpertStorer) RequestToExpertCheck(
 		Create(map[string]interface{}{
 			"AdsID":  ad.ID,
 			"UserID": user.ID,
-			"Status": utils.EXPERT_WAIT_FOR_PAYMENT_STATUS,
+			"Status": utils.WAIT_FOR_PAYMENT_STATUS,
 		}).Error; err != nil {
 		return err
 	}
@@ -119,7 +119,7 @@ func (e ExpertStorer) GetAllExpertRequests(
 }
 
 type FilterAndConditionExpertRequest struct {
-	Status   utils.ExpertStatus
+	Status   utils.Status
 	FromDate string
 	ExpertID int
 	UserID   int
@@ -167,7 +167,7 @@ func (q FilterAndConditionExpertRequest) ToQueryModel() (clause.AndConditions, e
 
 type FilterOrConditionExpertRequest struct {
 	ExpertIDList []interface{}
-	StatusList   []utils.ExpertStatus
+	StatusList   []utils.Status
 }
 
 func (q FilterOrConditionExpertRequest) ToQueryModel() clause.OrConditions {
@@ -195,7 +195,7 @@ func (q FilterOrConditionExpertRequest) ToQueryModel() clause.OrConditions {
 }
 
 type FilterNotConditionExpertRequest struct {
-	Status utils.ExpertStatus
+	Status utils.Status
 }
 
 func (q FilterNotConditionExpertRequest) ToQueryModel() clause.NotConditions {
@@ -220,7 +220,7 @@ func (e ExpertStorer) Update(
 		updatedMap["status"] = body.Status
 		if body.Status == utils.EXPERT_PENDING_STATUS {
 			updatedMap["expert_id"] = nil
-		} else if body.Status == utils.EXPERT_WAIT_FOR_PAYMENT_STATUS {
+		} else if body.Status == utils.WAIT_FOR_PAYMENT_STATUS {
 			return tmpExpertAd, errors.New("not allowed")
 		} else {
 			updatedMap["expert_id"] = user.ID
@@ -228,7 +228,7 @@ func (e ExpertStorer) Update(
 	}
 	if body.Report != "" {
 		updatedMap["report"] = body.Report
-		updatedMap["status"] = utils.EXPERT_CONFIRMED_STATUS
+		updatedMap["status"] = utils.DONE_STATUS
 	}
 
 	result := e.db.WithContext(ctx).
@@ -248,7 +248,7 @@ func (e ExpertStorer) Delete(
 	err := e.db.WithContext(ctx).
 		Where(
 			"user_id = ? AND ads_id = ? AND status = ?",
-			user.ID, adID, utils.EXPERT_WAIT_FOR_PAYMENT_STATUS,
+			user.ID, adID, utils.WAIT_FOR_PAYMENT_STATUS,
 		).
 		Delete(&models.ExpertAds{}).Error
 	if err != nil {

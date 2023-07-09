@@ -269,6 +269,56 @@
                     }
                 }
             }
+        },
+        "/repair/ads/{adID}/check-request": {
+            "post": {
+                "description": "Request to repair check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Request to repair check",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -341,23 +391,25 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/utils.ExpertStatus"
+                    "$ref": "#/definitions/utils.Status"
                 }
             }
         },
-        "utils.ExpertStatus": {
+        "utils.Status": {
             "type": "string",
             "enum": [
                 "Wait for payment status",
                 "Pending for expert",
+                "Pending for matin",
                 "In progress",
-                "Confirmed"
+                "Done"
             ],
             "x-enum-varnames": [
-                "EXPERT_WAIT_FOR_PAYMENT_STATUS",
+                "WAIT_FOR_PAYMENT_STATUS",
                 "EXPERT_PENDING_STATUS",
-                "EXPERT_IN_PROGRESS_STATUS",
-                "EXPERT_CONFIRMED_STATUS"
+                "MATIN_PENDING_STATUS",
+                "IN_PROGRESS_STATUS",
+                "DONE_STATUS"
             ]
         }
     }

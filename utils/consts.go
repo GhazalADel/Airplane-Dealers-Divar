@@ -4,21 +4,22 @@ import (
 	"database/sql/driver"
 )
 
-type ExpertStatus string
+type Status string
 
 const (
-	EXPERT_WAIT_FOR_PAYMENT_STATUS ExpertStatus = "Wait for payment status"
-	EXPERT_PENDING_STATUS          ExpertStatus = "Pending for expert"
-	EXPERT_IN_PROGRESS_STATUS      ExpertStatus = "In progress"
-	EXPERT_CONFIRMED_STATUS        ExpertStatus = "Confirmed"
+	WAIT_FOR_PAYMENT_STATUS Status = "Wait for payment status"
+	EXPERT_PENDING_STATUS   Status = "Pending for expert"
+	MATIN_PENDING_STATUS    Status = "Pending for matin"
+	IN_PROGRESS_STATUS      Status = "In progress"
+	DONE_STATUS             Status = "Done"
 )
 
-func (ct *ExpertStatus) Scan(value interface{}) error {
-	*ct = ExpertStatus(value.(string))
+func (ct *Status) Scan(value interface{}) error {
+	*ct = Status(value.(string))
 	return nil
 }
 
-func (ct ExpertStatus) Value() (driver.Value, error) {
+func (ct Status) Value() (driver.Value, error) {
 	return string(ct), nil
 }
 

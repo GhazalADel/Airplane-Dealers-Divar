@@ -50,7 +50,7 @@ INSERT INTO public.ads (id, user_id, image, description, subject, price, categor
 -- Data for Name: expert_ads; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (1, 2, 3, 1, 'Evrything is ok!', 'Confirmed', '2023-07-09 10:04:59.386335');
+INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (1, 2, 3, 1, 'Evrything is ok!', 'Done', '2023-07-09 10:04:59.386335');
 INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (2, 2, 1, 2, NULL, 'In progress', '2023-07-09 10:34:21.826941');
 
 
