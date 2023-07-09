@@ -105,3 +105,33 @@ func (e RepairStorer) GetAllRepairRequests(
 	result := query.Find(&repairRequests)
 	return repairRequests, result.Error
 }
+
+func (e RepairStorer) Update(
+	ctx context.Context, repairRequestID int,
+	user models.User, body models.UpdateRepairRequest,
+) (models.RepairRequest, error) {
+	tmpRepairRequest := models.RepairRequest{}
+	updatedMap := make(map[string]interface{})
+
+	if user.Role != 1 {
+		return tmpRepairRequest, errors.New("not allowed")
+	}
+
+	if body.Status != "" {
+		updatedMap["status"] = body.Status
+		if body.Status == utils.WAIT_FOR_PAYMENT_STATUS {
+			return tmpRepairRequest, errors.New("not allowed")
+		}
+	}
+
+	result := e.db.WithContext(ctx).
+		Clauses(clause.Returning{}).
+		Model(&tmpRepairRequest).
+		Where(
+			"id = ?",
+			repairRequestID,
+		).
+		Updates(updatedMap)
+
+	return tmpRepairRequest, result.Error
+}

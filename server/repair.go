@@ -17,6 +17,6 @@ func repairRoutes(e *echo.Echo, db *gorm.DB) {
 	e.POST("/repair/ads/:adID/check-request", repairHandler.RequestToRepairCheck)
 	e.GET("/repair/ads/:adID", repairHandler.GetRepairRequest)
 	e.GET("/repair/check-requests", repairHandler.GetAllRepairRequest)
-	// e.PUT("/expert/check-request/:expertRequestID", repairHandler.UpdateCheckExpert)
+	e.PUT("/repair/check-request/:repairRequestID", repairHandler.UpdateRepairRequest)
 	// e.DELETE("/expert/ads/:adID", repairHandler.DeleteExpertRequest)
 }

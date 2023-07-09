@@ -73,6 +73,11 @@ definitions:
       status:
         $ref: '#/definitions/utils.Status'
     type: object
+  models.UpdateRepairRequest:
+    properties:
+      status:
+        $ref: '#/definitions/utils.Status'
+    type: object
   utils.Status:
     enum:
     - Wait for payment status
@@ -327,6 +332,45 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Request to repair check
+      tags:
+      - repair
+  /repair/check-request/{repairRequestID}:
+    put:
+      consumes:
+      - application/json
+      description: Update repair request
+      parameters:
+      - description: repair request ID
+        in: path
+        name: repairRequestID
+        required: true
+        type: integer
+      - description: repair object
+        in: body
+        name: repairCheckRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRepairRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update repair request
       tags:
       - repair
   /repair/check-requests:

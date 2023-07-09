@@ -48,11 +48,11 @@ type (
 			filterNotCondtion clause.NotConditions,
 			page int,
 		) ([]models.RepairRequest, error)
+		Update(
+			ctx context.Context, repairRequestID int,
+			user models.User, body models.UpdateRepairRequest,
+		) (models.RepairRequest, error)
 		// Get(ctx context.Context, repairRequestID int) (models.RepairRequest, error)
-		// Update(
-		// 	ctx context.Context, repairRequestID int,
-		// 	user models.User, body models.UpdateRepairRequest,
-		// ) (models.RepairRequest, error)
 		// Delete(
 		// 	ctx context.Context,
 		// 	adID int,

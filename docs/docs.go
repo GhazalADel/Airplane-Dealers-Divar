@@ -371,6 +371,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/repair/check-request/{repairRequestID}": {
+            "put": {
+                "description": "Update repair request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Update repair request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "repair request ID",
+                        "name": "repairRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "repair object",
+                        "name": "repairCheckRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateRepairRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/repair/check-requests": {
             "get": {
                 "description": "ListRepairRequest retrieves all repair requests for an repair",
@@ -539,6 +598,14 @@ const docTemplate = `{
                 "report": {
                     "type": "string"
                 },
+                "status": {
+                    "$ref": "#/definitions/utils.Status"
+                }
+            }
+        },
+        "models.UpdateRepairRequest": {
+            "type": "object",
+            "properties": {
                 "status": {
                     "$ref": "#/definitions/utils.Status"
                 }

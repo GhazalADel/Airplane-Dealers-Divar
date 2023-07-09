@@ -6,3 +6,7 @@ type UpdateExpertCheckRequest struct {
 	Status utils.Status `json:"status"`
 	Report string       `json:"report"`
 }
+
+type UpdateRepairRequest struct {
+	Status utils.Status `json:"status"`
+}

@@ -100,7 +100,7 @@ func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user, _ := e.UserDatastore.Get(ctx, 4)
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -119,7 +119,7 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 		AdsID:    adsID,
 		UserID:   userID,
 	}
-	if user.Role == 2 {
+	if user.Role == 1 {
 		filterNotCondtion = repair.FilterNotConditionRepairRequest{
 			Status: utils.WAIT_FOR_PAYMENT_STATUS,
 		}
@@ -151,4 +151,45 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 	}
 
 	return c.JSON(200, resp)
+}
+
+// @Summary Update repair request
+// @Description Update repair request
+// @Tags repair
+// @Accept json
+// @Produce json
+// @Param repairRequestID path int true "repair request ID"
+// @Param repairCheckRequest body models.UpdateRepairRequest true "repair object"
+// @Success 200 {object} models.RepairRequestResponse
+// @Failure 204 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /repair/check-request/{repairRequestID} [put]
+func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+	user, _ := e.UserDatastore.Get(ctx, 4)
+
+	repairRequestID, _ := strconv.Atoi(c.Param("repairRequestID"))
+
+	var updatedRepairRequest models.UpdateRepairRequest
+	if err := c.Bind(&updatedRepairRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	repairRequest, err := e.RepairDatastore.Update(
+		ctx, repairRequestID, user, updatedRepairRequest,
+	)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	resp := models.RepairRequestResponse{
+		ID:        int(repairRequest.ID),
+		UserID:    int(repairRequest.UserID),
+		AdID:      int(repairRequest.AdsID),
+		Status:    string(repairRequest.Status),
+		CreatedAt: repairRequest.CreatedAt,
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
