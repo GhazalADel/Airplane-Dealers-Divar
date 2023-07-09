@@ -1,9 +1,8 @@
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
-    phone VARCHAR(255) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    national_id VARCHAR(255) NOT NULL UNIQUE,
-    PRIMARY KEY (id)
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(255) NOT NULL,
+    token VARCHAR(1020),
+    is_active boolean,
 );

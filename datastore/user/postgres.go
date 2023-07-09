@@ -3,7 +3,11 @@ package user
 import (
 	"Airplane-Divar/models"
 	"errors"
+	"os"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -15,41 +19,108 @@ func New(db *gorm.DB) UserStore {
 	return UserStore{db: db}
 }
 
-func (u UserStore) Get(id int) ([]models.User, error) {
+func (a UserStore) Get(id int) ([]models.User, error) {
 	return []models.User{}, nil
 }
 
-func (u UserStore) Create(user models.User) (models.User, error) {
-	res := u.db.Create(&user)
-	if res.Error != nil {
-		return models.User{}, res.Error
+// this function used to create an account and insert it into database
+func (a UserStore) Create(username string, password string) (string, models.User, error) {
+	msg := "OK"
+	// Instantiating Account Object
+	var user models.User
+	user.Username = username
+	user.Token = ""
+
+	//hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		msg = "Failed to Hashing Password"
+		return msg, models.User{}, errors.New("")
+	}
+	user.Password = string(hash)
+
+	//insert account into database
+	createdUser := a.db.Create(&user)
+	if createdUser.Error != nil {
+		msg = "Failed to Create Account"
+		return msg, models.User{}, errors.New("")
 	}
 
-	return user, nil
+	//generate token
+	var token *jwt.Token
+	token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    user.ID,
+		"exp":   time.Now().Add(time.Hour).Unix(),
+		"admin": false,
+	})
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		msg = "Failed To Create Token"
+		return msg, models.User{}, errors.New("")
+	}
+	user.Token = tokenString
+
+	//update account
+	a.db.Save(&user)
+
+	return msg, user, nil
+
 }
 
-func (u UserStore) CheckUnique(user models.User) (string, error) {
-	msg := "Ok"
-	// Is Input Phone Number Unique or Not
+func (a UserStore) CheckUnique(username string) (string, error) {
+	msg := "OK"
+	// Is Input Username Unique or Not
 	var existingUser models.User
-	u.db.Where("phone = ?", user.Phone).First(&existingUser)
+	a.db.Where("username = ?", username).First(&existingUser)
 	if existingUser.ID != 0 {
-		msg = "Inupt Phone Number has already been registered"
-		return msg, errors.New("")
-	}
-
-	// Is Input Email Address Unique or Not
-	u.db.Where("email = ?", user.Email).First(&existingUser)
-	if existingUser.ID != 0 {
-		msg = "Inupt Email Address has already been registered"
-		return msg, errors.New("")
-	}
-
-	// Is Input National ID Unique or Not
-	u.db.Where("national_id = ?", user.NationalID).First(&existingUser)
-	if existingUser.ID != 0 {
-		msg = "Inupt National ID has already been registered"
+		msg = "Inupt Username has already been registered"
 		return msg, errors.New("")
 	}
 	return msg, nil
+}
+
+func (a UserStore) Login(username, password string) (string, models.User, error) {
+	msg := "OK"
+	// Find account based on input username
+	var user models.User
+
+	a.db.Where("username = ?", username).First(&user)
+
+	// Account Not Found
+	if user.ID == 0 {
+		msg = "Invalid Username"
+		return msg, models.User{}, errors.New("")
+	}
+
+	// Incorrect Password
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		msg = "Wrong Password"
+		return msg, models.User{}, errors.New("")
+	}
+
+	//Account isn't active
+	if !user.IsActive {
+		msg = "Your Account Isn't Active"
+		return msg, models.User{}, errors.New("")
+	}
+
+	var token *jwt.Token
+
+	token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    user.ID,
+		"exp":   time.Now().Add(time.Hour).Unix(),
+		"admin": false,
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	if err != nil {
+		msg = "Failed To Create Token"
+		return msg, models.User{}, errors.New("")
+	}
+
+	// Update Account's Token In Database
+	user.Token = tokenString
+	a.db.Save(&user)
+	return msg, user, nil
 }

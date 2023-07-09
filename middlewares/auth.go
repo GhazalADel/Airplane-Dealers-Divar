@@ -45,21 +45,21 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 				return echo.ErrInternalServerError
 			}
 
-			//Find Account
-			var account models.Account
-			db.First(&account, claims["id"])
+			//Find User
+			var user models.User
+			db.First(&user, claims["id"])
 
-			//Token And Id are not For Same Accounts
-			if account.ID == 0 {
+			//Token And Id are not For Same User
+			if user.ID == 0 {
 				return echo.ErrUnauthorized
 			}
 			//account is deactive
-			if account.Token == "" && !account.IsActive {
+			if user.Token == "" && !user.IsActive {
 				return echo.ErrUnauthorized
 			}
 
 			//Add Account Object To Context
-			c.Set("account", account)
+			c.Set("account", user)
 			return next(c)
 
 		} else {

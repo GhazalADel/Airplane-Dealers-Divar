@@ -88,12 +88,6 @@ func NewPaymentHandler(datastore datastore.Payment) *PaymentHandler {
 // @Failure 500 {object} ErrorResponse
 // @Router /accounts/payment/request [post]
 func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
-	// Connect To The Datebase
-	db, err := database.GetConnection()
-	if err != nil {
-		return c.JSON(http.StatusBadGateway, models.Response{ResponseCode: 502, Message: "Can't Connect To Database"})
-	}
-
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
 	err = json.NewDecoder(c.Request().Body).Decode(&jsonBody)
@@ -107,14 +101,7 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
-	account := c.Get("account").(models.Account)
-	userID := account.UserID
-
-	var user models.User
-	if err := db.First(&user, userID).Error; err != nil {
-		// Handle the error (e.g., user not found)
-		return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "User Not Founded"})
-	}
+	user := c.Get("account").(models.User)
 
 	data := map[string]interface{}{
 		"merchant_id":  merchantID,
@@ -122,8 +109,8 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 		"callback_url": callbackURL,
 		"description":  "Add budget to account",
 		"metadata": map[string]string{
-			"mobile": user.Phone,
-			"email":  user.Email,
+			"mobile": "09121234567",
+			"email":  "test@test.com",
 		},
 	}
 

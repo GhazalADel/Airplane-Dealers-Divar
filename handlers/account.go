@@ -45,13 +45,12 @@ type SenderNumbersResponse struct {
 	Numbers []string `json:"numbers"`
 }
 
-type AccountHandler struct {
-	data_user    datastore.User
-	data_account datastore.Account
+type UserHandler struct {
+	data_user datastore.User
 }
 
-func NewAccountHandler(user datastore.User, account datastore.Account) *AccountHandler {
-	return &AccountHandler{data_user: user, data_account: account}
+func NewUserHandler(user datastore.User) *UserHandler {
+	return &UserHandler{data_user: user}
 }
 
 // @Summary Register a new user
@@ -65,7 +64,7 @@ func NewAccountHandler(user datastore.User, account datastore.Account) *AccountH
 // @Failure 422 {object} ErrorResponseRegisterLogin
 // @Failure 500 {object} ErrorResponseRegisterLogin
 // @Router /accounts/register [post]
-func (a AccountHandler) RegisterHandler(c echo.Context) error {
+func (a UserHandler) RegisterHandler(c echo.Context) error {
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
@@ -74,37 +73,19 @@ func (a AccountHandler) RegisterHandler(c echo.Context) error {
 	}
 
 	//check json format
-	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password", "email", "phone", "nationalid", "username", "password")
+	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password")
 	if jsonFormatErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
-	//check user validation
-	userFormatValidationMsg, user, userFormatErr := utils.ValidateUser(jsonBody)
-	if userFormatErr != nil {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userFormatValidationMsg})
-	}
-
-	//check unique User
-	userUniqueMsg, userUniqueErr := a.data_user.CheckUnique(user)
-	if userUniqueErr != nil {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userUniqueMsg})
-	}
-
 	//check unique Account
-	accountUniqueMsg, accountUniqueErr := a.data_account.CheckUnique(jsonBody["username"].(string))
+	accountUniqueMsg, accountUniqueErr := a.data_user.CheckUnique(jsonBody["username"].(string))
 	if accountUniqueErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: accountUniqueMsg})
 	}
 
-	// Insert User Object Into Database
-	_, err = a.data_user.Create(user)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "User Cration Failed"})
-	}
-
 	//create account
-	accountCreationMsg, account, accountCreationErr := a.data_account.Create(int(user.ID), jsonBody["username"].(string), false, jsonBody["password"].(string))
+	accountCreationMsg, account, accountCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string))
 	if accountCreationErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: accountCreationMsg})
 	}
@@ -123,7 +104,7 @@ func (a AccountHandler) RegisterHandler(c echo.Context) error {
 // @Failure 400 {object} ErrorResponseRegisterLogin
 // @Failure 422 {object} ErrorResponseRegisterLogin
 // @Router  /accounts/login [post]
-func (a AccountHandler) LoginHandler(c echo.Context) error {
+func (a UserHandler) LoginHandler(c echo.Context) error {
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
 	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
@@ -138,7 +119,7 @@ func (a AccountHandler) LoginHandler(c echo.Context) error {
 	}
 
 	//find account based on username and check password correction
-	findAccountMsg, account, findAccountErr := a.data_account.Login(jsonBody["username"].(string), jsonBody["password"].(string), false)
+	findAccountMsg, account, findAccountErr := a.data_user.Login(jsonBody["username"].(string), jsonBody["password"].(string))
 	if findAccountErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: findAccountMsg})
 	}
