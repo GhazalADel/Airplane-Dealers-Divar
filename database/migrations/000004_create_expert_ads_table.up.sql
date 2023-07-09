@@ -1,7 +1,8 @@
 CREATE TYPE expert_status_type AS ENUM (
     'Wait for payment status',
     'Pending for expert',
-    "Confirmed"
+    'In progress',
+    'Confirmed'
 );
 
 CREATE TABLE IF NOT EXISTS expert_ads (
