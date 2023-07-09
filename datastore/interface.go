@@ -36,6 +36,12 @@ type (
 
 	Repair interface {
 		RequestToRepairCheck(ctx context.Context, adID int, userID int) error
+		GetByAd(
+			ctx context.Context,
+			adID int,
+			user models.User,
+		) (models.RepairRequest, error)
+		// Get(ctx context.Context, repairRequestID int) (models.RepairRequest, error)
 		// GetAllRepairRequests(
 		// 	ctx context.Context,
 		// 	filterAndCondition clause.AndConditions,
@@ -43,12 +49,6 @@ type (
 		// 	filterNotCondtion clause.NotConditions,
 		// 	page int,
 		// ) ([]models.RepairRequest, error)
-		// Get(ctx context.Context, repairRequestID int) (models.RepairRequest, error)
-		// GetByAd(
-		// 	ctx context.Context,
-		// 	adID int,
-		// 	user models.User,
-		// ) (models.RepairRequest, error)
 		// Update(
 		// 	ctx context.Context, repairRequestID int,
 		// 	user models.User, body models.UpdateRepairRequest,

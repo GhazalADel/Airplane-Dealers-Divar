@@ -17,6 +17,22 @@ func NewRepairStorer(db *gorm.DB) RepairStorer {
 	return RepairStorer{db: db}
 }
 
+func (e RepairStorer) GetByAd(
+	ctx context.Context,
+	adID int,
+	user models.User,
+) (models.RepairRequest, error) {
+	var repairRequest models.RepairRequest
+	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.ads_id = ?", adID)
+
+	if user.Role == 4 { // is advertiser
+		query.Where(&models.Ad{UserID: user.ID})
+	}
+	result := query.First(&repairRequest)
+
+	return repairRequest, result.Error
+}
+
 func (e RepairStorer) RequestToRepairCheck(
 	ctx context.Context, adID int, userID int,
 ) error {

@@ -277,6 +277,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/repair/ads/{adID}": {
+            "get": {
+                "description": "retrieve repair check request for repair or user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "retrieve repair check request for repair or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetRepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/repair/ads/{adID}/check-request": {
             "post": {
                 "description": "Request to repair check",
@@ -371,6 +415,26 @@ const docTemplate = `{
                 },
                 "expertID": {
                     "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.GetRepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adSubject": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"

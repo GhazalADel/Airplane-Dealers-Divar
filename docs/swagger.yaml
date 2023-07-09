@@ -35,6 +35,19 @@ definitions:
       userName:
         type: integer
     type: object
+  models.GetRepairRequestResponse:
+    properties:
+      adSubject:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userName:
+        type: integer
+    type: object
   models.SuccessResponse:
     properties:
       success:
@@ -241,6 +254,35 @@ paths:
       summary: ListExpertRequest retrieves all expert requests for an expert
       tags:
       - expert
+  /repair/ads/{adID}:
+    get:
+      description: retrieve repair check request for repair or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetRepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve repair check request for repair or user
+      tags:
+      - repair
   /repair/ads/{adID}/check-request:
     post:
       consumes:

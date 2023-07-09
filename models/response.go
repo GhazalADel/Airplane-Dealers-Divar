@@ -33,3 +33,11 @@ type ExpertRequestResponse struct {
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+
+type GetRepairRequestResponse struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"userName"`
+	AdSubject string    `json:"adSubject"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"createdAt"`
+}
