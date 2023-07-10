@@ -8,15 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type LoggingImplementation struct {
+type LoggingStore struct {
 	db *gorm.DB
 }
 
-func NewLoggingDataLayer(db *gorm.DB) datastore.LoggingDataLayer {
-	return &LoggingImplementation{db: db}
+func New(db *gorm.DB) datastore.Logging {
+	return &LoggingStore{db: db}
 }
 
-func (logDL *LoggingImplementation) AddNewLogName(id uint, title string) error {
+func (logDL *LoggingStore) AddNewLogName(id uint, title string) error {
 	var logname models.LogName
 	var result *gorm.DB
 
@@ -39,7 +39,7 @@ func (logDL *LoggingImplementation) AddNewLogName(id uint, title string) error {
 	return nil
 }
 
-func (logDL *LoggingImplementation) ReportActivity(al models.ActivityLog) error {
+func (logDL *LoggingStore) ReportActivity(al models.ActivityLog) error {
 	var result *gorm.DB
 	var logname models.LogName
 	actvtlog := models.ActivityLog{
@@ -69,7 +69,7 @@ func (logDL *LoggingImplementation) ReportActivity(al models.ActivityLog) error 
 	return nil
 }
 
-func (logDL *LoggingImplementation) GetAdsActivity(id int) ([]models.ActivityLog, error) {
+func (logDL *LoggingStore) GetAdsActivity(id int) ([]models.ActivityLog, error) {
 
 	var dbResult *gorm.DB
 	var activityResult []models.ActivityLog

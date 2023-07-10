@@ -13,7 +13,7 @@ type Payment interface {
 	Create(userID uint, fee int64, authority string) (string, error)
 }
 
-type LoggingDataLayer interface {
+type Logging interface {
 	AddNewLogName(id uint, title string) error
 	ReportActivity(al models.ActivityLog) error
 	GetAdsActivity(id int) ([]models.ActivityLog, error)
