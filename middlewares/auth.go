@@ -16,7 +16,7 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 		req := c.Request()
 		tokenString := req.Header.Get("Authorization")
 
-		//Account Doesn't have Token
+		//User Doesn't have Token
 		if tokenString == "" {
 			return echo.ErrConflict
 		}
@@ -53,13 +53,13 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 			if user.ID == 0 {
 				return echo.ErrUnauthorized
 			}
-			//account is deactive
+			//user is deactive
 			if user.Token == "" && !user.IsActive {
 				return echo.ErrUnauthorized
 			}
 
-			//Add Account Object To Context
-			c.Set("account", user)
+			//Add User Object To Context
+			c.Set("user", user)
 			return next(c)
 
 		} else {

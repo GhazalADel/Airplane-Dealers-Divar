@@ -2,7 +2,6 @@ package server
 
 import (
 	database "Airplane-Divar/database"
-	"Airplane-Divar/datastore/account"
 	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
@@ -27,11 +26,10 @@ func StartServer() {
 	// Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// Account
-	accountDatastore := account.New(db)
+	// User
 	userDatastore := user.New(db)
-	accountHandler := handlers.NewAccountHandler(userDatastore, accountDatastore)
-	accountRoutes(e, accountHandler)
+	userHandler := handlers.NewUserHandler(userDatastore)
+	userRoutes(e, userHandler)
 
 	// Payment
 	paymentDatastore := payment.New(db)

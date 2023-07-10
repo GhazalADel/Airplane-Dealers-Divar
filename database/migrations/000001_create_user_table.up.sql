@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL UNIQUE,
     role VARCHAR(255) NOT NULL,
     token VARCHAR(1020),
-    is_active boolean,
+    is_active BOOLEAN
 );

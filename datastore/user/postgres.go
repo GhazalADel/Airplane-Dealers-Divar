@@ -2,6 +2,7 @@ package user
 
 import (
 	"Airplane-Divar/models"
+	"Airplane-Divar/utils"
 	"errors"
 	"os"
 	"time"
@@ -29,6 +30,7 @@ func (a UserStore) Create(username string, password string) (string, models.User
 	// Instantiating Account Object
 	var user models.User
 	user.Username = username
+	user.Role = utils.ROLE_AIRLINE
 	user.Token = ""
 
 	//hash password
