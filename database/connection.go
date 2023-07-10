@@ -1,6 +1,7 @@
 package db
 
 import (
+	"Airplane-Divar/config"
 	"errors"
 	"fmt"
 
@@ -11,14 +12,20 @@ import (
 var dbConn *gorm.DB
 
 func Connect() error {
+
+	cfg, err := config.NewConfig()
+	if err != nil {
+		return err
+	}
+
 	// -------env----------
-	// dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-	// 	cfg.PG.HOST, cfg.PG.USER, cfg.PG.PASSWORD, cfg.PG.DB, cfg.PG.PORT, cfg.PG.SSLMODE, cfg.PG.TIMEZONE)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		cfg.PG.HOST, cfg.PG.USER, cfg.PG.PASSWORD, cfg.PG.DB, cfg.PG.PORT, cfg.PG.SSLMODE, cfg.PG.TIMEZONE)
 	// -------env----------
 
 	// If not connect - use "db" instead of "localhost"
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
-		"localhost", "postgres", "root", "divar_airplane", "5432", "disable", "Asia/Tehran")
+	// dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+	// 	"localhost", "postgres", "root", "divar_airplane", "5432", "disable", "Asia/Tehran")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err
