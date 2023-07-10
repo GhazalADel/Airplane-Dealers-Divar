@@ -16,7 +16,7 @@ import (
 
 const (
 	merchantID      = "860C78FA-D6A9-48AE-805D-2B33B52309D2"
-	callbackURL     = "http://localhost:8080/accounts/payment/verify"
+	callbackURL     = "http://localhost:8080/users/payment/verify"
 	zarinpalRequest = "https://sandbox.banktest.ir/zarinpal/api.zarinpal.com/pg/v4/payment/request.json"
 	zarinpalVerify  = "https://sandbox.banktest.ir/zarinpal/api.zarinpal.com/pg/v4/payment/verify.json"
 	zarinpalGateURL = "https://sandbox.banktest.ir/zarinpal/www.zarinpal.com/pg/StartPay/"
@@ -77,20 +77,20 @@ func NewPaymentHandler(datastore datastore.Payment) *PaymentHandler {
 }
 
 // @Summary Add budget request
-// @Description Zarinpal Payment to add budget to account
+// @Description Zarinpal Payment to add budget to user
 // @Tags payment
 // @Accept json
 // @Produce json
 // @Param body body AmountFee true "Payment request details"
 // @Success 200 {object} RequestResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 422 {object} ErrorResponse
-// @Failure 500 {object} ErrorResponse
-// @Router /accounts/payment/request [post]
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 422 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/payment/request [post]
 func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 	// Read Request Body
 	jsonBody := make(map[string]interface{})
-	err = json.NewDecoder(c.Request().Body).Decode(&jsonBody)
+	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
 	}
@@ -101,13 +101,13 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
-	user := c.Get("account").(models.User)
+	user := c.Get("user").(models.User)
 
 	data := map[string]interface{}{
 		"merchant_id":  merchantID,
 		"amount":       jsonBody["fee"],
 		"callback_url": callbackURL,
-		"description":  "Add budget to account",
+		"description":  "Add budget to user",
 		"metadata": map[string]string{
 			"mobile": "09121234567",
 			"email":  "test@test.com",
@@ -162,16 +162,16 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 // Todo: Talk about handling payments
 
 // @Summary Verify budget payment and add budget
-// @Description Verify Zarinpal Payment to add budget to account
+// @Description Verify Zarinpal Payment to add budget to user
 // @Tags payment
 // @Accept json
 // @Produce json
 // @Param body body VerifyResponse true "Payment verify details"
 // @Success 200 {string} string
-// @Failure 400 {string} ErrorResponse
-// @Failure 422 {string} ErrorResponse
-// @Failure 500 {string} ErrorResponse
-// @Router /accounts/payment/verify [get]
+// @Failure 400 {string} models.ErrorResponse
+// @Failure 422 {string} models.ErrorResponse
+// @Failure 500 {string} models.ErrorResponse
+// @Router /users/payment/verify [get]
 func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 	// Connect To The Datebase
 	db, err := database.GetConnection()
@@ -231,11 +231,11 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 					transaction.Status = "Okay"
 					db.Save(&transaction)
 
-					accountID := transaction.UserID
-					var account models.Account
-					if err := db.First(&account, accountID).Error; err != nil {
-						// Handle the error (e.g., account not found)
-						return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "Account Not Founded"})
+					userID := transaction.UserID
+					var user models.User
+					if err := db.First(&user, userID).Error; err != nil {
+						// Handle the error (e.g., user not found)
+						return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "User Not Founded"})
 					}
 
 					return c.JSON(http.StatusOK, "Successful Payment")
