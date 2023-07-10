@@ -3,6 +3,10 @@ package models
 import (
 	"time"
 )
+type Response struct {
+	ResponseCode uint16 `json:"responsecode"`
+	Message      string `json:"message"`
+}
 
 type MessageResponse struct {
 	Message string

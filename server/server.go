@@ -2,6 +2,9 @@ package server
 
 import (
 	database "Airplane-Divar/database"
+	"Airplane-Divar/datastore/payment"
+	"Airplane-Divar/datastore/user"
+	"Airplane-Divar/handlers"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -28,6 +31,15 @@ func StartServer() {
 
 	// Repair
 	repairRoutes(e, db)
+	// User
+	userDatastore := user.New(db)
+	userHandler := handlers.NewUserHandler(userDatastore)
+	userRoutes(e, userHandler)
+
+	// Payment
+	paymentDatastore := payment.New(db)
+	paymentHandler := handlers.NewPaymentHandler(paymentDatastore)
+	paymentRoutes(e, paymentHandler)
 
 	log.Fatal(e.Start(":8080"))
 }

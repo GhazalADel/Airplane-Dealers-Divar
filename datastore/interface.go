@@ -60,6 +60,17 @@ type (
 	}
 
 	User interface {
-		Get(ctx context.Context, id int) (models.User, error)
+		Get(id int) ([]models.User, error)
+		Create(username string, password string) (string, models.User, error)
+		Login(username, password string) (string, models.User, error)
+		CheckUnique(username string) (string, error)
+	}
+	
+	Payment interface {
+		Create(userID uint, fee int64, authority string) (string, error)
 	}
 )
+
+
+
+
