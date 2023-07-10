@@ -13,6 +13,7 @@ type AdsFilter struct {
 	FlyTime       uint64
 	CategoryID    uint
 	AirplaneModel string
+	Status        string
 }
 
 func NewAdsFilter(v url.Values) *AdsFilter {

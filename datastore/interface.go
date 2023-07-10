@@ -6,7 +6,8 @@ import (
 )
 
 type Ad interface {
-	Get(id int) ([]models.Ad, error)
+	// Create(models.Ad) (models.Ad, error)
+	Get(id int, userRole string) ([]models.Ad, error)
 	ListFilterByColumn(f *filter.AdsFilter) ([]models.Ad, error)
 	ListFilterSort(f *filter.Filter) ([]models.Ad, error)
 	GetCategoryByName(name string) (models.Category, error)

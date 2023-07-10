@@ -26,6 +26,9 @@ type Filter struct {
 	Limit         int  `json:"size"`
 	DisablePaging bool `json:"disable_paging"`
 
+	// 0: airlines, 1: Experts, 2: Admins, 3: Matin
+	UserRole string
+
 	Sort   map[string]string `json:"sort"`
 	Search bool
 }
