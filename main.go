@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "Airplane-Divar/docs"
+	"Airplane-Divar/server"
 )
 
 //	@Title			Airplane-Divar
@@ -19,5 +20,5 @@ import (
 // @BasePath					/
 // @query.collection.format	multi
 func main() {
-	// server.StartServer()
+	server.StartServer()
 }
