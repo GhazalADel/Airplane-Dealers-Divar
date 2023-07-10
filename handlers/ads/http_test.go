@@ -229,15 +229,15 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("JSON Without Price", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "XYZ123",
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "XYZ123",
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -263,15 +263,15 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("JSON Without Category", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "XYZ123",
-			"price":        500000,
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "XYZ123",
+			"Price":         500000,
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -297,16 +297,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string category", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "XYZ123",
-			"price":        500000,
-			"category":     54,
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "XYZ123",
+			"Price":         500000,
+			"Category":      54,
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -332,16 +332,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("invalid category name", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "XYZ123",
-			"price":        500000,
-			"category":     "Hello",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "XYZ123",
+			"Price":         500000,
+			"Category":      "Hello",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -367,16 +367,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string model", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        24,
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": 24,
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -402,16 +402,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-number price", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "something",
-			"price":        "548000",
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "something",
+			"Price":         "548000",
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -437,16 +437,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-integer price", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     1000,
-			"model":        "something",
-			"price":        54.5,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "something",
+			"Price":         54.5,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -472,16 +472,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-integer fly time", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78.5,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78.5,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -507,16 +507,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-boolean repair_check", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": "hello",
-			"expert_check": false,
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   "hello",
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -540,18 +540,18 @@ func TestAdHandler_AddAd(t *testing.T) {
 		assert.Equal(t, "Repair Check should be boolean !", response.Message)
 	})
 
-	t.Run("non-boolean expert_check", func(t *testing.T) {
+	t.Run("non-boolean ExpertCheck", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": false,
-			"expert_check": "bye",
-			"age":          7,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   false,
+			"ExpertCheck":   "bye",
+			"PlaneAge":      7,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -577,16 +577,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-integer age", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          7.25,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7.25,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -611,16 +611,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 	})
 	t.Run("invalid age", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "example1.jpg",
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          123,
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      123,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -646,16 +646,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string image", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        8745,
-			"description":  "This is example ad 1.",
-			"subject":      "Example Ad 1",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          23,
+			"image":         8745,
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      23,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -681,16 +681,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string subject", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "image",
-			"description":  "This is example ad 1.",
-			"subject":      7852,
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          23,
+			"Image":         "image",
+			"Description":   "This is example ad 1.",
+			"Subject":       7852,
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      23,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -716,16 +716,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string description", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "image",
-			"description":  55,
-			"subject":      "Subject",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          23,
+			"Image":         "image",
+			"Description":   55,
+			"Subject":       "Subject",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      23,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)
@@ -751,16 +751,16 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("valid request", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":        "image",
-			"description":  "Desc",
-			"subject":      "Subject",
-			"fly_time":     78,
-			"model":        "something",
-			"price":        500000,
-			"category":     "small-passenger",
-			"repair_check": true,
-			"expert_check": false,
-			"age":          23,
+			"Image":         "image",
+			"Description":   "Desc",
+			"Subject":       "Subject",
+			"FlyTime":       78,
+			"AirplaneModel": "something",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      23,
 		}
 		jsonData, err := json.Marshal(addAdReqBody)
 		assert.NoError(t, err)

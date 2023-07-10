@@ -29,14 +29,14 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 
 	ad.CategoryID = cat.ID
 
-	if model, ok := jsonBody["model"].(string); ok {
+	if model, ok := jsonBody["AirplaneModel"].(string); ok {
 		ad.AirplaneModel = model
 	} else {
 		msg = "Plane Model should be string !"
 		return msg, models.Ad{}, errors.New("")
 	}
 
-	price, ok := jsonBody["price"].(float64)
+	price, ok := jsonBody["Price"].(float64)
 	if !ok {
 		msg = "Price should be a number !"
 		return msg, models.Ad{}, errors.New("")
@@ -47,7 +47,7 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 	}
 	ad.Price = uint64(price)
 
-	fly, ok := jsonBody["fly_time"].(float64)
+	fly, ok := jsonBody["FlyTime"].(float64)
 	if !ok {
 		msg = "fly_time should be a number !"
 		return msg, models.Ad{}, errors.New("")
@@ -58,21 +58,21 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 	}
 	ad.FlyTime = uint(fly)
 
-	if rc, ok := jsonBody["repair_check"].(bool); ok {
+	if rc, ok := jsonBody["RepairCheck"].(bool); ok {
 		ad.RepairCheck = rc
 	} else {
 		msg = "Repair Check should be boolean !"
 		return msg, models.Ad{}, errors.New("")
 	}
 
-	if ec, ok := jsonBody["expert_check"].(bool); ok {
+	if ec, ok := jsonBody["ExpertCheck"].(bool); ok {
 		ad.ExpertCheck = ec
 	} else {
 		msg = "Expert Check should be boolean !"
 		return msg, models.Ad{}, errors.New("")
 	}
 
-	age, ok := jsonBody["age"].(float64)
+	age, ok := jsonBody["PlaneAge"].(float64)
 	if !ok {
 		msg = "Age should be a number !"
 		return msg, models.Ad{}, errors.New("")
@@ -88,8 +88,8 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 	ad.PlaneAge = uint(age)
 
 	//check for optional properties
-	if _, ok := jsonBody["image"]; ok {
-		if image, ok := jsonBody["image"].(string); ok {
+	if _, ok := jsonBody["Image"]; ok {
+		if image, ok := jsonBody["Image"].(string); ok {
 			ad.Image = image
 		} else {
 			msg = "Image should be an url !"
@@ -99,8 +99,8 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 		ad.Image = ""
 	}
 
-	if _, ok := jsonBody["subject"]; ok {
-		if sub, ok := jsonBody["subject"].(string); ok {
+	if _, ok := jsonBody["Subject"]; ok {
+		if sub, ok := jsonBody["Subject"].(string); ok {
 			ad.Subject = sub
 		} else {
 			msg = "subject should be string !"
@@ -110,8 +110,8 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 		ad.Subject = fmt.Sprintf("%d years old airplane : %s in the %s category", ad.PlaneAge, ad.AirplaneModel, cat)
 	}
 
-	if _, ok := jsonBody["description"]; ok {
-		if desc, ok := jsonBody["description"].(string); ok {
+	if _, ok := jsonBody["Description"]; ok {
+		if desc, ok := jsonBody["Description"].(string); ok {
 			ad.Description = desc
 		} else {
 			msg = "description should be string !"

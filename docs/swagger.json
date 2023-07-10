@@ -19,7 +19,7 @@
     "paths": {
         "/ads": {
             "get": {
-                "description": "Retrieves all ads from database.",
+                "description": "Retrieves ads from database and accept query params.",
                 "consumes": [
                     "application/json"
                 ],
@@ -29,7 +29,7 @@
                 "tags": [
                     "ads"
                 ],
-                "summary": "Get ads.",
+                "summary": "List of ads.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -40,16 +40,56 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Invalid parameter id",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     "500": {
                         "description": "Could not retrieve ads",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ads/add": {
+            "post": {
+                "description": "Create new ad by given properties",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ads"
+                ],
+                "summary": "Create an ad",
+                "parameters": [
+                    {
+                        "description": "Ad details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ads.AdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ads.AdResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
                         }
                     }
                 }
@@ -101,6 +141,96 @@
         }
     },
     "definitions": {
+        "ads.AdRequest": {
+            "type": "object",
+            "properties": {
+                "AirplaneModel": {
+                    "type": "string"
+                },
+                "Category": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ExpertCheck": {
+                    "type": "boolean"
+                },
+                "FlyTime": {
+                    "type": "integer"
+                },
+                "Image": {
+                    "type": "string"
+                },
+                "PlaneAge": {
+                    "type": "integer"
+                },
+                "Price": {
+                    "type": "integer"
+                },
+                "RepairCheck": {
+                    "type": "boolean"
+                },
+                "Subject": {
+                    "type": "string"
+                }
+            }
+        },
+        "ads.AdResponse": {
+            "type": "object",
+            "properties": {
+                "AirplaneModel": {
+                    "type": "string"
+                },
+                "CategoryID": {
+                    "type": "integer"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ExpertCheck": {
+                    "type": "boolean"
+                },
+                "FlyTime": {
+                    "type": "integer"
+                },
+                "ID": {
+                    "type": "integer"
+                },
+                "Image": {
+                    "type": "string"
+                },
+                "PlaneAge": {
+                    "type": "integer"
+                },
+                "Price": {
+                    "type": "integer"
+                },
+                "RepairCheck": {
+                    "type": "boolean"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "Subject": {
+                    "type": "string"
+                },
+                "UserID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ads.ErrorAddAd": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "responsecode": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Ad": {
             "type": "object",
             "properties": {
@@ -120,7 +250,7 @@
                     "type": "boolean"
                 },
                 "flyTime": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

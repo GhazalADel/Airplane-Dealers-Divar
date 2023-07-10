@@ -31,10 +31,5 @@ func StartServer() {
 	adsHandler := adsHandler.New(datastore)
 	adsRoutes(e, adsHandler)
 
-	// Bookmarks
-	// bmDatastore := bookmarkDatastore.New(db)
-	// bmHandlers := bookmarksHanlder.New(bmDatastore)
-	// bookmarksRoutes(e, bmHandlers)
-
 	log.Fatal(e.Start(":8080"))
 }
