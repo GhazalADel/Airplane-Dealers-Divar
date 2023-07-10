@@ -39,7 +39,7 @@ func (logDL *LoggingStore) AddNewLogName(id uint, title string) error {
 	return nil
 }
 
-func (logDL *LoggingStore) ReportActivity(al models.ActivityLog) error {
+func (logDL *LoggingStore) AddActivity(al models.ActivityLog) error {
 	var result *gorm.DB
 	var logname models.LogName
 	actvtlog := models.ActivityLog{
@@ -69,7 +69,7 @@ func (logDL *LoggingStore) ReportActivity(al models.ActivityLog) error {
 	return nil
 }
 
-func (logDL *LoggingStore) GetAdsActivity(id int) ([]models.ActivityLog, error) {
+func (logDL *LoggingStore) GetAdsActivityByID(id int) ([]models.ActivityLog, error) {
 
 	var dbResult *gorm.DB
 	var activityResult []models.ActivityLog

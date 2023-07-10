@@ -15,6 +15,6 @@ type Payment interface {
 
 type Logging interface {
 	AddNewLogName(id uint, title string) error
-	ReportActivity(al models.ActivityLog) error
-	GetAdsActivity(id int) ([]models.ActivityLog, error)
+	AddActivity(al models.ActivityLog) error
+	GetAdsActivityByID(id int) ([]models.ActivityLog, error)
 }
