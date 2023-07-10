@@ -119,11 +119,11 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 		AdsID:    adsID,
 		UserID:   userID,
 	}
-	if user.Role == 1 {
+	if user.Role == utils.ROLE_MATIN {
 		filterNotCondtion = repair.FilterNotConditionRepairRequest{
 			Status: utils.WAIT_FOR_PAYMENT_STATUS,
 		}
-	} else if user.Role == 4 {
+	} else if user.Role == utils.ROLE_AIRLINE {
 		filterAndCondition.UserID = int(user.ID)
 	}
 

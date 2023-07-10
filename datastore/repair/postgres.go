@@ -26,7 +26,7 @@ func (e RepairStorer) GetByAd(
 	var repairRequest models.RepairRequest
 	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.ads_id = ?", adID)
 
-	if user.Role == 4 { // is airline
+	if user.Role == utils.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&repairRequest)
@@ -113,7 +113,7 @@ func (e RepairStorer) Update(
 	tmpRepairRequest := models.RepairRequest{}
 	updatedMap := make(map[string]interface{})
 
-	if user.Role != 1 {
+	if user.Role != utils.ROLE_MATIN {
 		return tmpRepairRequest, errors.New("not allowed")
 	}
 

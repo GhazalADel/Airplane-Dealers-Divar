@@ -87,13 +87,13 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 		FromDate: fromDate,
 		AdsID:    adsID,
 	}
-	if user.Role == 2 {
+	if user.Role == utils.ROLE_EXPERT {
 		filterAndCondition.UserID = userID
 
 		filterNotCondtion = expert.FilterNotConditionExpertRequest{
 			Status: utils.WAIT_FOR_PAYMENT_STATUS,
 		}
-	} else if user.Role == 4 {
+	} else if user.Role == utils.role {
 		filterAndCondition.UserID = int(user.ID)
 	}
 

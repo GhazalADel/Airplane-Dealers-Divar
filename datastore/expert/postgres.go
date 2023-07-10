@@ -27,9 +27,9 @@ func (e ExpertStorer) GetByAd(
 	var expertAd models.ExpertAds
 	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.ads_id = ?", adID)
 
-	if user.Role == 2 { // is_expert
+	if user.Role == utils.ROLE_EXPERT { // is_expert
 		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
-	} else if user.Role == 4 { // is advertiser
+	} else if user.Role == utils.ROLE_AIRLINE { // is advertiser
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&expertAd)
