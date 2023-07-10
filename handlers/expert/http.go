@@ -5,7 +5,6 @@ import (
 	"Airplane-Divar/datastore/expert"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -90,15 +89,15 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 		AdsID:    adsID,
 		UserID:   userID,
 	}
-	if user.Role == 2 {
+	if user.Role == utils.ROLE_EXPERT {
 		filterOrCondition = expert.FilterOrConditionExpertRequest{
 			ExpertIDList: []interface{}{user.ID, nil},
 		}
 
 		filterNotCondtion = expert.FilterNotConditionExpertRequest{
-			Status: utils.EXPERT_WAIT_FOR_PAYMENT_STATUS,
+			Status: utils.WAIT_FOR_PAYMENT_STATUS,
 		}
-	} else if user.Role == 4 {
+	} else if user.Role == utils.ROLE_AIRLINE {
 		filterAndCondition.UserID = int(user.ID)
 	}
 

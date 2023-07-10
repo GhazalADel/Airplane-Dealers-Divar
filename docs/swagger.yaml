@@ -35,6 +35,32 @@ definitions:
       userName:
         type: integer
     type: object
+  models.GetRepairRequestResponse:
+    properties:
+      adSubject:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userName:
+        type: integer
+    type: object
+  models.RepairRequestResponse:
+    properties:
+      adID:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userID:
+        type: integer
+    type: object
   models.SuccessResponse:
     properties:
       success:
@@ -45,20 +71,27 @@ definitions:
       report:
         type: string
       status:
-        $ref: '#/definitions/utils.ExpertStatus'
+        $ref: '#/definitions/utils.Status'
     type: object
-  utils.ExpertStatus:
+  models.UpdateRepairRequest:
+    properties:
+      status:
+        $ref: '#/definitions/utils.Status'
+    type: object
+  utils.Status:
     enum:
     - Wait for payment status
     - Pending for expert
+    - Pending for matin
     - In progress
-    - Confirmed
+    - Done
     type: string
     x-enum-varnames:
-    - EXPERT_WAIT_FOR_PAYMENT_STATUS
+    - WAIT_FOR_PAYMENT_STATUS
     - EXPERT_PENDING_STATUS
-    - EXPERT_IN_PROGRESS_STATUS
-    - EXPERT_CONFIRMED_STATUS
+    - MATIN_PENDING_STATUS
+    - IN_PROGRESS_STATUS
+    - DONE_STATUS
 host: localhost:8080
 info:
   contact:
@@ -239,4 +272,171 @@ paths:
       summary: ListExpertRequest retrieves all expert requests for an expert
       tags:
       - expert
+  /repair/ads/{adID}:
+    delete:
+      description: delete repair request for user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: delete repair request for user
+      tags:
+      - repair
+    get:
+      description: retrieve repair check request for repair or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetRepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve repair check request for repair or user
+      tags:
+      - repair
+  /repair/ads/{adID}/check-request:
+    post:
+      consumes:
+      - application/json
+      description: Request to repair check
+      parameters:
+      - description: Ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request to repair check
+      tags:
+      - repair
+  /repair/check-request/{repairRequestID}:
+    put:
+      consumes:
+      - application/json
+      description: Update repair request
+      parameters:
+      - description: repair request ID
+        in: path
+        name: repairRequestID
+        required: true
+        type: integer
+      - description: repair object
+        in: body
+        name: repairCheckRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRepairRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update repair request
+      tags:
+      - repair
+  /repair/check-requests:
+    get:
+      description: ListRepairRequest retrieves all repair requests for an repair
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: integer
+      - description: Ad ID
+        in: query
+        name: ads_id
+        type: integer
+      - description: From date
+        in: query
+        name: from_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RepairRequestResponse'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: ListRepairRequest retrieves all repair requests for an repair
+      tags:
+      - repair
 swagger: "2.0"

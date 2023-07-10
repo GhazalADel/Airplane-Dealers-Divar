@@ -23,8 +23,11 @@ func StartServer() {
 	// Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	// Account
+	// Expert
 	expertRoutes(e, db)
+
+	// Repair
+	repairRoutes(e, db)
 
 	log.Fatal(e.Start(":8080"))
 }

@@ -269,6 +269,259 @@
                     }
                 }
             }
+        },
+        "/repair/ads/{adID}": {
+            "get": {
+                "description": "retrieve repair check request for repair or user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "retrieve repair check request for repair or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetRepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete repair request for user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "delete repair request for user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/ads/{adID}/check-request": {
+            "post": {
+                "description": "Request to repair check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Request to repair check",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/check-request/{repairRequestID}": {
+            "put": {
+                "description": "Update repair request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Update repair request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "repair request ID",
+                        "name": "repairRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "repair object",
+                        "name": "repairCheckRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateRepairRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/check-requests": {
+            "get": {
+                "description": "ListRepairRequest retrieves all repair requests for an repair",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "ListRepairRequest retrieves all repair requests for an repair",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "ads_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RepairRequestResponse"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -326,6 +579,46 @@
                 }
             }
         },
+        "models.GetRepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adSubject": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.SuccessResponse": {
             "type": "object",
             "properties": {
@@ -341,23 +634,33 @@
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/utils.ExpertStatus"
+                    "$ref": "#/definitions/utils.Status"
                 }
             }
         },
-        "utils.ExpertStatus": {
+        "models.UpdateRepairRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/utils.Status"
+                }
+            }
+        },
+        "utils.Status": {
             "type": "string",
             "enum": [
                 "Wait for payment status",
                 "Pending for expert",
+                "Pending for matin",
                 "In progress",
-                "Confirmed"
+                "Done"
             ],
             "x-enum-varnames": [
-                "EXPERT_WAIT_FOR_PAYMENT_STATUS",
+                "WAIT_FOR_PAYMENT_STATUS",
                 "EXPERT_PENDING_STATUS",
-                "EXPERT_IN_PROGRESS_STATUS",
-                "EXPERT_CONFIRMED_STATUS"
+                "MATIN_PENDING_STATUS",
+                "IN_PROGRESS_STATUS",
+                "DONE_STATUS"
             ]
         }
     }

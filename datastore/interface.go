@@ -27,7 +27,31 @@ type (
 			ctx context.Context, expertAdID int,
 			user models.User, body models.UpdateExpertCheckRequest,
 		) (models.ExpertAds, error)
+		Delete(
+			ctx context.Context,
+			adID int,
+			user models.User,
+		) error
+	}
 
+	Repair interface {
+		RequestToRepairCheck(ctx context.Context, adID int, userID int) error
+		GetByAd(
+			ctx context.Context,
+			adID int,
+			user models.User,
+		) (models.RepairRequest, error)
+		GetAllRepairRequests(
+			ctx context.Context,
+			filterAndCondition clause.AndConditions,
+			filterOrCondition []clause.OrConditions,
+			filterNotCondtion clause.NotConditions,
+			page int,
+		) ([]models.RepairRequest, error)
+		Update(
+			ctx context.Context, repairRequestID int,
+			user models.User, body models.UpdateRepairRequest,
+		) (models.RepairRequest, error)
 		Delete(
 			ctx context.Context,
 			adID int,
