@@ -73,11 +73,9 @@ func (logDL *LoggingStore) GetAdsActivityByID(id int) ([]models.ActivityLog, err
 
 	var dbResult *gorm.DB
 	var activityResult []models.ActivityLog
-	// no need for payment, bookmark and buy logs
-	excludeLogID := []uint{9, 10, 11, 12, 13}
 
 	dbResult = logDL.db.
-		Where("SubjectType = ? AND SubjectID = ? AND LogID NOT IN ?", "Ads", id, excludeLogID).
+		Where("SubjectType = ? AND SubjectID = ? ", "Ads", id).
 		Order("CreatedAt").
 		Find(&activityResult)
 
