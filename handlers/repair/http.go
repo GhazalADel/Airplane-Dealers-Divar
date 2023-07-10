@@ -37,12 +37,13 @@ func NewRepairHandler(repairDS datastore.Repair, userDS datastore.User) *RepairH
 // @Router /repair/ads/{adID}/check-request [post]
 func (e *RepairHandler) RequestToRepairCheck(c echo.Context) error {
 	ctx := c.Request().Context()
+	user := c.Get("user").(models.User)
 	adID, err := strconv.Atoi(c.Param("adID"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 	}
 
-	err = e.RepairDatastore.RequestToRepairCheck(ctx, adID, 2)
+	err = e.RepairDatastore.RequestToRepairCheck(ctx, adID, user)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 	}
@@ -65,7 +66,7 @@ func (e *RepairHandler) RequestToRepairCheck(c echo.Context) error {
 // @Router /repair/ads/{adID} [get]
 func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
 
 	repairRequest, err := e.RepairDatastore.GetByAd(ctx, adID, user)
@@ -100,7 +101,7 @@ func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	user, _ := e.UserDatastore.Get(ctx, 4)
+	user := c.Get("user").(models.User)
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -167,7 +168,7 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 // @Router /repair/check-request/{repairRequestID} [put]
 func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 4)
+	user := c.Get("user").(models.User)
 
 	repairRequestID, _ := strconv.Atoi(c.Param("repairRequestID"))
 
@@ -205,7 +206,7 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 // @Router /repair/ads/{adID} [delete]
 func (e *RepairHandler) DeleteRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
 
 	err := e.RepairDatastore.Delete(ctx, adID, user)
@@ -218,3 +219,4 @@ func (e *RepairHandler) DeleteRepairRequest(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, models.SuccessResponse{Success: true})
 
 }
+	

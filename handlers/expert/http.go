@@ -38,11 +38,13 @@ func NewExpertHandler(expertDS datastore.Expert, userDS datastore.User) *ExpertH
 func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 	ctx := c.Request().Context()
 	adID, err := strconv.Atoi(c.Param("adID"))
+	user := c.Get("user").(models.User)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 	}
 
-	err = e.ExpertDatastore.RequestToExpertCheck(ctx, adID, 2)
+	err = e.ExpertDatastore.RequestToExpertCheck(ctx, adID, user)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 
@@ -69,7 +71,7 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	user, _ := e.UserDatastore.Get(ctx, 1)
+	user := c.Get("user").(models.User)
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -143,7 +145,7 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 // @Router /expert/check-request/{expertRequestID} [put]
 func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 1)
+	user := c.Get("user").(models.User)
 
 	expertRequestID, _ := strconv.Atoi(c.Param("expertRequestID"))
 
@@ -184,7 +186,7 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 // @Router /expert/ads/{adID} [get]
 func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
 
 	expertAd, err := e.ExpertDatastore.GetByAd(ctx, adID, user)
@@ -218,7 +220,7 @@ func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
 // @Router /expert/ads/{adID} [delete]
 func (e *ExpertHandler) DeleteExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
-	user, _ := e.UserDatastore.Get(ctx, 2)
+	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
 
 	err := e.ExpertDatastore.Delete(ctx, adID, user)

@@ -47,14 +47,8 @@ func (e ExpertStorer) Get(ctx context.Context, expertRequestID int) (models.Expe
 }
 
 func (e ExpertStorer) RequestToExpertCheck(
-	ctx context.Context, adID int, userID int,
+	ctx context.Context, adID int, user models.User,
 ) error {
-	// get user
-	var user models.User
-	if err := e.db.WithContext(ctx).First(&user, userID).Error; err != nil {
-		return err
-	}
-
 	// get ad
 	var ad models.Ad
 	if err := e.db.WithContext(ctx).First(&ad, adID).Error; err != nil {
@@ -67,7 +61,7 @@ func (e ExpertStorer) RequestToExpertCheck(
 	// get or create expert_ad
 	var expertAd models.ExpertAds
 	err := e.db.WithContext(ctx).
-		Where("user_id = ? AND ads_id = ?", userID, adID).
+		Where("user_id = ? AND ads_id = ?", user.ID, adID).
 		First(&expertAd).Error
 	if err != gorm.ErrRecordNotFound && err != nil {
 		return err

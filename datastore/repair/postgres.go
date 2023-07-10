@@ -35,14 +35,8 @@ func (e RepairStorer) GetByAd(
 }
 
 func (e RepairStorer) RequestToRepairCheck(
-	ctx context.Context, adID int, userID int,
+	ctx context.Context, adID int, user models.User,
 ) error {
-	// get user
-	var user models.User
-	if err := e.db.WithContext(ctx).First(&user, userID).Error; err != nil {
-		return err
-	}
-
 	// get ad
 	var ad models.Ad
 	if err := e.db.WithContext(ctx).First(&ad, adID).Error; err != nil {
@@ -55,7 +49,7 @@ func (e RepairStorer) RequestToRepairCheck(
 	// get or create repair request
 	var repairRequest models.RepairRequest
 	err := e.db.WithContext(ctx).
-		Where("user_id = ? AND ads_id = ?", userID, adID).
+		Where("user_id = ? AND ads_id = ?", user.ID, adID).
 		First(&repairRequest).Error
 	if err != gorm.ErrRecordNotFound && err != nil {
 		return err

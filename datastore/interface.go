@@ -9,7 +9,7 @@ import (
 
 type (
 	Expert interface {
-		RequestToExpertCheck(ctx context.Context, adID int, userID int) error
+		RequestToExpertCheck(ctx context.Context, adID int, user models.User) error
 		GetAllExpertRequests(
 			ctx context.Context,
 			filterAndCondition clause.AndConditions,
@@ -35,7 +35,7 @@ type (
 	}
 
 	Repair interface {
-		RequestToRepairCheck(ctx context.Context, adID int, userID int) error
+		RequestToRepairCheck(ctx context.Context, adID int, user models.User) error
 		GetByAd(
 			ctx context.Context,
 			adID int,
@@ -65,12 +65,8 @@ type (
 		Login(username, password string) (string, models.User, error)
 		CheckUnique(username string) (string, error)
 	}
-	
+
 	Payment interface {
 		Create(userID uint, fee int64, authority string) (string, error)
 	}
 )
-
-
-
-
