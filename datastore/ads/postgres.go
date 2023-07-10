@@ -89,12 +89,12 @@ func (a AdDatastorer) GetCategoryByName(name string) (models.Category, error) {
 	return categoryObj, nil
 }
 
-func (a AdDatastorer) CreateAdminAd(ad *models.AdminAds) (models.AdminAds, error) {
-	var ad_ad *models.AdminAds
-	ad_ad = ad
-	createdAd := a.db.Create(&ad_ad)
+func (a AdDatastorer) CreateAd(ad *models.Ad) (models.Ad, error) {
+	var tmp_ad *models.Ad
+	tmp_ad = ad
+	createdAd := a.db.Create(&tmp_ad)
 	if createdAd.Error != nil {
-		return models.AdminAds{}, fmt.Errorf("Admin Ad Creation Failed")
+		return models.Ad{}, fmt.Errorf("Admin Ad Creation Failed")
 	}
-	return *ad_ad, nil
+	return *tmp_ad, nil
 }

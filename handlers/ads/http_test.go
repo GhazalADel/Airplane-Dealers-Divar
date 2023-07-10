@@ -3,6 +3,7 @@ package ads
 import (
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
+	"Airplane-Divar/utils"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -748,6 +749,44 @@ func TestAdHandler_AddAd(t *testing.T) {
 		assert.Equal(t, "description should be string !", response.Message)
 	})
 
+	t.Run("valid request", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"image":        "image",
+			"description":  "Desc",
+			"subject":      "Subject",
+			"fly_time":     78,
+			"model":        "something",
+			"price":        500000,
+			"category":     "small-passenger",
+			"repair_check": true,
+			"expert_check": false,
+			"age":          23,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		var response models.Ad
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		//check some fields
+		assert.Equal(t, "image", response.Image)
+		assert.Equal(t, "Desc", response.Description)
+		assert.Equal(t, "Subject", response.Subject)
+	})
+
 }
 
 var (
@@ -761,36 +800,7 @@ var (
 			Name: "big-passenger",
 		},
 	}
-	mockAdminAdData = []models.AdminAds{
-		{
-			ID:            1,
-			UserID:        1,
-			Image:         "example1.jpg",
-			Description:   "This is example ad 1.",
-			Subject:       "Example Ad 1",
-			Price:         1000,
-			CategoryID:    2,
-			FlyTime:       1000,
-			AirplaneModel: "XYZ123",
-			RepairCheck:   true,
-			ExpertCheck:   false,
-			PlaneAge:      7,
-		},
-		{
-			ID:            2,
-			UserID:        1,
-			Image:         "example2.jpg",
-			Description:   "This is example ad 2.",
-			Subject:       "Example Ad 2",
-			Price:         2000,
-			CategoryID:    1,
-			FlyTime:       1000,
-			AirplaneModel: "ABC456",
-			RepairCheck:   true,
-			ExpertCheck:   true,
-			PlaneAge:      3,
-		},
-	}
+
 	mockAdData = []models.Ad{
 		{
 			ID:            1,
@@ -800,7 +810,7 @@ var (
 			Subject:       "Example Ad 1",
 			Price:         1000,
 			CategoryID:    2,
-			Status:        "Active",
+			Status:        string(utils.INACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "XYZ123",
 			RepairCheck:   true,
@@ -815,7 +825,7 @@ var (
 			Subject:       "Example Ad 2",
 			Price:         2000,
 			CategoryID:    1,
-			Status:        "Active",
+			Status:        string(utils.INACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "ABC456",
 			RepairCheck:   true,
@@ -825,7 +835,9 @@ var (
 	}
 )
 
-type mockDatastore struct{}
+type mockDatastore struct {
+	ads_data []models.Ad
+}
 
 func (m mockDatastore) Get(id int) ([]models.Ad, error) {
 	if id == 1 {
@@ -885,6 +897,10 @@ func (m mockDatastore) GetCategoryByName(name string) (models.Category, error) {
 	return models.Category{}, errors.New("Database Error")
 }
 
-func (m mockDatastore) CreateAdminAd(*models.AdminAds) (models.AdminAds, error) {
-	return models.AdminAds{}, nil
+func (m mockDatastore) CreateAd(a *models.Ad) (models.Ad, error) {
+	ex_size := len(m.ads_data)
+	a.ID = uint(ex_size) + 1
+	a.Status = string(utils.INACTIVE)
+	m.ads_data = append(m.ads_data, *a)
+	return *a, nil
 }

@@ -4,6 +4,7 @@ import (
 	database "Airplane-Divar/database"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
+	"Airplane-Divar/utils"
 	"fmt"
 	"reflect"
 	"testing"
@@ -27,15 +28,12 @@ func TestDatastore(t *testing.T) {
 	cleanup3 := createCategories(t, db)
 	defer cleanup3()
 
-	cleanup4 := createAdminAd(t, db)
-	defer cleanup4()
-
 	a := New(db)
 	testAdStorer_Get(t, a)
 	testAdStorer_ListFilterByColumn(t, a)
 	testAdStorer_ListFilterSort(t, a)
 	testAdStorer_GetCategoryByName(t, a)
-	testAdStorer_CreateAdminAd(t, a)
+	testAdStorer_CreateAd(t, a)
 }
 
 func testAdStorer_Get(t *testing.T, db AdDatastorer) {
@@ -243,12 +241,12 @@ func testAdStorer_GetCategoryByName(t *testing.T, db AdDatastorer) {
 	}
 }
 
-func testAdStorer_CreateAdminAd(t *testing.T, db AdDatastorer) {
+func testAdStorer_CreateAd(t *testing.T, db AdDatastorer) {
 	testcases := []struct {
-		ad  models.AdminAds
-		res models.AdminAds
+		ad  models.Ad
+		res models.Ad
 	}{
-		{models.AdminAds{
+		{models.Ad{
 			UserID:        1,
 			Image:         "",
 			Description:   "Description2",
@@ -257,12 +255,13 @@ func testAdStorer_CreateAdminAd(t *testing.T, db AdDatastorer) {
 			CategoryID:    1,
 			FlyTime:       50,
 			AirplaneModel: "Good Model2",
+			Status:        string(utils.INACTIVE),
 			RepairCheck:   true,
 			ExpertCheck:   false,
 			PlaneAge:      3,
 		},
-			models.AdminAds{
-				ID:            2,
+			models.Ad{
+				ID:            4,
 				UserID:        1,
 				Image:         "",
 				Description:   "Description2",
@@ -271,6 +270,7 @@ func testAdStorer_CreateAdminAd(t *testing.T, db AdDatastorer) {
 				CategoryID:    1,
 				FlyTime:       50,
 				AirplaneModel: "Good Model2",
+				Status:        string(utils.INACTIVE),
 				RepairCheck:   true,
 				ExpertCheck:   false,
 				PlaneAge:      3,
@@ -279,7 +279,7 @@ func testAdStorer_CreateAdminAd(t *testing.T, db AdDatastorer) {
 	}
 
 	for i, v := range testcases {
-		resp, _ := db.CreateAdminAd(&v.ad)
+		resp, _ := db.CreateAd(&v.ad)
 
 		if !reflect.DeepEqual(resp, v.res) {
 			t.Errorf("[CreateAdminAd() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.res)
@@ -386,30 +386,5 @@ func createCategories(t *testing.T, db *gorm.DB) func() {
 
 	return func() {
 		db.Exec("DELETE FROM categories")
-	}
-}
-
-func createAdminAd(t *testing.T, db *gorm.DB) func() {
-	ad := models.AdminAds{
-		ID:            1,
-		UserID:        1,
-		Image:         "",
-		Description:   "Description",
-		Subject:       "Subject",
-		Price:         50000,
-		CategoryID:    1,
-		FlyTime:       100,
-		AirplaneModel: "Good Model",
-		RepairCheck:   true,
-		ExpertCheck:   true,
-		PlaneAge:      5,
-	}
-
-	if err := db.Create(&ad).Error; err != nil {
-		t.Fatal(err)
-	}
-
-	return func() {
-		db.Exec("DELETE FROM admin_ads")
 	}
 }

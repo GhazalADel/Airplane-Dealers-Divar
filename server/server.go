@@ -5,9 +5,7 @@ import (
 
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
-	bookmarkDatastore "Airplane-Divar/datastore/bookmarks"
 	adsHandler "Airplane-Divar/handlers/ads"
-	bookmarksHanlder "Airplane-Divar/hanlders/bookmarks"
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -34,9 +32,9 @@ func StartServer() {
 	adsRoutes(e, adsHandler)
 
 	// Bookmarks
-	bmDatastore := bookmarkDatastore.New(db)
-	bookmarksHandler := bookmarksHanlder.New(bmDatastore)
-	bookmarksRoutes(e, bookmarksHandler)
+	// bmDatastore := bookmarkDatastore.New(db)
+	// bmHandlers := bookmarksHanlder.New(bmDatastore)
+	// bookmarksRoutes(e, bmHandlers)
 
 	log.Fatal(e.Start(":8080"))
 }

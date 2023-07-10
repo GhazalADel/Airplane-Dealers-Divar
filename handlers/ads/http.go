@@ -20,7 +20,7 @@ func New(ads datastore.Ad) *AdsHandler {
 	return &AdsHandler{datastore: ads}
 }
 
-type AdminAdRequest struct {
+type AdRequest struct {
 	Image         string `json:"Image"`
 	Description   string `json:"Description"`
 	Subject       string `json:"Subject"`
@@ -33,7 +33,7 @@ type AdminAdRequest struct {
 	PlaneAge      uint   `json:"PlaneAge"`
 }
 
-type AdminAdResponse struct {
+type AdResponse struct {
 	ID            uint   `json:"ID"`
 	UserID        uint   `json:"UserID"`
 	Image         string `json:"Image"`
@@ -41,6 +41,7 @@ type AdminAdResponse struct {
 	Subject       string `json:"Subject"`
 	Price         uint64 `json:"Price"`
 	CategoryID    uint   `json:"CategoryID"`
+	Status        string `json:"Status"`
 	FlyTime       uint   `json:"FlyTime"`
 	AirplaneModel string `json:"AirplaneModel"`
 	RepairCheck   bool   `json:"RepairCheck"`
@@ -58,11 +59,11 @@ type ErrorAddAd struct {
 // @Tags ads
 // @Accept json
 // @Produce json
-// @Param body body AdCreateRequest true "Ad details"
-// @Success 200 {object} AdminAdResponse
+// @Param body body AdRequest true "Ad details"
+// @Success 200 {object} AdResponse
 // @Failure 422 {object} ErrorAddAd
 // @Failure 500 {object} ErrorAddAd
-// @Router /accounts/register [post]
+// @Router /ads/add [post]
 
 func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	// Read Request Body
@@ -100,7 +101,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid Category Name"})
 	}
 
-	var ad models.AdminAds
+	var ad models.Ad
 
 	//check ad properties validation
 	adFormatValidationMsg, ad, adFormatErr := utils.ValidateAd(jsonBody, categoryObj)
@@ -113,8 +114,10 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	// id := uint(user.(models.User).ID)
 	// ad.UserID = id
 
+	ad.Status = string(utils.INACTIVE)
+
 	//Create Admin Ad
-	createdAd, err := a.datastore.CreateAdminAd(&ad)
+	createdAd, err := a.datastore.CreateAd(&ad)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
 	}
