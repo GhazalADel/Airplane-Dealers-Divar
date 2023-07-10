@@ -258,7 +258,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		err = json.Unmarshal(rec.Body.Bytes(), &response)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "Input Json doesn't include price", response.Message)
+		assert.Equal(t, "Input Json doesn't include Price", response.Message)
 	})
 
 	t.Run("JSON Without Category", func(t *testing.T) {
@@ -292,7 +292,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		err = json.Unmarshal(rec.Body.Bytes(), &response)
 		assert.NoError(t, err)
 
-		assert.Equal(t, "Input Json doesn't include category", response.Message)
+		assert.Equal(t, "Input Json doesn't include Category", response.Message)
 	})
 
 	t.Run("non-string category", func(t *testing.T) {
@@ -646,7 +646,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 
 	t.Run("non-string image", func(t *testing.T) {
 		addAdReqBody := map[string]interface{}{
-			"image":         8745,
+			"Image":         8745,
 			"Description":   "This is example ad 1.",
 			"Subject":       "Example Ad 1",
 			"FlyTime":       78,
