@@ -1,8 +1,6 @@
-package utils
+package consts
 
-import (
-	"database/sql/driver"
-)
+import "database/sql/driver"
 
 type Status string
 

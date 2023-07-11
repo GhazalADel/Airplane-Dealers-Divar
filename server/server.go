@@ -1,16 +1,13 @@
 package server
 
 import (
-	"log"
-
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
-	adsHandler "Airplane-Divar/handlers/ads"
 	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
+	adsHandler "Airplane-Divar/handlers/ads"
 	"log"
-
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -31,6 +28,11 @@ func StartServer() {
 	// Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
+	// Expert
+	expertRoutes(e, db)
+
+	// Repair
+	repairRoutes(e, db)
 	// Ads
 	datastore := adsDatastore.New(db)
 	adsHandler := adsHandler.New(datastore)
@@ -45,7 +47,6 @@ func StartServer() {
 	paymentDatastore := payment.New(db)
 	paymentHandler := handlers.NewPaymentHandler(paymentDatastore)
 	paymentRoutes(e, paymentHandler)
-
 
 	log.Fatal(e.Start(":8080"))
 }

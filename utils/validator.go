@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"time"
 	"net/mail"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func ValidateJsonFormat(jsonBody map[string]interface{}, fields ...string) (string, error) {
@@ -179,18 +179,4 @@ func ValidateNationalID(id string) bool {
 	s = s % 11
 
 	return (s < 2 && c == s) || (s >= 2 && c == (11-s))
-}
-
-func ValidateJsonFormat(jsonBody map[string]interface{}, fields ...string) (string, error) {
-	msg := "OK"
-	for _, field := range fields {
-		if _, ok := jsonBody[field]; !ok {
-			msg = "Input Json doesn't include " + field
-			break
-		}
-	}
-	if msg != "OK" {
-		return msg, errors.New("")
-	}
-	return msg, nil
 }

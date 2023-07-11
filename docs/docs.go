@@ -27,9 +27,6 @@ const docTemplate = `{
         "/ads": {
             "get": {
                 "description": "Retrieves ads from database and accept query params.",
-        "/users/login": {
-            "post": {
-                "description": "Login with username and password",
                 "consumes": [
                     "application/json"
                 ],
@@ -40,6 +37,631 @@ const docTemplate = `{
                     "ads"
                 ],
                 "summary": "List of ads.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Ad"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not retrieve ads",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ads/add": {
+            "post": {
+                "description": "Create new ad by given properties",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ads"
+                ],
+                "summary": "Create an ad",
+                "parameters": [
+                    {
+                        "description": "Ad details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ads.AdRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ads.AdResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
+                        }
+                    }
+                }
+            }
+        },
+        "/ads/{id}": {
+            "get": {
+                "description": "Retrieves an ad based on the provided ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ads"
+                ],
+                "summary": "Get ad by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Ad"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not retrieve ads",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/ads/{adID}": {
+            "get": {
+                "description": "retrieve expert check request for expert or user",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "retrieve expert check request for expert or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetExpertRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete expert check request for expert or user",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "delete expert check request for expert or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/ads/{adID}/check-request": {
+            "post": {
+                "description": "Request to expert check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expert"
+                ],
+                "summary": "Request to expert check",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/check-request/{expertRequestID}": {
+            "put": {
+                "description": "Update expert check request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "expert"
+                ],
+                "summary": "Update expert check request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "expert request ID",
+                        "name": "expertRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Expert check object",
+                        "name": "expertCheckRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateExpertCheckRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExpertRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/expert/check-requests": {
+            "get": {
+                "description": "ListExpertRequest retrieves all expert requests for an expert",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "ListExpertRequest retrieves all expert requests for an expert",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "ads_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ExpertRequestResponse"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/ads/{adID}": {
+            "get": {
+                "description": "retrieve repair check request for repair or user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "retrieve repair check request for repair or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetRepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete repair request for user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "delete repair request for user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/ads/{adID}/check-request": {
+            "post": {
+                "description": "Request to repair check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Request to repair check",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "adID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/check-request/{repairRequestID}": {
+            "put": {
+                "description": "Update repair request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "repair"
+                ],
+                "summary": "Update repair request",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "repair request ID",
+                        "name": "repairRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "repair object",
+                        "name": "repairCheckRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateRepairRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/check-requests": {
+            "get": {
+                "description": "ListRepairRequest retrieves all repair requests for an repair",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "ListRepairRequest retrieves all repair requests for an repair",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "ads_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "From date",
+                        "name": "from_date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RepairRequestResponse"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "description": "Login with username and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
                     "users"
                 ],
                 "summary": "User login",
@@ -58,16 +680,6 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Ad"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Could not retrieve ads",
-                        "schema": {
-                            "type": "string"
                             "$ref": "#/definitions/handlers.UserResponse"
                         }
                     },
@@ -86,9 +698,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/ads/add": {
-            "post": {
-                "description": "Create new ad by given properties",
         "/users/payment/request": {
             "post": {
                 "description": "Zarinpal Payment to add budget to user",
@@ -99,12 +708,6 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
-                ],
-                "summary": "Create an ad",
-                "parameters": [
-                    {
-                        "description": "Ad details",
                     "payment"
                 ],
                 "summary": "Add budget request",
@@ -115,7 +718,6 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/ads.AdRequest"
                             "$ref": "#/definitions/handlers.AmountFee"
                         }
                     }
@@ -124,7 +726,6 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/ads.AdResponse"
                             "$ref": "#/definitions/handlers.RequestResponse"
                         }
                     },
@@ -137,23 +738,18 @@ const docTemplate = `{
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/ads.ErrorAddAd"
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/ads.ErrorAddAd"
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/ads/{id}": {
-            "get": {
-                "description": "Retrieves an ad based on the provided ID",
         "/users/payment/verify": {
             "get": {
                 "description": "Verify Zarinpal Payment to add budget to user",
@@ -164,16 +760,6 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
-                ],
-                "summary": "Get ad by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Ad ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
                     "payment"
                 ],
                 "summary": "Verify budget payment and add budget",
@@ -192,11 +778,6 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Ad"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid parameter id",
                             "type": "string"
                         }
                     },
@@ -213,10 +794,61 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Could not retrieve ads",
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/register": {
+            "post": {
+                "description": "Register a new user with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User registration details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
                         }
                     }
                 }
@@ -314,135 +946,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Ad": {
-            "type": "object",
-            "properties": {
-                "airplaneModel": {
-                    "type": "string"
-                },
-                "category": {
-                    "$ref": "#/definitions/models.Category"
-                },
-                "categoryID": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "expertCheck": {
-                    "type": "boolean"
-                },
-                "flyTime": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "planeAge": {
-                    "type": "integer"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "repairCheck": {
-                    "type": "boolean"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "subject": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "userID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Bookmarks": {
-            "type": "object",
-            "properties": {
-                "ads": {
-                    "$ref": "#/definitions/models.Ad"
-                },
-                "adsID": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "userID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Category": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-        },
-        "/users/register": {
-            "post": {
-                "description": "Register a new user with the provided information",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Register a new user",
-                "parameters": [
-                    {
-                        "description": "User registration details",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.UserCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.UserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
         "handlers.AmountFee": {
             "type": "object",
             "properties": {
@@ -526,7 +1029,205 @@ const docTemplate = `{
                 }
             }
         },
-
+        "models.Ad": {
+            "type": "object",
+            "properties": {
+                "airplaneModel": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "categoryID": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "expertCheck": {
+                    "type": "boolean"
+                },
+                "flyTime": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "planeAge": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "repairCheck": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Bookmarks": {
+            "type": "object",
+            "properties": {
+                "ads": {
+                    "$ref": "#/definitions/models.Ad"
+                },
+                "adsID": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExpertRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "expertID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.GetExpertRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adSubject": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "expertID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.GetRepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adSubject": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RepairRequestResponse": {
+            "type": "object",
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.UpdateExpertCheckRequest": {
+            "type": "object",
+            "properties": {
+                "report": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/utils.Status"
+                }
+            }
+        },
+        "models.UpdateRepairRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/utils.Status"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -539,21 +1240,39 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isActive": {
+                    "type": "boolean"
+                },
                 "password": {
                     "type": "string"
                 },
                 "role": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
                 },
                 "username": {
-
-        "models.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
                     "type": "string"
                 }
             }
+        },
+        "utils.Status": {
+            "type": "string",
+            "enum": [
+                "Wait for payment status",
+                "Pending for expert",
+                "Pending for matin",
+                "In progress",
+                "Done"
+            ],
+            "x-enum-varnames": [
+                "WAIT_FOR_PAYMENT_STATUS",
+                "EXPERT_PENDING_STATUS",
+                "MATIN_PENDING_STATUS",
+                "IN_PROGRESS_STATUS",
+                "DONE_STATUS"
+            ]
         }
     }
 }`

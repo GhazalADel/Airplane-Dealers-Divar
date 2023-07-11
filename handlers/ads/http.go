@@ -140,7 +140,7 @@ func (a AdsHandler) Get(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "invalid parameter id")
 	}
 
-	userRole := c.Get("account").(models.User).Role
+	userRole := c.Get("user").(models.User).Role
 
 	resp, err := a.datastore.Get(index, userRole)
 	if err != nil {
@@ -162,7 +162,7 @@ func (a AdsHandler) Get(c echo.Context) error {
 func (a AdsHandler) List(c echo.Context) error {
 	filter := filter.NewAdsFilter(c.QueryParams())
 
-	filter.Base.UserRole = c.Get("account").(models.User).Role
+	filter.Base.UserRole = c.Get("user").(models.User).Role
 
 	if len(filter.Base.Sort) != 0 {
 		resp, err := a.datastore.ListFilterSort(&filter.Base)

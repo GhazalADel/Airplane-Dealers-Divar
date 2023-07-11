@@ -59,70 +59,6 @@ definitions:
       responsecode:
         type: integer
     type: object
-  models.Ad:
-    properties:
-      airplaneModel:
-        type: string
-      category:
-        $ref: '#/definitions/models.Category'
-      categoryID:
-        type: integer
-      description:
-        type: string
-      expertCheck:
-        type: boolean
-      flyTime:
-        type: integer
-      id:
-        type: integer
-      image:
-        type: string
-      planeAge:
-        type: integer
-      price:
-        type: integer
-      repairCheck:
-        type: boolean
-      status:
-        type: string
-      subject:
-        type: string
-      user:
-        $ref: '#/definitions/models.User'
-      userID:
-        type: integer
-    type: object
-  models.Bookmarks:
-    properties:
-      ads:
-        $ref: '#/definitions/models.Ad'
-      adsID:
-        type: integer
-      user:
-        $ref: '#/definitions/models.User'
-      userID:
-        type: integer
-    type: object
-  models.Category:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  models.User:
-    properties:
-      bookmarks:
-        items:
-          $ref: '#/definitions/models.Bookmarks'
-        type: array
-      id:
-        type: integer
-      password:
-        type: string
-      role:
-        type: integer
-      username:
   handlers.AmountFee:
     properties:
       fee:
@@ -176,11 +112,168 @@ definitions:
       Status:
         type: string
     type: object
+  models.Ad:
+    properties:
+      airplaneModel:
+        type: string
+      category:
+        $ref: '#/definitions/models.Category'
+      categoryID:
+        type: integer
+      description:
+        type: string
+      expertCheck:
+        type: boolean
+      flyTime:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      planeAge:
+        type: integer
+      price:
+        type: integer
+      repairCheck:
+        type: boolean
+      status:
+        type: string
+      subject:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.Bookmarks:
+    properties:
+      ads:
+        $ref: '#/definitions/models.Ad'
+      adsID:
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.ErrorResponse:
     properties:
       error:
         type: string
     type: object
+  models.ExpertRequestResponse:
+    properties:
+      adID:
+        type: integer
+      createdAt:
+        type: string
+      expertID:
+        type: integer
+      id:
+        type: integer
+      status:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.GetExpertRequestResponse:
+    properties:
+      adSubject:
+        type: string
+      createdAt:
+        type: string
+      expertID:
+        type: integer
+      id:
+        type: integer
+      status:
+        type: string
+      userName:
+        type: integer
+    type: object
+  models.GetRepairRequestResponse:
+    properties:
+      adSubject:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userName:
+        type: integer
+    type: object
+  models.RepairRequestResponse:
+    properties:
+      adID:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.SuccessResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  models.UpdateExpertCheckRequest:
+    properties:
+      report:
+        type: string
+      status:
+        $ref: '#/definitions/utils.Status'
+    type: object
+  models.UpdateRepairRequest:
+    properties:
+      status:
+        $ref: '#/definitions/utils.Status'
+    type: object
+  models.User:
+    properties:
+      bookmarks:
+        items:
+          $ref: '#/definitions/models.Bookmarks'
+        type: array
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      password:
+        type: string
+      role:
+        type: string
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+  utils.Status:
+    enum:
+    - Wait for payment status
+    - Pending for expert
+    - Pending for matin
+    - In progress
+    - Done
+    type: string
+    x-enum-varnames:
+    - WAIT_FOR_PAYMENT_STATUS
+    - EXPERT_PENDING_STATUS
+    - MATIN_PENDING_STATUS
+    - IN_PROGRESS_STATUS
+    - DONE_STATUS
 host: localhost:8080
 info:
   contact:
@@ -199,18 +292,6 @@ paths:
       consumes:
       - application/json
       description: Retrieves ads from database and accept query params.
-  /users/login:
-    post:
-      consumes:
-      - application/json
-      description: Login with username and password
-      parameters:
-      - description: Login request body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.LoginRequest'
       produces:
       - application/json
       responses:
@@ -238,6 +319,406 @@ paths:
         name: id
         required: true
         type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Ad'
+        "400":
+          description: Invalid parameter id
+          schema:
+            type: string
+        "500":
+          description: Could not retrieve ads
+          schema:
+            type: string
+      summary: Get ad by ID
+      tags:
+      - ads
+  /ads/add:
+    post:
+      consumes:
+      - application/json
+      description: Create new ad by given properties
+      parameters:
+      - description: Ad details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/ads.AdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ads.AdResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ads.ErrorAddAd'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ads.ErrorAddAd'
+      summary: Create an ad
+      tags:
+      - ads
+  /expert/ads/{adID}:
+    delete:
+      description: delete expert check request for expert or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: delete expert check request for expert or user
+      tags:
+      - expert
+    get:
+      description: retrieve expert check request for expert or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetExpertRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve expert check request for expert or user
+      tags:
+      - expert
+  /expert/ads/{adID}/check-request:
+    post:
+      consumes:
+      - application/json
+      description: Request to expert check
+      parameters:
+      - description: Ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request to expert check
+      tags:
+      - expert
+  /expert/check-request/{expertRequestID}:
+    put:
+      consumes:
+      - application/json
+      description: Update expert check request
+      parameters:
+      - description: expert request ID
+        in: path
+        name: expertRequestID
+        required: true
+        type: integer
+      - description: Expert check object
+        in: body
+        name: expertCheckRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateExpertCheckRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ExpertRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update expert check request
+      tags:
+      - expert
+  /expert/check-requests:
+    get:
+      description: ListExpertRequest retrieves all expert requests for an expert
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: integer
+      - description: Ad ID
+        in: query
+        name: ads_id
+        type: integer
+      - description: From date
+        in: query
+        name: from_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ExpertRequestResponse'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: ListExpertRequest retrieves all expert requests for an expert
+      tags:
+      - expert
+  /repair/ads/{adID}:
+    delete:
+      description: delete repair request for user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: delete repair request for user
+      tags:
+      - repair
+    get:
+      description: retrieve repair check request for repair or user
+      parameters:
+      - description: ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetRepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve repair check request for repair or user
+      tags:
+      - repair
+  /repair/ads/{adID}/check-request:
+    post:
+      consumes:
+      - application/json
+      description: Request to repair check
+      parameters:
+      - description: Ad ID
+        in: path
+        name: adID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Request to repair check
+      tags:
+      - repair
+  /repair/check-request/{repairRequestID}:
+    put:
+      consumes:
+      - application/json
+      description: Update repair request
+      parameters:
+      - description: repair request ID
+        in: path
+        name: repairRequestID
+        required: true
+        type: integer
+      - description: repair object
+        in: body
+        name: repairCheckRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRepairRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RepairRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update repair request
+      tags:
+      - repair
+  /repair/check-requests:
+    get:
+      description: ListRepairRequest retrieves all repair requests for an repair
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: integer
+      - description: Ad ID
+        in: query
+        name: ads_id
+        type: integer
+      - description: From date
+        in: query
+        name: from_date
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RepairRequestResponse'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: ListRepairRequest retrieves all repair requests for an repair
+      tags:
+      - repair
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username and password
+      parameters:
+      - description: Login request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
             $ref: '#/definitions/handlers.UserResponse'
         "400":
           description: Bad Request
@@ -302,25 +783,6 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Ad'
-        "400":
-          description: Invalid parameter id
-          schema:
-            type: string
-        "500":
-          description: Could not retrieve ads
-          schema:
-            type: string
-      summary: Get ad by ID
-      tags:
-      - ads
-  /ads/add:
-    post:
-      consumes:
-      - application/json
-      description: Create new ad by given properties
-      parameters:
-      - description: Ad details
             type: string
         "400":
           description: Bad Request
@@ -348,25 +810,6 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/ads.AdRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/ads.AdResponse'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/ads.ErrorAddAd'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/ads.ErrorAddAd'
-      summary: Create an ad
-      tags:
-      - ads
           $ref: '#/definitions/handlers.UserCreateRequest'
       produces:
       - application/json

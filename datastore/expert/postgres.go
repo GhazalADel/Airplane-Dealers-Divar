@@ -1,6 +1,7 @@
 package expert
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
 	"context"
@@ -27,9 +28,9 @@ func (e ExpertStorer) GetByAd(
 	var expertAd models.ExpertAds
 	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.ads_id = ?", adID)
 
-	if user.Role == utils.ROLE_EXPERT { // is_expert
+	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
-	} else if user.Role == utils.ROLE_AIRLINE { // is advertiser
+	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&expertAd)
@@ -47,14 +48,8 @@ func (e ExpertStorer) Get(ctx context.Context, expertRequestID int) (models.Expe
 }
 
 func (e ExpertStorer) RequestToExpertCheck(
-	ctx context.Context, adID int, userID int,
+	ctx context.Context, adID int, user models.User,
 ) error {
-	// get user
-	var user models.User
-	if err := e.db.WithContext(ctx).First(&user, userID).Error; err != nil {
-		return err
-	}
-
 	// get ad
 	var ad models.Ad
 	if err := e.db.WithContext(ctx).First(&ad, adID).Error; err != nil {
@@ -67,14 +62,14 @@ func (e ExpertStorer) RequestToExpertCheck(
 	// get or create expert_ad
 	var expertAd models.ExpertAds
 	err := e.db.WithContext(ctx).
-		Where("user_id = ? AND ads_id = ?", userID, adID).
+		Where("user_id = ? AND ads_id = ?", user.ID, adID).
 		First(&expertAd).Error
 	if err != gorm.ErrRecordNotFound && err != nil {
 		return err
 	}
 
 	if expertAd.ID != 0 {
-		if expertAd.Status != utils.EXPERT_PENDING_STATUS {
+		if expertAd.Status != consts.EXPERT_PENDING_STATUS {
 			return errors.New("you had been requested for expert check")
 		}
 		return nil
@@ -84,7 +79,7 @@ func (e ExpertStorer) RequestToExpertCheck(
 		Create(map[string]interface{}{
 			"AdsID":  ad.ID,
 			"UserID": user.ID,
-			"Status": utils.WAIT_FOR_PAYMENT_STATUS,
+			"Status": consts.WAIT_FOR_PAYMENT_STATUS,
 		}).Error; err != nil {
 		return err
 	}
@@ -119,7 +114,7 @@ func (e ExpertStorer) GetAllExpertRequests(
 }
 
 type FilterAndConditionExpertRequest struct {
-	Status   utils.Status
+	Status   consts.Status
 	FromDate string
 	ExpertID int
 	UserID   int
@@ -167,7 +162,7 @@ func (q FilterAndConditionExpertRequest) ToQueryModel() (clause.AndConditions, e
 
 type FilterOrConditionExpertRequest struct {
 	ExpertIDList []interface{}
-	StatusList   []utils.Status
+	StatusList   []consts.Status
 }
 
 func (q FilterOrConditionExpertRequest) ToQueryModel() clause.OrConditions {
@@ -195,7 +190,7 @@ func (q FilterOrConditionExpertRequest) ToQueryModel() clause.OrConditions {
 }
 
 type FilterNotConditionExpertRequest struct {
-	Status utils.Status
+	Status consts.Status
 }
 
 func (q FilterNotConditionExpertRequest) ToQueryModel() clause.NotConditions {
@@ -218,9 +213,9 @@ func (e ExpertStorer) Update(
 
 	if body.Status != "" {
 		updatedMap["status"] = body.Status
-		if body.Status == utils.EXPERT_PENDING_STATUS {
+		if body.Status == consts.EXPERT_PENDING_STATUS {
 			updatedMap["expert_id"] = nil
-		} else if body.Status == utils.WAIT_FOR_PAYMENT_STATUS {
+		} else if body.Status == consts.WAIT_FOR_PAYMENT_STATUS {
 			return tmpExpertAd, errors.New("not allowed")
 		} else {
 			updatedMap["expert_id"] = user.ID
@@ -228,13 +223,16 @@ func (e ExpertStorer) Update(
 	}
 	if body.Report != "" {
 		updatedMap["report"] = body.Report
-		updatedMap["status"] = utils.DONE_STATUS
+		updatedMap["status"] = consts.DONE_STATUS
 	}
 
 	result := e.db.WithContext(ctx).
 		Clauses(clause.Returning{}).
 		Model(&tmpExpertAd).
-		Where("id = ?", expertAdID).
+		Where(
+			"id = ? AND (expert_id = ? OR expert_id IS NULL)",
+			expertAdID, user.ID,
+		).
 		Updates(updatedMap)
 
 	return tmpExpertAd, result.Error
@@ -248,7 +246,7 @@ func (e ExpertStorer) Delete(
 	result := e.db.WithContext(ctx).
 		Where(
 			"user_id = ? AND ads_id = ? AND status = ?",
-			user.ID, adID, utils.WAIT_FOR_PAYMENT_STATUS,
+			user.ID, adID, consts.WAIT_FOR_PAYMENT_STATUS,
 		).
 		Delete(&models.ExpertAds{})
 	if result.Error != nil {

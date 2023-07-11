@@ -1,17 +1,17 @@
 package models
 
 import (
-	"Airplane-Divar/utils"
+	"Airplane-Divar/consts"
 	"time"
 )
 
 type RepairRequest struct {
-	ID        uint         `gorm:"primary_key"`
-	Status    utils.Status `gorm:"type:status_type"`
-	CreatedAt time.Time    `gorm:"default:CURRENT_TIMESTAMP()"`
-	AdsID     uint         `gorm:"type:bigint;not null"`
-	UserID    uint         `gorm:"type:uint;not null"`
-	User      User         `gorm:"foreignKey:UserID"`
+	ID        uint          `gorm:"primary_key"`
+	Status    consts.Status `gorm:"type:status_type"`
+	CreatedAt time.Time     `gorm:"default:CURRENT_TIMESTAMP()"`
+	AdsID     uint          `gorm:"type:bigint;not null"`
+	UserID    uint          `gorm:"type:uint;not null"`
+	User      User          `gorm:"foreignKey:UserID"`
 	Ads       Ad
 }
 
