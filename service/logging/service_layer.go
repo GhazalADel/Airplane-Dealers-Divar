@@ -4,29 +4,44 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
 	"Airplane-Divar/service"
+	"fmt"
 )
 
 type Logging struct {
-	LoggingDatastore datastore.Logging
+	loggingDatastore datastore.Logging
 }
 
-func (loggingSrv *Logging) New(loggingDataStorer datastore.Logging) service.Logging {
+func New(loggingDataStorer datastore.Logging) service.Logging {
 	return &Logging{
-		LoggingDatastore: loggingDataStorer,
+		loggingDatastore: loggingDataStorer,
 	}
+
 }
 
-func (loggingSrv *Logging) GetAdsActivity(ID int) ([]models.ActivityLog, error) {
+func (loggingService *Logging) GetAdsActivity(ID int) ([]models.ActivityLog, error) {
 	// TODO
 	// Some Manipulation On Data !
-
 	// no need for payment, bookmark and buy logs
 	// excludeLogID := []uint{9, 10, 11, 12, 13}
 
-	return loggingSrv.LoggingDatastore.GetAdsActivityByID(ID)
+	return loggingService.loggingDatastore.GetAdsActivityByID(ID)
 }
 
-func (loggingSrv *Logging) ReportActivity(alog models.ActivityLog) error {
-	// TODO
-	return loggingSrv.LoggingDatastore.AddActivity(alog)
+func (loggingService *Logging) ReportActivity(causerType string, causerID int, subjectType string, subjectID int, logTitle string) error {
+
+	logName := loggingService.loggingDatastore.FindLogByTitle(logTitle)
+	if logName.Title == "" {
+		return fmt.Errorf("invalid logname %v", logTitle)
+	}
+
+	alog := models.ActivityLog{
+		CauserType:  causerType,
+		CauserID:    uint(causerID),
+		SubjectType: subjectType,
+		SubjecrID:   uint(subjectID),
+		Log:         logName,
+		LogID:       logName.ID,
+	}
+
+	return loggingService.loggingDatastore.AddActivity(alog)
 }
