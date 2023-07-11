@@ -1,6 +1,7 @@
 package db
 
 import (
+	"Airplane-Divar/models"
 	"errors"
 	"fmt"
 
@@ -25,6 +26,7 @@ func Connect() error {
 	}
 
 	dbConn = db
+	//initializeDatabase()
 	return nil
 }
 
@@ -36,4 +38,34 @@ func GetConnection() (*gorm.DB, error) {
 		}
 	}
 	return dbConn, nil
+}
+
+func CloseDatabase(db *gorm.DB) error {
+	postDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	err = postDB.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func initializeDatabase() {
+	//check categories table for tuples
+	var categories []models.Category
+	dbConn.Select("id").Find(&categories)
+	if len(categories) == 0 {
+		//insert categories
+		categories := []string{"small-passenger", "big-passenger"}
+		for _, v := range categories {
+			var c models.Category
+			c.Name = v
+			dbConn.Save(&c)
+		}
+
+	}
+
 }

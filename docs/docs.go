@@ -24,6 +24,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/ads": {
+            "get": {
+                "description": "Retrieves ads from database and accept query params.",
         "/users/login": {
             "post": {
                 "description": "Login with username and password",
@@ -34,6 +37,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
+                    "ads"
+                ],
+                "summary": "List of ads.",
                     "users"
                 ],
                 "summary": "User login",
@@ -52,6 +58,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Ad"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Could not retrieve ads",
+                        "schema": {
+                            "type": "string"
                             "$ref": "#/definitions/handlers.UserResponse"
                         }
                     },
@@ -70,6 +86,9 @@ const docTemplate = `{
                 }
             }
         },
+        "/ads/add": {
+            "post": {
+                "description": "Create new ad by given properties",
         "/users/payment/request": {
             "post": {
                 "description": "Zarinpal Payment to add budget to user",
@@ -80,6 +99,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
+                    "ads"
+                ],
+                "summary": "Create an ad",
+                "parameters": [
+                    {
+                        "description": "Ad details",
                     "payment"
                 ],
                 "summary": "Add budget request",
@@ -90,6 +115,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "$ref": "#/definitions/ads.AdRequest"
                             "$ref": "#/definitions/handlers.AmountFee"
                         }
                     }
@@ -98,6 +124,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/ads.AdResponse"
                             "$ref": "#/definitions/handlers.RequestResponse"
                         }
                     },
@@ -110,18 +137,23 @@ const docTemplate = `{
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
                             "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
             }
         },
+        "/ads/{id}": {
+            "get": {
+                "description": "Retrieves an ad based on the provided ID",
         "/users/payment/verify": {
             "get": {
                 "description": "Verify Zarinpal Payment to add budget to user",
@@ -132,6 +164,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
+                    "ads"
+                ],
+                "summary": "Get ad by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
                     "payment"
                 ],
                 "summary": "Verify budget payment and add budget",
@@ -150,6 +192,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "$ref": "#/definitions/models.Ad"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter id",
                             "type": "string"
                         }
                     },
@@ -166,6 +213,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
+                        "description": "Could not retrieve ads",
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
@@ -173,6 +221,173 @@ const docTemplate = `{
                     }
                 }
             }
+        }
+    },
+    "definitions": {
+        "ads.AdRequest": {
+            "type": "object",
+            "properties": {
+                "AirplaneModel": {
+                    "type": "string"
+                },
+                "Category": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ExpertCheck": {
+                    "type": "boolean"
+                },
+                "FlyTime": {
+                    "type": "integer"
+                },
+                "Image": {
+                    "type": "string"
+                },
+                "PlaneAge": {
+                    "type": "integer"
+                },
+                "Price": {
+                    "type": "integer"
+                },
+                "RepairCheck": {
+                    "type": "boolean"
+                },
+                "Subject": {
+                    "type": "string"
+                }
+            }
+        },
+        "ads.AdResponse": {
+            "type": "object",
+            "properties": {
+                "AirplaneModel": {
+                    "type": "string"
+                },
+                "CategoryID": {
+                    "type": "integer"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ExpertCheck": {
+                    "type": "boolean"
+                },
+                "FlyTime": {
+                    "type": "integer"
+                },
+                "ID": {
+                    "type": "integer"
+                },
+                "Image": {
+                    "type": "string"
+                },
+                "PlaneAge": {
+                    "type": "integer"
+                },
+                "Price": {
+                    "type": "integer"
+                },
+                "RepairCheck": {
+                    "type": "boolean"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "Subject": {
+                    "type": "string"
+                },
+                "UserID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "ads.ErrorAddAd": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "responsecode": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Ad": {
+            "type": "object",
+            "properties": {
+                "airplaneModel": {
+                    "type": "string"
+                },
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "categoryID": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "expertCheck": {
+                    "type": "boolean"
+                },
+                "flyTime": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "planeAge": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "repairCheck": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Bookmarks": {
+            "type": "object",
+            "properties": {
+                "ads": {
+                    "$ref": "#/definitions/models.Ad"
+                },
+                "adsID": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
         },
         "/users/register": {
             "post": {
@@ -311,6 +526,27 @@ const docTemplate = `{
                 }
             }
         },
+
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "bookmarks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Bookmarks"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "integer"
+                },
+                "username": {
+
         "models.ErrorResponse": {
             "type": "object",
             "properties": {

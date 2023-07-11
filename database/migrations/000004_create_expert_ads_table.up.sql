@@ -1,3 +1,4 @@
+
 CREATE TYPE status_type AS ENUM (
     'Wait for payment status',
     'Pending for expert',

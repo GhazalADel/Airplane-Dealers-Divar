@@ -1,5 +1,128 @@
 basePath: /
 definitions:
+  ads.AdRequest:
+    properties:
+      AirplaneModel:
+        type: string
+      Category:
+        type: string
+      Description:
+        type: string
+      ExpertCheck:
+        type: boolean
+      FlyTime:
+        type: integer
+      Image:
+        type: string
+      PlaneAge:
+        type: integer
+      Price:
+        type: integer
+      RepairCheck:
+        type: boolean
+      Subject:
+        type: string
+    type: object
+  ads.AdResponse:
+    properties:
+      AirplaneModel:
+        type: string
+      CategoryID:
+        type: integer
+      Description:
+        type: string
+      ExpertCheck:
+        type: boolean
+      FlyTime:
+        type: integer
+      ID:
+        type: integer
+      Image:
+        type: string
+      PlaneAge:
+        type: integer
+      Price:
+        type: integer
+      RepairCheck:
+        type: boolean
+      Status:
+        type: string
+      Subject:
+        type: string
+      UserID:
+        type: integer
+    type: object
+  ads.ErrorAddAd:
+    properties:
+      message:
+        type: string
+      responsecode:
+        type: integer
+    type: object
+  models.Ad:
+    properties:
+      airplaneModel:
+        type: string
+      category:
+        $ref: '#/definitions/models.Category'
+      categoryID:
+        type: integer
+      description:
+        type: string
+      expertCheck:
+        type: boolean
+      flyTime:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      planeAge:
+        type: integer
+      price:
+        type: integer
+      repairCheck:
+        type: boolean
+      status:
+        type: string
+      subject:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.Bookmarks:
+    properties:
+      ads:
+        $ref: '#/definitions/models.Ad'
+      adsID:
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.User:
+    properties:
+      bookmarks:
+        items:
+          $ref: '#/definitions/models.Bookmarks'
+        type: array
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        type: integer
+      username:
   handlers.AmountFee:
     properties:
       fee:
@@ -71,6 +194,11 @@ info:
   title: Airplane-Divar
   version: "1.0"
 paths:
+  /ads:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves ads from database and accept query params.
   /users/login:
     post:
       consumes:
@@ -89,6 +217,27 @@ paths:
         "200":
           description: OK
           schema:
+            items:
+              $ref: '#/definitions/models.Ad'
+            type: array
+        "500":
+          description: Could not retrieve ads
+          schema:
+            type: string
+      summary: List of ads.
+      tags:
+      - ads
+  /ads/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an ad based on the provided ID
+      parameters:
+      - description: Ad ID
+        in: query
+        name: id
+        required: true
+        type: integer
             $ref: '#/definitions/handlers.UserResponse'
         "400":
           description: Bad Request
@@ -153,6 +302,25 @@ paths:
         "200":
           description: OK
           schema:
+            $ref: '#/definitions/models.Ad'
+        "400":
+          description: Invalid parameter id
+          schema:
+            type: string
+        "500":
+          description: Could not retrieve ads
+          schema:
+            type: string
+      summary: Get ad by ID
+      tags:
+      - ads
+  /ads/add:
+    post:
+      consumes:
+      - application/json
+      description: Create new ad by given properties
+      parameters:
+      - description: Ad details
             type: string
         "400":
           description: Bad Request
@@ -180,6 +348,25 @@ paths:
         name: body
         required: true
         schema:
+          $ref: '#/definitions/ads.AdRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ads.AdResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/ads.ErrorAddAd'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ads.ErrorAddAd'
+      summary: Create an ad
+      tags:
+      - ads
           $ref: '#/definitions/handlers.UserCreateRequest'
       produces:
       - application/json
