@@ -63,7 +63,7 @@ type ActivityLogResponse struct {
 	CauserType  string    `json:"CauserType"`
 	CauserID    uint      `json:"CauserID"`
 	SubjectType string    `json:"SubjectType"`
-	SubjecrID   uint      `json:"SubjectId"`
+	SubjectID   uint      `json:"SubjectId"`
 	LogName     string    `json:"LogName"`
 	Description string    `json:"Description"`
 }
