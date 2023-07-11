@@ -17,7 +17,8 @@ func expertRoutes(e *echo.Echo, db *gorm.DB) {
 
 	e.POST("/expert/ads/:adID/check-request", expertHandler.RequestToExpertCheck, middlewares.IsLoggedIn)
 	e.GET("/expert/check-requests", expertHandler.GetAllExpertRequest, middlewares.IsLoggedIn)
-	e.GET("/expert/ads/:adID", expertHandler.GetExpertRequest, middlewares.IsLoggedIn)
+	e.GET("/expert/ads/:adID", expertHandler.GetExpertRequestByAd, middlewares.IsLoggedIn)
+	e.GET("/expert/check-request/:requestID", expertHandler.GetExpertRequest, middlewares.IsLoggedIn)
 	e.PUT("/expert/check-request/:expertRequestID", expertHandler.UpdateCheckExpert, middlewares.IsLoggedIn)
 	e.DELETE("/expert/ads/:adID", expertHandler.DeleteExpertRequest, middlewares.IsLoggedIn)
 }

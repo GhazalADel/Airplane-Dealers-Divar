@@ -148,11 +148,11 @@ const docTemplate = `{
         },
         "/expert/ads/{adID}": {
             "get": {
-                "description": "retrieve expert check request for expert or user",
+                "description": "retrieve expert check request by ad for expert or user",
                 "tags": [
                     "expert"
                 ],
-                "summary": "retrieve expert check request for expert or user",
+                "summary": "retrieve expert check request by ad for expert or user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -341,6 +341,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/expert/check-request/{requestID}": {
+            "get": {
+                "description": "retrieve expert check request for expert or user",
+                "tags": [
+                    "expert"
+                ],
+                "summary": "retrieve expert check request for expert or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "request ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetExpertRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/expert/check-requests": {
             "get": {
                 "description": "ListExpertRequest retrieves all expert requests for an expert",
@@ -372,16 +416,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ExpertRequestResponse"
-                            }
-                        }
-                    },
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/models.MessageResponse"
                         }
                     },
                     "400": {
@@ -946,6 +981,23 @@ const docTemplate = `{
                 }
             }
         },
+        "consts.Status": {
+            "type": "string",
+            "enum": [
+                "Wait for payment status",
+                "Pending for expert",
+                "Pending for matin",
+                "In progress",
+                "Done"
+            ],
+            "x-enum-varnames": [
+                "WAIT_FOR_PAYMENT_STATUS",
+                "EXPERT_PENDING_STATUS",
+                "MATIN_PENDING_STATUS",
+                "IN_PROGRESS_STATUS",
+                "DONE_STATUS"
+            ]
+        },
         "handlers.AmountFee": {
             "type": "object",
             "properties": {
@@ -1130,6 +1182,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "report": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -1153,10 +1208,13 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "report": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
-                "userName": {
+                "userID": {
                     "type": "integer"
                 }
             }
@@ -1176,8 +1234,16 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
-                "userName": {
+                "userID": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
                 }
             }
         },
@@ -1216,7 +1282,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/utils.Status"
+                    "$ref": "#/definitions/consts.Status"
                 }
             }
         },
@@ -1224,7 +1290,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "status": {
-                    "$ref": "#/definitions/utils.Status"
+                    "$ref": "#/definitions/consts.Status"
                 }
             }
         },
@@ -1256,23 +1322,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "utils.Status": {
-            "type": "string",
-            "enum": [
-                "Wait for payment status",
-                "Pending for expert",
-                "Pending for matin",
-                "In progress",
-                "Done"
-            ],
-            "x-enum-varnames": [
-                "WAIT_FOR_PAYMENT_STATUS",
-                "EXPERT_PENDING_STATUS",
-                "MATIN_PENDING_STATUS",
-                "IN_PROGRESS_STATUS",
-                "DONE_STATUS"
-            ]
         }
     }
 }`

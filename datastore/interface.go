@@ -27,7 +27,11 @@ type (
 			filterNotCondtion clause.NotConditions,
 			page int,
 		) ([]models.ExpertAds, error)
-		Get(ctx context.Context, expertRequestID int) (models.ExpertAds, error)
+		Get(
+			ctx context.Context,
+			requestID int,
+			user models.User,
+		) (models.ExpertAds, error)
 		GetByAd(
 			ctx context.Context,
 			adID int,

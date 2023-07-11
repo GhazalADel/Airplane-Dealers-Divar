@@ -6,7 +6,7 @@ import (
 	"Airplane-Divar/utils"
 	"context"
 	"errors"
-	"time"
+	"log"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -38,13 +38,22 @@ func (e ExpertStorer) GetByAd(
 	return expertAd, result.Error
 }
 
-func (e ExpertStorer) Get(ctx context.Context, expertRequestID int) (models.ExpertAds, error) {
+func (e ExpertStorer) Get(
+	ctx context.Context,
+	requestID int,
+	user models.User,
+) (models.ExpertAds, error) {
 	var expertAd models.ExpertAds
-	if err := e.db.WithContext(ctx).First(&expertAd, expertRequestID).Error; err != nil {
-		return expertAd, err
-	}
+	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.id = ?", requestID)
 
-	return expertAd, nil
+	if user.Role == consts.ROLE_EXPERT { // is_expert
+		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
+	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
+		query.Where(&models.Ad{UserID: user.ID})
+	}
+	result := query.First(&expertAd)
+
+	return expertAd, result.Error
 }
 
 func (e ExpertStorer) RequestToExpertCheck(
@@ -101,8 +110,11 @@ func (e ExpertStorer) GetAllExpertRequests(
 		query.Where(filterAndCondition)
 	}
 	if len(filterOrCondition) > 0 {
+		log.Println(filterOrCondition, "\n\n")
 		for _, filter := range filterOrCondition {
-			query.Where(filter)
+			if len(filter.Exprs) > 0 {
+				query.Where(filter)
+			}
 		}
 	}
 	if len(filterNotCondtion.Exprs) > 0 {
@@ -111,98 +123,6 @@ func (e ExpertStorer) GetAllExpertRequests(
 
 	result := query.Find(&expertRequests)
 	return expertRequests, result.Error
-}
-
-type FilterAndConditionExpertRequest struct {
-	Status   consts.Status
-	FromDate string
-	ExpertID int
-	UserID   int
-	AdsID    int
-}
-
-func (q FilterAndConditionExpertRequest) ToQueryModel() (clause.AndConditions, error) {
-	queryModel := clause.AndConditions{}
-
-	if q.UserID > 0 {
-		queryModel.Exprs = append(
-			queryModel.Exprs, clause.Eq{Column: "user_id", Value: q.UserID},
-		)
-	}
-
-	if q.Status != "" {
-		queryModel.Exprs = append(
-			queryModel.Exprs, clause.Eq{Column: "status", Value: q.Status},
-		)
-	}
-
-	if q.ExpertID > 0 {
-		queryModel.Exprs = append(
-			queryModel.Exprs, clause.Eq{Column: "expert_id", Value: q.ExpertID},
-		)
-	}
-
-	if q.AdsID > 0 {
-		queryModel.Exprs = append(
-			queryModel.Exprs, clause.Eq{Column: "ads_id", Value: q.AdsID},
-		)
-	}
-
-	if q.FromDate != "" {
-		t, err := time.Parse("2006-01-02", q.FromDate)
-		if err != nil {
-			return queryModel, err
-		}
-
-		queryModel.Exprs = append(queryModel.Exprs, clause.Gte{Column: "created_at", Value: t})
-	}
-
-	return queryModel, nil
-}
-
-type FilterOrConditionExpertRequest struct {
-	ExpertIDList []interface{}
-	StatusList   []consts.Status
-}
-
-func (q FilterOrConditionExpertRequest) ToQueryModel() clause.OrConditions {
-	queryModel := clause.OrConditions{}
-
-	if len(q.ExpertIDList) > 0 {
-		for _, val := range q.ExpertIDList {
-
-			queryModel.Exprs = append(
-				queryModel.Exprs, clause.Eq{Column: "expert_id", Value: val},
-			)
-		}
-	}
-
-	if len(q.StatusList) > 0 {
-		for _, val := range q.StatusList {
-
-			queryModel.Exprs = append(
-				queryModel.Exprs, clause.Eq{Column: "status", Value: val},
-			)
-		}
-	}
-
-	return queryModel
-}
-
-type FilterNotConditionExpertRequest struct {
-	Status consts.Status
-}
-
-func (q FilterNotConditionExpertRequest) ToQueryModel() clause.NotConditions {
-	queryModel := clause.NotConditions{}
-
-	if q.Status != "" {
-		queryModel.Exprs = append(
-			queryModel.Exprs, clause.Eq{Column: "status", Value: q.Status},
-		)
-	}
-
-	return queryModel
 }
 
 func (e ExpertStorer) Update(
@@ -224,14 +144,15 @@ func (e ExpertStorer) Update(
 	if body.Report != "" {
 		updatedMap["report"] = body.Report
 		updatedMap["status"] = consts.DONE_STATUS
+		updatedMap["expert_id"] = user.ID
 	}
 
 	result := e.db.WithContext(ctx).
 		Clauses(clause.Returning{}).
 		Model(&tmpExpertAd).
 		Where(
-			"id = ? AND (expert_id = ? OR expert_id IS NULL)",
-			expertAdID, user.ID,
+			"id = ? AND (expert_id = ? OR expert_id IS NULL) AND status != ?",
+			expertAdID, user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		).
 		Updates(updatedMap)
 

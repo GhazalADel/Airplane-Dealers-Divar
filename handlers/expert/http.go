@@ -40,6 +40,15 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 	adID, err := strconv.Atoi(c.Param("adID"))
 	user := c.Get("user").(models.User)
 
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "Only airline user can send request for expert check",
+			},
+		)
+	}
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 	}
@@ -64,7 +73,7 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 // @Param ads_id query int false "Ad ID"
 // @Param from_date query string false "From date"
 // @Success 200 {array} models.ExpertRequestResponse
-// @Failure 204 {object} models.ErrorResponse
+// @Success 200 {object} models.MessageResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /expert/check-requests [get]
@@ -72,6 +81,15 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	user := c.Get("user").(models.User)
+
+	if user.Role == consts.ROLE_MATIN {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to expert requests.",
+			},
+		)
+	}
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -112,7 +130,13 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 	)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
+	}
 
+	if len(expertAds) == 0 {
+		return c.JSON(
+			http.StatusOK,
+			models.MessageResponse{Message: "There is no expert request."},
+		)
 	}
 
 	var resp []models.ExpertRequestResponse
@@ -124,11 +148,12 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 			AdID:      int(v.AdsID),
 			ExpertID:  int(v.ExpertID),
 			Status:    string(v.Status),
+			Report:    v.Report,
 			CreatedAt: v.CreatedAt,
 		})
 	}
 
-	return c.JSON(200, resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 // @Summary Update expert check request
@@ -146,6 +171,15 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
+
+	if user.Role != consts.ROLE_EXPERT {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You can't update expert requests.",
+			},
+		)
+	}
 
 	expertRequestID, _ := strconv.Atoi(c.Param("expertRequestID"))
 
@@ -169,14 +203,15 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 		AdID:      int(expertAd.AdsID),
 		ExpertID:  int(expertAd.ExpertID),
 		Status:    string(expertAd.Status),
+		Report:    expertAd.Report,
 		CreatedAt: expertAd.CreatedAt,
 	}
 
 	return c.JSON(http.StatusOK, resp)
 }
 
-// @Summary retrieve expert check request for expert or user
-// @Description retrieve expert check request for expert or user
+// @Summary retrieve expert check request by ad for expert or user
+// @Description retrieve expert check request by ad for expert or user
 // @Tags expert
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.GetExpertRequestResponse
@@ -184,10 +219,19 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /expert/ads/{adID} [get]
-func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
+func (e *ExpertHandler) GetExpertRequestByAd(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
+
+	if user.Role == consts.ROLE_MATIN {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to expert requests.",
+			},
+		)
+	}
 
 	expertAd, err := e.ExpertDatastore.GetByAd(ctx, adID, user)
 	if err != nil {
@@ -202,6 +246,51 @@ func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
 		AdSubject: expertAd.Ads.Subject,
 		ExpertID:  int(expertAd.ExpertID),
 		Status:    string(expertAd.Status),
+		Report:    expertAd.Report,
+		CreatedAt: expertAd.CreatedAt,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+
+}
+
+// @Summary retrieve expert check request for expert or user
+// @Description retrieve expert check request for expert or user
+// @Tags expert
+// @Param requestID path int true "request ID"
+// @Success 200 {object} models.GetExpertRequestResponse
+// @Failure 204 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /expert/check-request/{requestID} [get]
+func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+	user := c.Get("user").(models.User)
+	requestID, _ := strconv.Atoi(c.Param("requestID"))
+
+	if user.Role == consts.ROLE_MATIN {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to expert requests.",
+			},
+		)
+	}
+
+	expertAd, err := e.ExpertDatastore.Get(ctx, requestID, user)
+	if err != nil {
+		return c.JSON(
+			http.StatusNotFound, models.ErrorResponse{Error: "Expert request not found!"},
+		)
+	}
+
+	resp := models.GetExpertRequestResponse{
+		ID:        int(expertAd.ID),
+		UserID:    int(expertAd.UserID),
+		AdSubject: expertAd.Ads.Subject,
+		ExpertID:  int(expertAd.ExpertID),
+		Status:    string(expertAd.Status),
+		Report:    expertAd.Report,
 		CreatedAt: expertAd.CreatedAt,
 	}
 
@@ -222,6 +311,15 @@ func (e *ExpertHandler) DeleteExpertRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
+
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You can't delete this expert request.",
+			},
+		)
+	}
 
 	err := e.ExpertDatastore.Delete(ctx, adID, user)
 	if err != nil {

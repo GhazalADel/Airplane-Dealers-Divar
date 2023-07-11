@@ -59,6 +59,20 @@ definitions:
       responsecode:
         type: integer
     type: object
+  consts.Status:
+    enum:
+    - Wait for payment status
+    - Pending for expert
+    - Pending for matin
+    - In progress
+    - Done
+    type: string
+    x-enum-varnames:
+    - WAIT_FOR_PAYMENT_STATUS
+    - EXPERT_PENDING_STATUS
+    - MATIN_PENDING_STATUS
+    - IN_PROGRESS_STATUS
+    - DONE_STATUS
   handlers.AmountFee:
     properties:
       fee:
@@ -178,6 +192,8 @@ definitions:
         type: integer
       id:
         type: integer
+      report:
+        type: string
       status:
         type: string
       userID:
@@ -193,9 +209,11 @@ definitions:
         type: integer
       id:
         type: integer
+      report:
+        type: string
       status:
         type: string
-      userName:
+      userID:
         type: integer
     type: object
   models.GetRepairRequestResponse:
@@ -208,8 +226,13 @@ definitions:
         type: integer
       status:
         type: string
-      userName:
+      userID:
         type: integer
+    type: object
+  models.MessageResponse:
+    properties:
+      message:
+        type: string
     type: object
   models.RepairRequestResponse:
     properties:
@@ -234,12 +257,12 @@ definitions:
       report:
         type: string
       status:
-        $ref: '#/definitions/utils.Status'
+        $ref: '#/definitions/consts.Status'
     type: object
   models.UpdateRepairRequest:
     properties:
       status:
-        $ref: '#/definitions/utils.Status'
+        $ref: '#/definitions/consts.Status'
     type: object
   models.User:
     properties:
@@ -260,20 +283,6 @@ definitions:
       username:
         type: string
     type: object
-  utils.Status:
-    enum:
-    - Wait for payment status
-    - Pending for expert
-    - Pending for matin
-    - In progress
-    - Done
-    type: string
-    x-enum-varnames:
-    - WAIT_FOR_PAYMENT_STATUS
-    - EXPERT_PENDING_STATUS
-    - MATIN_PENDING_STATUS
-    - IN_PROGRESS_STATUS
-    - DONE_STATUS
 host: localhost:8080
 info:
   contact:
@@ -397,7 +406,7 @@ paths:
       tags:
       - expert
     get:
-      description: retrieve expert check request for expert or user
+      description: retrieve expert check request by ad for expert or user
       parameters:
       - description: ad ID
         in: path
@@ -421,7 +430,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: retrieve expert check request for expert or user
+      summary: retrieve expert check request by ad for expert or user
       tags:
       - expert
   /expert/ads/{adID}/check-request:
@@ -496,6 +505,35 @@ paths:
       summary: Update expert check request
       tags:
       - expert
+  /expert/check-request/{requestID}:
+    get:
+      description: retrieve expert check request for expert or user
+      parameters:
+      - description: request ID
+        in: path
+        name: requestID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetExpertRequestResponse'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: retrieve expert check request for expert or user
+      tags:
+      - expert
   /expert/check-requests:
     get:
       description: ListExpertRequest retrieves all expert requests for an expert
@@ -516,13 +554,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.ExpertRequestResponse'
-            type: array
-        "204":
-          description: No Content
-          schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/models.MessageResponse'
         "400":
           description: Bad Request
           schema:
