@@ -27,6 +27,9 @@ const docTemplate = `{
         "/ads": {
             "get": {
                 "description": "Retrieves ads from database and accept query params.",
+        "/users/login": {
+            "post": {
+                "description": "Login with username and password",
                 "consumes": [
                     "application/json"
                 ],
@@ -37,6 +40,20 @@ const docTemplate = `{
                     "ads"
                 ],
                 "summary": "List of ads.",
+                    "users"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "Login request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -51,6 +68,19 @@ const docTemplate = `{
                         "description": "Could not retrieve ads",
                         "schema": {
                             "type": "string"
+                            "$ref": "#/definitions/handlers.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
                         }
                     }
                 }
@@ -59,6 +89,9 @@ const docTemplate = `{
         "/ads/add": {
             "post": {
                 "description": "Create new ad by given properties",
+        "/users/payment/request": {
+            "post": {
+                "description": "Zarinpal Payment to add budget to user",
                 "consumes": [
                     "application/json"
                 ],
@@ -72,11 +105,18 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Ad details",
+                    "payment"
+                ],
+                "summary": "Add budget request",
+                "parameters": [
+                    {
+                        "description": "Payment request details",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/ads.AdRequest"
+                            "$ref": "#/definitions/handlers.AmountFee"
                         }
                     }
                 ],
@@ -85,18 +125,27 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ads.AdResponse"
+                            "$ref": "#/definitions/handlers.RequestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/ads.ErrorAddAd"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/ads.ErrorAddAd"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -105,6 +154,9 @@ const docTemplate = `{
         "/ads/{id}": {
             "get": {
                 "description": "Retrieves an ad based on the provided ID",
+        "/users/payment/verify": {
+            "get": {
+                "description": "Verify Zarinpal Payment to add budget to user",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,6 +174,18 @@ const docTemplate = `{
                         "name": "id",
                         "in": "query",
                         "required": true
+                    "payment"
+                ],
+                "summary": "Verify budget payment and add budget",
+                "parameters": [
+                    {
+                        "description": "Payment verify details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.VerifyResponse"
+                        }
                     }
                 ],
                 "responses": {
@@ -133,12 +197,24 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid parameter id",
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "500": {
                         "description": "Could not retrieve ads",
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -312,10 +388,145 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
+        },
+        "/users/register": {
+            "post": {
+                "description": "Register a new user with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User registration details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponseRegisterLogin"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.AmountFee": {
+            "type": "object",
+            "properties": {
+                "fee": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.ErrorResponseRegisterLogin": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "responsecode": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
         },
+        "handlers.RequestResponse": {
+            "type": "object",
+            "properties": {
+                "payment_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.UserResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "IsActive": {
+                    "type": "boolean"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "Token": {
+                    "type": "string"
+                },
+                "UserID": {
+                    "type": "integer"
+                },
+                "Username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.VerifyResponse": {
+            "type": "object",
+            "properties": {
+                "Authority": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                }
+            }
+        },
+
         "models.User": {
             "type": "object",
             "properties": {
@@ -335,6 +546,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "username": {
+
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
                     "type": "string"
                 }
             }

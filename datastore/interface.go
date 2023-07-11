@@ -12,4 +12,15 @@ type Ad interface {
 	ListFilterSort(f *filter.Filter) ([]models.Ad, error)
 	GetCategoryByName(name string) (models.Category, error)
 	CreateAd(ad *models.Ad) (models.Ad, error)
+
+
+type User interface {
+	Get(id int) ([]models.User, error)
+	Create(username string, password string) (string, models.User, error)
+	Login(username, password string) (string, models.User, error)
+	CheckUnique(username string) (string, error)
+}
+
+type Payment interface {
+	Create(userID uint, fee int64, authority string) (string, error)
 }

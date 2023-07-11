@@ -15,3 +15,4 @@ CREATE TABLE IF NOT EXISTS ads (
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (category_id) REFERENCES categories (id)
 );
+

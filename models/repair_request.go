@@ -5,19 +5,16 @@ import (
 	"time"
 )
 
-type ExpertAds struct {
+type RepairRequest struct {
 	ID        uint         `gorm:"primary_key"`
-	Report    string       `gorm:"type:text"`
 	Status    utils.Status `gorm:"type:status_type"`
 	CreatedAt time.Time    `gorm:"default:CURRENT_TIMESTAMP()"`
-	Expert    User         `gorm:"foreignKey:ExpertID"`
-	ExpertID  uint         `gorm:"type:bigint"`
 	AdsID     uint         `gorm:"type:bigint;not null"`
 	UserID    uint         `gorm:"type:uint;not null"`
 	User      User         `gorm:"foreignKey:UserID"`
 	Ads       Ad
 }
 
-func (ExpertAds) TableName() string {
-	return "expert_ads"
+func (RepairRequest) TableName() string {
+	return "repair_request"
 }

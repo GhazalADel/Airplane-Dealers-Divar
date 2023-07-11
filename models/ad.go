@@ -1,5 +1,6 @@
 package models
 
+
 type Ad struct {
 	ID            uint   `gorm:"primaryKey"`
 	UserID        uint   `gorm:"not null"`
