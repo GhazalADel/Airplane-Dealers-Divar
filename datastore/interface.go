@@ -85,13 +85,14 @@ type (
 		CheckUnique(username string) (string, error)
 	}
 
-type Payment interface {
-	Create(userID uint, fee int64, authority string) (string, error)
-}
+	Payment interface {
+		Create(userID uint, fee int64, authority string) (string, error)
+	}
 
-type Logging interface {
-	AddNewLogName(id uint, title string) error
-	FindLogByTitle(title string) models.LogName
-	AddActivity(al models.ActivityLog) error
-	GetAdsActivityByID(id int) ([]models.ActivityLog, error)
-}
+	Logging interface {
+		AddNewLogName(id uint, title string) error
+		FindLogByTitle(title string) models.LogName
+		AddActivity(al models.ActivityLog) error
+		GetAdsActivityByID(id int) ([]models.ActivityLog, error)
+	}
+)
