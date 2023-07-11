@@ -19,6 +19,7 @@ func New(loggingDataStorer datastore.Logging) service.Logging {
 }
 
 func excludeLogIds(logID uint) bool {
+	// no need for payment - bookmark - buy logs
 	excludeLogId := []uint{9, 10, 11, 12, 13}
 
 	for _, lid := range excludeLogId {
