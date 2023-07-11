@@ -1,14 +1,14 @@
 package repair
 
 import (
-	"Airplane-Divar/utils"
+	"Airplane-Divar/consts"
 	"time"
 
 	"gorm.io/gorm/clause"
 )
 
 type FilterAndConditionRepairRequest struct {
-	Status   utils.Status
+	Status   consts.Status
 	FromDate string
 	UserID   int
 	AdsID    int
@@ -48,7 +48,7 @@ func (q FilterAndConditionRepairRequest) ToQueryModel() (clause.AndConditions, e
 }
 
 type FilterNotConditionRepairRequest struct {
-	Status utils.Status
+	Status consts.Status
 }
 
 func (q FilterNotConditionRepairRequest) ToQueryModel() clause.NotConditions {

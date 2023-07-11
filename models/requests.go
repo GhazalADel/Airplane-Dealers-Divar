@@ -1,12 +1,12 @@
 package models
 
-import "Airplane-Divar/utils"
+import "Airplane-Divar/consts"
 
 type UpdateExpertCheckRequest struct {
-	Status utils.Status `json:"status"`
-	Report string       `json:"report"`
+	Status consts.Status `json:"status"`
+	Report string        `json:"report"`
 }
 
 type UpdateRepairRequest struct {
-	Status utils.Status `json:"status"`
+	Status consts.Status `json:"status"`
 }

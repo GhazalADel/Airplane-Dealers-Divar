@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/datastore/repair"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"net/http"
 	"strconv"
 
@@ -120,11 +120,11 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 		AdsID:    adsID,
 		UserID:   userID,
 	}
-	if user.Role == utils.ROLE_MATIN {
+	if user.Role == consts.ROLE_MATIN {
 		filterNotCondtion = repair.FilterNotConditionRepairRequest{
-			Status: utils.WAIT_FOR_PAYMENT_STATUS,
+			Status: consts.WAIT_FOR_PAYMENT_STATUS,
 		}
-	} else if user.Role == utils.ROLE_AIRLINE {
+	} else if user.Role == consts.ROLE_AIRLINE {
 		filterAndCondition.UserID = int(user.ID)
 	}
 
@@ -219,4 +219,3 @@ func (e *RepairHandler) DeleteRepairRequest(c echo.Context) error {
 	return c.JSON(http.StatusNoContent, models.SuccessResponse{Success: true})
 
 }
-	

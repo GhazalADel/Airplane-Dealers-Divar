@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/datastore/expert"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"net/http"
 	"strconv"
 
@@ -91,15 +91,15 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 		AdsID:    adsID,
 		UserID:   userID,
 	}
-	if user.Role == utils.ROLE_EXPERT {
+	if user.Role == consts.ROLE_EXPERT {
 		filterOrCondition = expert.FilterOrConditionExpertRequest{
 			ExpertIDList: []interface{}{user.ID, nil},
 		}
 
 		filterNotCondtion = expert.FilterNotConditionExpertRequest{
-			Status: utils.WAIT_FOR_PAYMENT_STATUS,
+			Status: consts.WAIT_FOR_PAYMENT_STATUS,
 		}
-	} else if user.Role == utils.ROLE_AIRLINE {
+	} else if user.Role == consts.ROLE_AIRLINE {
 		filterAndCondition.UserID = int(user.ID)
 	}
 

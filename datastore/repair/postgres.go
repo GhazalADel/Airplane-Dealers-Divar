@@ -1,6 +1,7 @@
 package repair
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
 	"context"
@@ -26,7 +27,7 @@ func (e RepairStorer) GetByAd(
 	var repairRequest models.RepairRequest
 	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.ads_id = ?", adID)
 
-	if user.Role == utils.ROLE_AIRLINE { // is airline
+	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	}
 	result := query.First(&repairRequest)
@@ -56,7 +57,7 @@ func (e RepairStorer) RequestToRepairCheck(
 	}
 
 	if repairRequest.ID != 0 {
-		if repairRequest.Status != utils.MATIN_PENDING_STATUS {
+		if repairRequest.Status != consts.MATIN_PENDING_STATUS {
 			return errors.New("you had been requested for repairing")
 		}
 		return nil
@@ -66,7 +67,7 @@ func (e RepairStorer) RequestToRepairCheck(
 		Create(map[string]interface{}{
 			"AdsID":  ad.ID,
 			"UserID": user.ID,
-			"Status": utils.WAIT_FOR_PAYMENT_STATUS,
+			"Status": consts.WAIT_FOR_PAYMENT_STATUS,
 		}).Error; err != nil {
 		return err
 	}
@@ -107,13 +108,13 @@ func (e RepairStorer) Update(
 	tmpRepairRequest := models.RepairRequest{}
 	updatedMap := make(map[string]interface{})
 
-	if user.Role != utils.ROLE_MATIN {
+	if user.Role != consts.ROLE_MATIN {
 		return tmpRepairRequest, errors.New("not allowed")
 	}
 
 	if body.Status != "" {
 		updatedMap["status"] = body.Status
-		if body.Status == utils.WAIT_FOR_PAYMENT_STATUS {
+		if body.Status == consts.WAIT_FOR_PAYMENT_STATUS {
 			return tmpRepairRequest, errors.New("not allowed")
 		}
 	}
@@ -138,7 +139,7 @@ func (e RepairStorer) Delete(
 	result := e.db.WithContext(ctx).
 		Where(
 			"user_id = ? AND ads_id = ? AND status = ?",
-			user.ID, adID, utils.WAIT_FOR_PAYMENT_STATUS,
+			user.ID, adID, consts.WAIT_FOR_PAYMENT_STATUS,
 		).
 		Delete(&models.RepairRequest{})
 	if result.Error != nil {

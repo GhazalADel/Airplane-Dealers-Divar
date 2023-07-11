@@ -4,7 +4,6 @@ import (
 	database "Airplane-Divar/database"
 	"Airplane-Divar/models"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -60,7 +59,6 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 
 			//Add User Object To Context
-			log.Println(user, "++++++++++++++\n\n\n")
 			c.Set("user", user)
 			return next(c)
 
