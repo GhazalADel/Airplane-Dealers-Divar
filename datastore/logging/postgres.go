@@ -85,3 +85,14 @@ func (logDL *LoggingStore) GetAdsActivityByID(id int) ([]models.ActivityLog, err
 
 	return activityResult, nil
 }
+
+func (logDL *LoggingStore) FindLogByTitle(title string) models.LogName {
+
+	var logName models.LogName
+	err := logDL.db.Where("Title = ?", title).Find(&logName).Error
+
+	if err != nil {
+		return models.LogName{}
+	}
+	return logName
+}
