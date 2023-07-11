@@ -23,7 +23,7 @@ services:
 
   app:
     build: .
-    container_name: sms-panel
+    container_name: airplane-divar
     ports:
       - 8080:8080
     volumes:

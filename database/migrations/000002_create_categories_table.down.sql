@@ -1,1 +1,3 @@
-DROP TABLE categories;
+
+DROP TABLE IF EXISTS categories;
+

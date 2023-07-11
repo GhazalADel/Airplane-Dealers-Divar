@@ -2,9 +2,11 @@ package server
 
 import (
 	database "Airplane-Divar/database"
+	adsDatastore "Airplane-Divar/datastore/ads"
 	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
+	adsHandler "Airplane-Divar/handlers/ads"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -31,6 +33,11 @@ func StartServer() {
 
 	// Repair
 	repairRoutes(e, db)
+	// Ads
+	datastore := adsDatastore.New(db)
+	adsHandler := adsHandler.New(datastore)
+	adsRoutes(e, adsHandler)
+
 	// User
 	userDatastore := user.New(db)
 	userHandler := handlers.NewUserHandler(userDatastore)
