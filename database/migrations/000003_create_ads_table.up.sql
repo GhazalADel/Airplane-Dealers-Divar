@@ -7,12 +7,12 @@ CREATE TABLE IF NOT EXISTS ads (
     price BIGINT NOT NULL,
     category_id INT NOT NULL,
     status VARCHAR(255),
-    fly_time TIMESTAMP,
+    fly_time INT,
     airplane_model VARCHAR(255),
     repair_check BOOLEAN,
     expert_check BOOLEAN,
     plane_age INT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (category_id) REFERENCES categories(id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (category_id) REFERENCES categories (id)
 );
 
