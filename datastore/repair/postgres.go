@@ -29,6 +29,26 @@ func (e RepairStorer) GetByAd(
 
 	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
+	} else if user.Role == consts.ROLE_MATIN {
+		query.Where("status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
+	}
+	result := query.First(&repairRequest)
+
+	return repairRequest, result.Error
+}
+
+func (e RepairStorer) Get(
+	ctx context.Context,
+	requestID int,
+	user models.User,
+) (models.RepairRequest, error) {
+	var repairRequest models.RepairRequest
+	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.id = ?", requestID)
+
+	if user.Role == consts.ROLE_AIRLINE { // is airline
+		query.Where(&models.Ad{UserID: user.ID})
+	} else if user.Role == consts.ROLE_MATIN {
+		query.Where("status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
 	}
 	result := query.First(&repairRequest)
 
@@ -88,11 +108,15 @@ func (e RepairStorer) GetAllRepairRequests(
 	if len(filterAndCondition.Exprs) > 0 {
 		query.Where(filterAndCondition)
 	}
+
 	if len(filterOrCondition) > 0 {
 		for _, filter := range filterOrCondition {
-			query.Where(filter)
+			if len(filter.Exprs) > 0 {
+				query.Where(filter)
+			}
 		}
 	}
+
 	if len(filterNotCondtion.Exprs) > 0 {
 		query.Where(filterNotCondtion)
 	}
@@ -113,18 +137,18 @@ func (e RepairStorer) Update(
 	}
 
 	if body.Status != "" {
-		updatedMap["status"] = body.Status
 		if body.Status == consts.WAIT_FOR_PAYMENT_STATUS {
 			return tmpRepairRequest, errors.New("not allowed")
 		}
+		updatedMap["status"] = body.Status
 	}
 
 	result := e.db.WithContext(ctx).
 		Clauses(clause.Returning{}).
 		Model(&tmpRepairRequest).
 		Where(
-			"id = ?",
-			repairRequestID,
+			"id = ? AND status != ?",
+			repairRequestID, consts.WAIT_FOR_PAYMENT_STATUS,
 		).
 		Updates(updatedMap)
 

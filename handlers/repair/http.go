@@ -34,13 +34,22 @@ func NewRepairHandler(repairDS datastore.Repair, userDS datastore.User) *RepairH
 // @Failure 204 {object} models.ErrorResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /repair/ads/{adID}/check-request [post]
+// @Router /repair/ads/{adID}/request [post]
 func (e *RepairHandler) RequestToRepairCheck(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
 	adID, err := strconv.Atoi(c.Param("adID"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
+	}
+
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "Only airline user can send request for repairing",
+			},
+		)
 	}
 
 	err = e.RepairDatastore.RequestToRepairCheck(ctx, adID, user)
@@ -55,21 +64,72 @@ func (e *RepairHandler) RequestToRepairCheck(c echo.Context) error {
 	return c.JSON(201, resp)
 }
 
-// @Summary retrieve repair check request for repair or user
-// @Description retrieve repair check request for repair or user
+// @Summary retrieve repair check request by ad for repair or user
+// @Description retrieve repair check request by ad for repair or user
 // @Tags repair
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.GetRepairRequestResponse
-// @Failure 204 {object} models.ErrorResponse
+// @Success 200 {object} models.MessageResponse
+// @Success 200 {object} models.MessageResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /repair/ads/{adID} [get]
-func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
+func (e *RepairHandler) GetRepairRequestByAd(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
 
+	if user.Role == consts.ROLE_EXPERT {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to repair requests.",
+			},
+		)
+	}
+
 	repairRequest, err := e.RepairDatastore.GetByAd(ctx, adID, user)
+	if err != nil {
+		return c.JSON(
+			http.StatusNotFound, models.ErrorResponse{Error: "repair request not found!"},
+		)
+	}
+
+	resp := models.GetRepairRequestResponse{
+		ID:        int(repairRequest.ID),
+		UserID:    int(repairRequest.UserID),
+		AdSubject: repairRequest.Ads.Subject,
+		Status:    string(repairRequest.Status),
+		CreatedAt: repairRequest.CreatedAt,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+// @Summary retrieve repair check request for repair or user
+// @Description retrieve repair check request for repair or user
+// @Tags repair
+// @Param requestID path int true "ad ID"
+// @Success 200 {object} models.GetRepairRequestResponse
+// @Failure 204 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /repair/request/{requestID} [get]
+func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
+	ctx := c.Request().Context()
+	user := c.Get("user").(models.User)
+	requestID, _ := strconv.Atoi(c.Param("requestID"))
+
+	if user.Role == consts.ROLE_EXPERT {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to repair requests.",
+			},
+		)
+	}
+
+	repairRequest, err := e.RepairDatastore.Get(ctx, requestID, user)
 	if err != nil {
 		return c.JSON(
 			http.StatusNotFound, models.ErrorResponse{Error: "repair request not found!"},
@@ -94,14 +154,23 @@ func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 // @Param ads_id query int false "Ad ID"
 // @Param from_date query string false "From date"
 // @Success 200 {array} models.RepairRequestResponse
-// @Failure 204 {object} models.ErrorResponse
+// @Success 200 {object} models.MessageResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /repair/check-requests [get]
+// @Router /repair/requests [get]
 func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	user := c.Get("user").(models.User)
+
+	if user.Role == consts.ROLE_EXPERT {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to repair requests.",
+			},
+		)
+	}
 
 	// params
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -138,6 +207,12 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 
 	}
+	if len(repairRequests) == 0 {
+		return c.JSON(
+			http.StatusOK,
+			models.MessageResponse{Message: "There is no repair request."},
+		)
+	}
 
 	var resp []models.RepairRequestResponse
 
@@ -151,7 +226,7 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(200, resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 // @Summary Update repair request
@@ -165,10 +240,19 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 // @Failure 204 {object} models.ErrorResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /repair/check-request/{repairRequestID} [put]
+// @Router /repair/request/{repairRequestID} [put]
 func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
+
+	if user.Role != consts.ROLE_MATIN {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You don't have access to repair requests.",
+			},
+		)
+	}
 
 	repairRequestID, _ := strconv.Atoi(c.Param("repairRequestID"))
 
@@ -182,6 +266,10 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 	)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
+	} else if repairRequest.ID == 0 {
+		return c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Error: "repair request does not exist!",
+		})
 	}
 
 	resp := models.RepairRequestResponse{
@@ -208,6 +296,15 @@ func (e *RepairHandler) DeleteRepairRequest(c echo.Context) error {
 	ctx := c.Request().Context()
 	user := c.Get("user").(models.User)
 	adID, _ := strconv.Atoi(c.Param("adID"))
+
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "You can't delete this repair request.",
+			},
+		)
+	}
 
 	err := e.RepairDatastore.Delete(ctx, adID, user)
 	if err != nil {

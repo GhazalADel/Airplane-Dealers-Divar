@@ -15,9 +15,10 @@ func repairRoutes(e *echo.Echo, db *gorm.DB) {
 	userDS := user.New(db)
 	repairHandler := handlers.NewRepairHandler(repairDS, userDS)
 
-	e.POST("/repair/ads/:adID/check-request", repairHandler.RequestToRepairCheck, middlewares.IsLoggedIn)
-	e.GET("/repair/ads/:adID", repairHandler.GetRepairRequest, middlewares.IsLoggedIn)
-	e.GET("/repair/check-requests", repairHandler.GetAllRepairRequest, middlewares.IsLoggedIn)
-	e.PUT("/repair/check-request/:repairRequestID", repairHandler.UpdateRepairRequest, middlewares.IsLoggedIn)
+	e.POST("/repair/ads/:adID/request", repairHandler.RequestToRepairCheck, middlewares.IsLoggedIn)
+	e.GET("/repair/ads/:adID", repairHandler.GetRepairRequestByAd, middlewares.IsLoggedIn)
+	e.GET("/repair/requests", repairHandler.GetAllRepairRequest, middlewares.IsLoggedIn)
+	e.PUT("/repair/request/:repairRequestID", repairHandler.UpdateRepairRequest, middlewares.IsLoggedIn)
+	e.GET("/repair/request/:requestID", repairHandler.GetRepairRequest, middlewares.IsLoggedIn)
 	e.DELETE("/repair/ads/:adID", repairHandler.DeleteRepairRequest, middlewares.IsLoggedIn)
 }

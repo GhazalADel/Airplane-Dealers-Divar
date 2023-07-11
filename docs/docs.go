@@ -436,11 +436,11 @@ const docTemplate = `{
         },
         "/repair/ads/{adID}": {
             "get": {
-                "description": "retrieve repair check request for repair or user",
+                "description": "retrieve repair check request by ad for repair or user",
                 "tags": [
                     "repair"
                 ],
-                "summary": "retrieve repair check request for repair or user",
+                "summary": "retrieve repair check request by ad for repair or user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -454,13 +454,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.GetRepairRequestResponse"
-                        }
-                    },
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/models.MessageResponse"
                         }
                     },
                     "400": {
@@ -520,7 +514,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/repair/ads/{adID}/check-request": {
+        "/repair/ads/{adID}/request": {
             "post": {
                 "description": "Request to repair check",
                 "consumes": [
@@ -570,7 +564,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/repair/check-request/{repairRequestID}": {
+        "/repair/request/{repairRequestID}": {
             "put": {
                 "description": "Update repair request",
                 "consumes": [
@@ -629,7 +623,51 @@ const docTemplate = `{
                 }
             }
         },
-        "/repair/check-requests": {
+        "/repair/request/{requestID}": {
+            "get": {
+                "description": "retrieve repair check request for repair or user",
+                "tags": [
+                    "repair"
+                ],
+                "summary": "retrieve repair check request for repair or user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ad ID",
+                        "name": "requestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetRepairRequestResponse"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/repair/requests": {
             "get": {
                 "description": "ListRepairRequest retrieves all repair requests for an repair",
                 "tags": [
@@ -660,16 +698,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.RepairRequestResponse"
-                            }
-                        }
-                    },
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/models.MessageResponse"
                         }
                     },
                     "400": {

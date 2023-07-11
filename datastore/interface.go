@@ -55,6 +55,11 @@ type (
 			adID int,
 			user models.User,
 		) (models.RepairRequest, error)
+		Get(
+			ctx context.Context,
+			requestID int,
+			user models.User,
+		) (models.RepairRequest, error)
 		GetAllRepairRequests(
 			ctx context.Context,
 			filterAndCondition clause.AndConditions,

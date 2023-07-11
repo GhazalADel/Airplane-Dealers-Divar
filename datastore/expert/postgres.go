@@ -6,7 +6,6 @@ import (
 	"Airplane-Divar/utils"
 	"context"
 	"errors"
-	"log"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -29,7 +28,10 @@ func (e ExpertStorer) GetByAd(
 	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.ads_id = ?", adID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
-		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
+		query.Where(
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?", 
+			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
+		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
 		query.Where(&models.Ad{UserID: user.ID})
 	}
@@ -47,7 +49,10 @@ func (e ExpertStorer) Get(
 	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.id = ?", requestID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
-		query.Where("expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL", user.ID)
+		query.Where(
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?",
+			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
+		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
 		query.Where(&models.Ad{UserID: user.ID})
 	}
@@ -110,7 +115,6 @@ func (e ExpertStorer) GetAllExpertRequests(
 		query.Where(filterAndCondition)
 	}
 	if len(filterOrCondition) > 0 {
-		log.Println(filterOrCondition, "\n\n")
 		for _, filter := range filterOrCondition {
 			if len(filter.Exprs) > 0 {
 				query.Where(filter)

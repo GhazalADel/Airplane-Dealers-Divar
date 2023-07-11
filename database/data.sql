@@ -28,11 +28,11 @@ INSERT INTO public.categories (id, name) VALUES (1, 'Fighter aircrafts');
 --
 
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (3, 'expert2', '$2a$10$siQbgPqRp73XO5XrzCJXA.qRhJZ8o81X0eBFsxQ.dZKumr.zXsGG6', 'Expert', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA3NjI3MiwiaWQiOjN9.VtXtZHfMbLKeBeedAxOhayQrEByCWqiiDmMpdYKZcXg', true);
-INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (5, 'user2', '$2a$10$De72U25sFMXE8D./8SFDO.TEiPhAvW1S5ciW2nRS5RkudfnQs3pam', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA3NzkwOCwiaWQiOjV9.Ku68UGio-usWfKgIX08Sv2Iz5sejA48bwdvvnrTvad0', true);
-INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (4, 'matin', '$2a$10$c5NLMAH6NEyN.R/YJ5V7MuD5YXeR05ClP42vh/YkuGH4k40Zvhx7G', 'Matin', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4MDAwMywiaWQiOjR9.eLsWi1IdUJPugSnRcNCy81MM18FQ_U1TikPMXch63XQ', true);
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (6, 'admin', '$2a$10$Ns0EFT5hrBEwHo9pisXTMu.Ge4ME0U9HbfVo/cPXqVfEXrNJN43iy', 'Admin', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4MDE5OCwiaWQiOjZ9.bLeCAE9ywy8FwgQmREA7TTVUV7sd0IdJofwQlyQGXOQ', true);
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (1, 'expert1', '$2a$10$zM2Q5PNMg6si1oeSeZijD.bLyaeLEfORnQ8btxGewGN/xA5aszSam', 'Expert', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4MDQxMiwiaWQiOjF9.bSl_tAGPSyAntx9wNl1yVZJLue0q1BDD8MctIu0m-uM', true);
-INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (2, 'user1', '$2a$10$bt7LM.ARJb9S4iFnLdPJE.0AT2vle6Nrv/zUgbVGIb3nRy7JylOca', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4MzE4NSwiaWQiOjJ9.9Wc83df5zazq_OxLC-lfTtT3VXjE6d9M618vvLx3IJY', true);
+INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (2, 'user1', '$2a$10$bt7LM.ARJb9S4iFnLdPJE.0AT2vle6Nrv/zUgbVGIb3nRy7JylOca', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NjE4OSwiaWQiOjJ9.uN8A7qNrkRexcHDzgx6MFaezgAok0H13RXSI7OMV1XI', true);
+INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (4, 'matin', '$2a$10$c5NLMAH6NEyN.R/YJ5V7MuD5YXeR05ClP42vh/YkuGH4k40Zvhx7G', 'Matin', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NzI4NywiaWQiOjR9.4dw7tG9ZQoEUlRLzaJYi352awWPU8sjWfYCVPUqqAVE', true);
+INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (5, 'user2', '$2a$10$De72U25sFMXE8D./8SFDO.TEiPhAvW1S5ciW2nRS5RkudfnQs3pam', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NzY3NCwiaWQiOjV9.yc_7i34ZG0UN540lq8p4cVy_cCaez5ab7btlOzfL1_4', true);
 
 
 --
@@ -62,6 +62,8 @@ INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, c
 -- Data for Name: repair_request; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.repair_request (id, user_id, ads_id, status, created_at) VALUES (2, 5, 2, 'Wait for payment status', '2023-07-11 17:32:00.18268');
+INSERT INTO public.repair_request (id, user_id, ads_id, status, created_at) VALUES (1, 2, 1, 'In progress', '2023-07-11 17:08:54.353166');
 
 
 --
@@ -122,7 +124,7 @@ SELECT pg_catalog.setval('public.expert_ads_id_seq', 3, true);
 -- Name: repair_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.repair_request_id_seq', 1, false);
+SELECT pg_catalog.setval('public.repair_request_id_seq', 2, true);
 
 
 --
