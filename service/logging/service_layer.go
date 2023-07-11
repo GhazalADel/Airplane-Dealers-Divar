@@ -71,7 +71,7 @@ func (loggingService *Logging) ReportActivity(causerType string, causerID int, s
 		CauserType:  causerType,
 		CauserID:    uint(causerID),
 		SubjectType: subjectType,
-		SubjecrID:   uint(subjectID),
+		SubjectID:   uint(subjectID),
 		Log:         logName,
 		LogID:       logName.ID,
 	}
