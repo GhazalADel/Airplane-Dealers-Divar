@@ -44,7 +44,7 @@ func (logDL *LoggingStore) AddActivity(al models.ActivityLog) error {
 	var logname models.LogName
 	actvtlog := models.ActivityLog{
 		SubjectType: al.SubjectType,
-		SubjecrID:   al.SubjecrID,
+		SubjectID:   al.SubjectID,
 		CauserType:  al.CauserType,
 		CauserID:    al.CauserID,
 		Log:         al.Log,
