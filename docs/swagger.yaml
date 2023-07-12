@@ -59,6 +59,13 @@ definitions:
       responsecode:
         type: integer
     type: object
+  bookmarks.ErrorAddAd:
+    properties:
+      message:
+        type: string
+      responsecode:
+        type: integer
+    type: object
   consts.Status:
     enum:
     - Wait for payment status
@@ -159,6 +166,35 @@ definitions:
       userID:
         type: integer
     type: object
+  models.AdResponse:
+    properties:
+      airplaneModel:
+        type: string
+      categoryID:
+        type: integer
+      description:
+        type: string
+      expertCheck:
+        type: boolean
+      flyTime:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      planeAge:
+        type: integer
+      price:
+        type: integer
+      repairCheck:
+        type: boolean
+      status:
+        type: string
+      subject:
+        type: string
+      userID:
+        type: integer
+    type: object
   models.Bookmarks:
     properties:
       ads:
@@ -167,6 +203,13 @@ definitions:
         type: integer
       user:
         $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.BookmarksResponse:
+    properties:
+      adsID:
+        type: integer
       userID:
         type: integer
     type: object
@@ -352,9 +395,14 @@ paths:
       - application/json
       description: Create new ad by given properties
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Ad details
         in: body
-        name: body
+        name: AdRequest
         required: true
         schema:
           $ref: '#/definitions/ads.AdRequest'
@@ -365,6 +413,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ads.AdResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ads.ErrorAddAd'
         "422":
           description: Unprocessable Entity
           schema:
@@ -373,9 +425,124 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/ads.ErrorAddAd'
+      security:
+      - ApiKeyAuth: []
       summary: Create an ad
       tags:
       - ads
+  /bookmarks/add/{id}:
+    put:
+      consumes:
+      - application/json
+      description: add bookmark using given ad id
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Ad ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BookmarksResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+      security:
+      - ApiKeyAuth: []
+      summary: add bookmark
+      tags:
+      - bookmarks
+  /bookmarks/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete existing bookmark using id
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Ad ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bookmark Deleted Successfully
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+      security:
+      - ApiKeyAuth: []
+      summary: delete existing bookmark
+      tags:
+      - bookmarks
+  /bookmarks/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all bookmarks of this user
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AdResponse'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bookmarks.ErrorAddAd'
+      security:
+      - ApiKeyAuth: []
+      summary: bookmarks list
+      tags:
+      - bookmarks
   /expert/ads/{adID}:
     delete:
       description: delete expert check request for expert or user

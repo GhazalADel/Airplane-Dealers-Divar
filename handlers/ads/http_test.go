@@ -395,7 +395,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		err = a.AddAdHandler(c)
 
 		assert.NoError(t, err)
-		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+		assert.Equal(t, http.StatusForbidden, rec.Code)
 
 		var response models.Response
 		err = json.Unmarshal(rec.Body.Bytes(), &response)

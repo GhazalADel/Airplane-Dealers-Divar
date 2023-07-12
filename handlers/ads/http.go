@@ -60,9 +60,12 @@ type ErrorAddAd struct {
 // @Tags ads
 // @Accept json
 // @Produce json
-// @Param body body AdRequest true "Ad details"
+// @Security ApiKeyAuth
+// @Param Authorization header string true "User Token"
+// @Param AdRequest body AdRequest true "Ad details"
 // @Success 200 {object} AdResponse
 // @Failure 422 {object} ErrorAddAd
+// @Failure 403 {object} ErrorAddAd
 // @Failure 500 {object} ErrorAddAd
 // @Router /ads/add [post]
 func (a AdsHandler) AddAdHandler(c echo.Context) error {
@@ -82,7 +85,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	//check user role
 	user := c.Get("user").(models.User)
 	if user.Role != consts.ROLE_AIRLINE {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Airlines Can Add an ad!"})
+		return c.JSON(http.StatusForbidden, models.Response{ResponseCode: 403, Message: "Airlines Can Add an ad!"})
 	}
 
 	//validate and initialize categoryID in ad object
@@ -118,7 +121,23 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
 	}
-	return c.JSON(http.StatusOK, createdAd)
+	adRes := models.AdResponse{
+		ID:            createdAd.ID,
+		UserID:        createdAd.UserID,
+		Image:         createdAd.Image,
+		Description:   createdAd.Description,
+		Subject:       createdAd.Subject,
+		Price:         createdAd.Price,
+		CategoryID:    createdAd.CategoryID,
+		Status:        createdAd.Status,
+		FlyTime:       createdAd.FlyTime,
+		AirplaneModel: createdAd.AirplaneModel,
+		RepairCheck:   createdAd.RepairCheck,
+		ExpertCheck:   createdAd.ExpertCheck,
+		PlaneAge:      createdAd.PlaneAge,
+	}
+
+	return c.JSON(http.StatusOK, adRes)
 }
 
 // Get retrieves an ad by ID.

@@ -88,4 +88,9 @@ type (
 	Payment interface {
 		Create(userID uint, fee int64, authority string) (string, error)
 	}
+	Bookmark interface {
+		GetAdsByUserID(id int) ([]models.AdResponse, error)
+		AddBookmark(userID, adID int) (models.BookmarksResponse, error)
+		DeleteBookmark(userID, adID int) error
+	}
 )
