@@ -110,7 +110,7 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 			return msg, models.Ad{}, errors.New("")
 		}
 	} else {
-		ad.Subject = fmt.Sprintf("%d years old airplane : %s in the %s category", ad.PlaneAge, ad.AirplaneModel, cat)
+		ad.Subject = fmt.Sprintf("%d years old airplane : %s in the %s category", ad.PlaneAge, ad.AirplaneModel, cat.Name)
 	}
 
 	if _, ok := jsonBody["Description"]; ok {
@@ -121,7 +121,7 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 			return msg, models.Ad{}, errors.New("")
 		}
 	} else {
-		ad.Description = fmt.Sprintf("Model : %s | Age : %d | Category : %s | Price : %d | Fly Time : %d | Has Expert Check : %v | Has Repair Check : %v", ad.AirplaneModel, ad.PlaneAge, cat, ad.Price, ad.FlyTime, ad.ExpertCheck, ad.RepairCheck)
+		ad.Description = fmt.Sprintf("Model : %s | Age : %d | Category : %s | Price : %d | Fly Time : %d | Has Expert Check : %v | Has Repair Check : %v", ad.AirplaneModel, ad.PlaneAge, cat.Name, ad.Price, ad.FlyTime, ad.ExpertCheck, ad.RepairCheck)
 	}
 
 	return msg, ad, nil

@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
@@ -316,6 +317,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -351,6 +353,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -363,6 +366,42 @@ func TestAdHandler_AddAd(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.Equal(t, "Invalid Category Name", response.Message)
+	})
+
+	t.Run("non-airline user", func(t *testing.T) {
+		addAdReqBody := map[string]interface{}{
+			"Image":         "example1.jpg",
+			"Description":   "This is example ad 1.",
+			"Subject":       "Example Ad 1",
+			"FlyTime":       1000,
+			"AirplaneModel": "XYZ123",
+			"Price":         500000,
+			"Category":      "small-passenger",
+			"RepairCheck":   true,
+			"ExpertCheck":   false,
+			"PlaneAge":      7,
+		}
+		jsonData, err := json.Marshal(addAdReqBody)
+		assert.NoError(t, err)
+		req := httptest.NewRequest(http.MethodPost, "/ads/add", bytes.NewReader([]byte(jsonData)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		rec := httptest.NewRecorder()
+
+		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[1])
+
+		a := New(mockDatastore{})
+		err = a.AddAdHandler(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+
+		var response models.Response
+		err = json.Unmarshal(rec.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "Airlines Can Add an ad!", response.Message)
 	})
 
 	t.Run("non-string model", func(t *testing.T) {
@@ -386,6 +425,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -421,6 +461,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -456,6 +497,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -491,6 +533,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -526,6 +569,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -561,6 +605,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -596,6 +641,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -630,6 +676,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -665,6 +712,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -700,6 +748,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -735,6 +784,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -770,6 +820,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -831,6 +882,20 @@ var (
 			RepairCheck:   true,
 			ExpertCheck:   true,
 			PlaneAge:      3,
+		},
+	}
+	mockUserData = []models.User{
+		{
+			ID:       1,
+			Username: "John",
+			Password: "John123",
+			Role:     consts.ROLE_AIRLINE,
+		},
+		{
+			ID:       2,
+			Username: "Rose",
+			Password: "Rose123",
+			Role:     consts.ROLE_ADMIN,
 		},
 	}
 )

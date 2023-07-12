@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
@@ -79,10 +80,8 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	}
 
 	//check user role
-	user := c.Get("user")
-	user = user.(models.User)
-	role := string(user.(models.User).Role)
-	if role != "airline" {
+	user := c.Get("user").(models.User)
+	if user.Role != consts.ROLE_AIRLINE {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Airlines Can Add an ad!"})
 	}
 
@@ -109,7 +108,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 
 	//set user id
 
-	id := uint(user.(models.User).ID)
+	id := user.ID
 	ad.UserID = id
 
 	ad.Status = string(utils.INACTIVE)
