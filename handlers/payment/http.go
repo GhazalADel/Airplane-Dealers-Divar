@@ -1,14 +1,15 @@
 package handlers
 
 import (
+	"Airplane-Divar/consts"
 	database "Airplane-Divar/database"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -55,8 +56,14 @@ type ZarinpalErrors struct {
 	Code    int    `json:"code"`
 }
 
-type AmountFee struct {
-	Fee int `json:"fee"`
+type PaymentRequest struct {
+	AdID             int      `json:"adID" binding:"required"`
+	TransactionTypes []string `json:"transactionType" binding:"required"`
+}
+
+type TransactioTypeObject struct {
+	Type     string
+	ObjectID uint
 }
 
 type VerifyResponse struct {
@@ -69,11 +76,24 @@ type RequestResponse struct {
 }
 
 type PaymentHandler struct {
-	datastore datastore.Payment
+	UserDS    datastore.User
+	ExpertDS  datastore.Expert
+	RepairDS  datastore.Repair
+	PaymentDS datastore.Payment
 }
 
-func NewPaymentHandler(datastore datastore.Payment) *PaymentHandler {
-	return &PaymentHandler{datastore: datastore}
+func NewPaymentHandler(
+	userDS datastore.User,
+	expertDS datastore.Expert,
+	repairDS datastore.Repair,
+	paymentDS datastore.Payment,
+) *PaymentHandler {
+	return &PaymentHandler{
+		ExpertDS:  expertDS,
+		RepairDS:  repairDS,
+		UserDS:    userDS,
+		PaymentDS: paymentDS,
+	}
 }
 
 // @Summary Add budget request
@@ -81,33 +101,96 @@ func NewPaymentHandler(datastore datastore.Payment) *PaymentHandler {
 // @Tags payment
 // @Accept json
 // @Produce json
-// @Param body body AmountFee true "Payment request details"
+// @Param body body PaymentRequest true "Payment request details"
 // @Success 200 {object} RequestResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 422 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /users/payment/request [post]
 func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
-	// Read Request Body
-	jsonBody := make(map[string]interface{})
-	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
-	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
-	}
-
-	//check json format
-	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "fee")
-	if jsonFormatErr != nil {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
-	}
-
 	user := c.Get("user").(models.User)
+	ctx := c.Request().Context()
+
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(
+			http.StatusForbidden,
+			models.ErrorResponse{
+				Error: "Not allowed!",
+			},
+		)
+	}
+
+	var requestBody PaymentRequest
+	if err := c.Bind(&requestBody); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	// get service requests
+	requestIds := []TransactioTypeObject{}
+	for _, tType := range requestBody.TransactionTypes {
+		if tType == models.ExpertAds.TableName(models.ExpertAds{}) {
+			expertAd, err := p.ExpertDS.GetByAd(ctx, requestBody.AdID, user)
+			log.Println(expertAd)
+			if err != nil {
+				return c.JSON(
+					http.StatusNotFound, models.ErrorResponse{
+						Error: "You don't have any expert request",
+					},
+				)
+			}
+			if expertAd.Status != consts.WAIT_FOR_PAYMENT_STATUS {
+				return c.JSON(
+					http.StatusNotFound, models.ErrorResponse{
+						Error: "it's already payed!",
+					},
+				)
+			}
+			requestIds = append(requestIds, TransactioTypeObject{
+				Type: tType, ObjectID: expertAd.ID,
+			})
+
+		} else if tType == models.RepairRequest.TableName(models.RepairRequest{}) {
+			repairRequest, err := p.RepairDS.GetByAd(ctx, requestBody.AdID, user)
+			if err != nil {
+				return c.JSON(
+					http.StatusNotFound, models.ErrorResponse{
+						Error: "You don't have any repair request",
+					},
+				)
+			}
+			if repairRequest.Status != consts.WAIT_FOR_PAYMENT_STATUS {
+				return c.JSON(
+					http.StatusNotFound, models.ErrorResponse{
+						Error: "it's already payed!",
+					},
+				)
+			}
+			requestIds = append(requestIds, TransactioTypeObject{
+				Type: tType, ObjectID: repairRequest.ID,
+			})
+
+		} else {
+			return c.JSON(
+				http.StatusNotFound, models.ErrorResponse{
+					Error: "service not found!",
+				},
+			)
+		}
+	}
+
+	// calculate price
+	prices, err := p.PaymentDS.GetPriceByServices(ctx, requestBody.TransactionTypes)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, "Error")
+	}
+	total_price := p.PaymentDS.GetTotalPriceByServices(prices)
+	log.Println(total_price)
 
 	data := map[string]interface{}{
 		"merchant_id":  merchantID,
-		"amount":       jsonBody["fee"],
+		"amount":       total_price,
 		"callback_url": callbackURL,
-		"description":  "Add budget to user",
+		"description":  "Pay for service",
 		"metadata": map[string]string{
 			"mobile": "09121234567",
 			"email":  "test@test.com",
@@ -148,9 +231,14 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 	}
 
 	//create payment Transaction
-	transactionCreationMsg, transactionCreationErr := p.datastore.Create(user.ID, int64(result.Data.Fee), result.Data.Authority)
-	if transactionCreationErr != nil {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: transactionCreationMsg})
+	for _, service := range requestIds {
+		transactionCreationMsg, transactionCreationErr := p.PaymentDS.Create(
+			user.ID, int64(prices[service.Type]), result.Data.Authority,
+			service.Type, service.ObjectID,
+		)
+		if transactionCreationErr != nil {
+			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: transactionCreationMsg})
+		}
 	}
 
 	var response RequestResponse
