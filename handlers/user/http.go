@@ -64,12 +64,6 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
 	}
 
-	// Check if "role" key is present
-	if _, ok := jsonBody["role"]; !ok {
-		// Add a default value to "role"
-		jsonBody["role"] = consts.ROLE_AIRLINE
-	}
-
 	//check json format
 	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password", "role")
 	if jsonFormatErr != nil {
@@ -82,8 +76,33 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userUniqueMsg})
 	}
 
+	//role
+	role := string(consts.ROLE_AIRLINE)
+	if r, ok := jsonBody["role"]; ok {
+		if r.(string) != string(consts.ROLE_ADMIN) && r.(string) != (consts.ROLE_EXPERT) {
+			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid Role"})
+		} else {
+			role = r.(string)
+		}
+	}
+	if role == string(consts.ROLE_EXPERT) || role == string(consts.ROLE_ADMIN) {
+		if code, ok := jsonBody["code"]; !ok {
+			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "You have to enter code!"})
+		} else {
+			if role == string(consts.ROLE_EXPERT) {
+				if code.(string) != "expert123" {
+					return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "WRONG code"})
+				}
+			} else {
+				if code.(string) != "admin123" {
+					return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "WRONG code"})
+				}
+			}
+		}
+	}
+
 	//create user
-	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string), jsonBody["role"].(string))
+	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string), role)
 	if userCreationErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userCreationMsg})
 	}

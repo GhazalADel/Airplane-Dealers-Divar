@@ -38,15 +38,15 @@ func (a UserStore) Create(username string, password string, role string) (string
 		return msg, models.User{}, errors.New("")
 	}
 
-	if user.Role == consts.ROLE_MATIN {
-		msg = "User Creation Faield: You can't create Matin Role"
-		return msg, models.User{}, errors.New("")
-	}
+	// if user.Role == consts.ROLE_MATIN {
+	// 	msg = "User Creation Faield: You can't create Matin Role"
+	// 	return msg, models.User{}, errors.New("")
+	// }
 
-	if user.Role == consts.ROLE_ADMIN && password != "Admin123" {
-		msg = "User Creation Faield: You can't create Admin Role"
-		return msg, models.User{}, errors.New("")
-	}
+	// if user.Role == consts.ROLE_ADMIN && password != "Admin123" {
+	// 	msg = "User Creation Faield: You can't create Admin Role"
+	// 	return msg, models.User{}, errors.New("")
+	// }
 
 	//hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -56,7 +56,7 @@ func (a UserStore) Create(username string, password string, role string) (string
 	}
 	user.Password = string(hash)
 
-	//insert account into database
+	//insert user into database
 	createdUser := a.db.Create(&user)
 	if createdUser.Error != nil {
 		msg = "Failed to Create Account"
