@@ -86,7 +86,15 @@ type (
 	}
 
 	Payment interface {
-		Create(userID uint, fee int64, authority string) (string, error)
+		Create(
+			userID uint,
+			fee int64,
+			authority string,
+			transactionType string,
+			objectID uint,
+		) (string, error)
+		GetPriceByServices(ctx context.Context, services []string) (map[string]float64, error)
+		GetTotalPriceByServices(prices map[string]float64) float64
 	}
 	Bookmark interface {
 		GetAdsByUserID(id int) ([]models.AdResponse, error)

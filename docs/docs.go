@@ -976,7 +976,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.AmountFee"
+                            "$ref": "#/definitions/handlers.PaymentRequest"
                         }
                     }
                 ],
@@ -1232,14 +1232,6 @@ const docTemplate = `{
                 "DONE_STATUS"
             ]
         },
-        "handlers.AmountFee": {
-            "type": "object",
-            "properties": {
-                "fee": {
-                    "type": "integer"
-                }
-            }
-        },
         "handlers.ErrorResponseRegisterLogin": {
             "type": "object",
             "properties": {
@@ -1259,6 +1251,24 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.PaymentRequest": {
+            "type": "object",
+            "required": [
+                "adID",
+                "transactionType"
+            ],
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "transactionType": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

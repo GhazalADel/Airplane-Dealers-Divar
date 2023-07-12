@@ -3,7 +3,6 @@ package server
 import (
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
-	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
 	adsHandler "Airplane-Divar/handlers/ads"
@@ -47,9 +46,7 @@ func StartServer() {
 	userRoutes(e, userHandler)
 
 	// Payment
-	paymentDatastore := payment.New(db)
-	paymentHandler := handlers.NewPaymentHandler(paymentDatastore)
-	paymentRoutes(e, paymentHandler)
+	paymentRoutes(e, db)
 
 	// Bookmarks
 	bmDatastore := bookmarkDatastore.New(db)

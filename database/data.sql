@@ -32,7 +32,7 @@ INSERT INTO public.users (id, username, password, role, token, is_active) VALUES
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (1, 'expert1', '$2a$10$zM2Q5PNMg6si1oeSeZijD.bLyaeLEfORnQ8btxGewGN/xA5aszSam', 'Expert', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4MDQxMiwiaWQiOjF9.bSl_tAGPSyAntx9wNl1yVZJLue0q1BDD8MctIu0m-uM', true);
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (2, 'user1', '$2a$10$bt7LM.ARJb9S4iFnLdPJE.0AT2vle6Nrv/zUgbVGIb3nRy7JylOca', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NjE4OSwiaWQiOjJ9.uN8A7qNrkRexcHDzgx6MFaezgAok0H13RXSI7OMV1XI', true);
 INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (4, 'matin', '$2a$10$c5NLMAH6NEyN.R/YJ5V7MuD5YXeR05ClP42vh/YkuGH4k40Zvhx7G', 'Matin', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NzI4NywiaWQiOjR9.4dw7tG9ZQoEUlRLzaJYi352awWPU8sjWfYCVPUqqAVE', true);
-INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (5, 'user2', '$2a$10$De72U25sFMXE8D./8SFDO.TEiPhAvW1S5ciW2nRS5RkudfnQs3pam', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTA4NzY3NCwiaWQiOjV9.yc_7i34ZG0UN540lq8p4cVy_cCaez5ab7btlOzfL1_4', true);
+INSERT INTO public.users (id, username, password, role, token, is_active) VALUES (5, 'user2', '$2a$10$De72U25sFMXE8D./8SFDO.TEiPhAvW1S5ciW2nRS5RkudfnQs3pam', 'Airline', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cCI6MTY4OTE3Mjg0MCwiaWQiOjV9.oLQoNQyiZ58QDh19snPcBHYrIU8UEhwDn34tDk8-1Pk', true);
 
 
 --
@@ -50,12 +50,21 @@ INSERT INTO public.ads (id, user_id, image, description, subject, price, categor
 
 
 --
+-- Data for Name: configuration; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.configuration (id, name, value) VALUES (1, 'repair_request', 100000);
+INSERT INTO public.configuration (id, name, value) VALUES (2, 'expert_ads', 50000);
+
+
+--
 -- Data for Name: expert_ads; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (1, 2, 3, 1, 'Evrything is ok!', 'Done', '2023-07-09 10:04:59.386335');
 INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (3, 5, 1, 2, 'dfgdfg', 'Done', '2023-07-11 15:13:09.925577');
 INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (2, 2, 1, 2, 'dfgdfg', 'Done', '2023-07-09 10:34:21.826941');
+INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, created_at) VALUES (4, 5, NULL, 1, NULL, 'Wait for payment status', '2023-07-12 16:17:41.698048');
 
 
 --
@@ -64,12 +73,14 @@ INSERT INTO public.expert_ads (id, user_id, expert_id, ads_id, report, status, c
 
 INSERT INTO public.repair_request (id, user_id, ads_id, status, created_at) VALUES (2, 5, 2, 'Wait for payment status', '2023-07-11 17:32:00.18268');
 INSERT INTO public.repair_request (id, user_id, ads_id, status, created_at) VALUES (1, 2, 1, 'In progress', '2023-07-11 17:08:54.353166');
+INSERT INTO public.repair_request (id, user_id, ads_id, status, created_at) VALUES (3, 5, 1, 'Wait for payment status', '2023-07-12 16:17:15.175851');
 
 
 --
 -- Data for Name: schema_migrations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.schema_migrations (version, dirty) VALUES (8, false);
 INSERT INTO public.schema_migrations (version, dirty) VALUES (7, false);
 
 
@@ -77,6 +88,8 @@ INSERT INTO public.schema_migrations (version, dirty) VALUES (7, false);
 -- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO public.transactions (id, user_id, transaction_type, object_id, amount, status, authority, created_at) VALUES (15, 5, 'expert_ads', 4, 50000, 'Failed', 'A00000000000000000000000000000469340', '2023-07-12 17:24:53.349139');
+INSERT INTO public.transactions (id, user_id, transaction_type, object_id, amount, status, authority, created_at) VALUES (16, 5, 'repair_request', 3, 100000, 'Failed', 'A00000000000000000000000000000469340', '2023-07-12 17:24:53.452596');
 
 
 --
@@ -114,24 +127,31 @@ SELECT pg_catalog.setval('public.categories_id_seq', 1, true);
 
 
 --
+-- Name: configuration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.configuration_id_seq', 2, true);
+
+
+--
 -- Name: expert_ads_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.expert_ads_id_seq', 3, true);
+SELECT pg_catalog.setval('public.expert_ads_id_seq', 4, true);
 
 
 --
 -- Name: repair_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.repair_request_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repair_request_id_seq', 3, true);
 
 
 --
 -- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.transactions_id_seq', 1, false);
+SELECT pg_catalog.setval('public.transactions_id_seq', 16, true);
 
 
 --
