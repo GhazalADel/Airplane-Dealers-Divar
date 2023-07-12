@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
@@ -30,6 +31,7 @@ type UserCreateRequest struct {
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 type BudgetAmountResponse struct {
 	Amount int `json:"amount"`
@@ -62,8 +64,14 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid JSON"})
 	}
 
+	// Check if "role" key is present
+	if _, ok := jsonBody["role"]; !ok {
+		// Add a default value to "role"
+		jsonBody["role"] = consts.ROLE_AIRLINE
+	}
+
 	//check json format
-	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password")
+	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password", "role")
 	if jsonFormatErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
@@ -75,7 +83,7 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 	}
 
 	//create user
-	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string))
+	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string), jsonBody["role"].(string))
 	if userCreationErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userCreationMsg})
 	}

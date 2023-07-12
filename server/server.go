@@ -7,6 +7,7 @@ import (
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
 	adsHandler "Airplane-Divar/handlers/ads"
+	userHandler "Airplane-Divar/handlers/user"
 	"log"
 
 	"github.com/labstack/echo/v4"
@@ -40,7 +41,7 @@ func StartServer() {
 
 	// User
 	userDatastore := user.New(db)
-	userHandler := handlers.NewUserHandler(userDatastore)
+	userHandler := userHandler.NewUserHandler(userDatastore)
 	userRoutes(e, userHandler)
 
 	// Payment
