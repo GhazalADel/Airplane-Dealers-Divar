@@ -9,6 +9,7 @@ type (
 			subjectType string,
 			subjectID uint,
 			logTitle string,
+			description string,
 		) error
 	}
 )

@@ -70,7 +70,7 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 	return json.Marshal(resp)
 }
 
-func (loggingService *Logging) ReportActivity(causerType string, causerID uint, subjectType string, subjectID uint, logTitle string) error {
+func (loggingService *Logging) ReportActivity(causerType string, causerID uint, subjectType string, subjectID uint, logTitle string, description string) error {
 
 	logName := loggingService.loggingDatastore.FindLogByTitle(logTitle)
 	if logName.Title == "" {
@@ -84,6 +84,7 @@ func (loggingService *Logging) ReportActivity(causerType string, causerID uint, 
 		SubjectID:   uint(subjectID),
 		Log:         logName,
 		LogID:       logName.ID,
+		Description: description,
 	}
 
 	return loggingService.loggingDatastore.AddActivity(alog)
