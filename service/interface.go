@@ -5,9 +5,9 @@ type (
 		GetAdsActivity(ID int) ([]byte, error)
 		ReportActivity(
 			causerType string,
-			causerID int,
+			causerID uint,
 			subjectType string,
-			subjectID int,
+			subjectID uint,
 			logTitle string,
 		) error
 	}

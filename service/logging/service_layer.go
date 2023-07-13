@@ -12,10 +12,19 @@ type Logging struct {
 	loggingDatastore datastore.Logging
 }
 
-func New(loggingDataStorer datastore.Logging) service.Logging {
-	return &Logging{
-		loggingDatastore: loggingDataStorer,
+var logService *Logging
+
+func Initialize(loggingDataStorer datastore.Logging) {
+	if logService == nil {
+		logService = &Logging{
+			loggingDatastore: loggingDataStorer,
+		}
 	}
+}
+
+func GetInstance() service.Logging {
+
+	return logService
 }
 
 func excludeLogIds(logID uint) bool {
@@ -61,7 +70,7 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 	return json.Marshal(resp)
 }
 
-func (loggingService *Logging) ReportActivity(causerType string, causerID int, subjectType string, subjectID int, logTitle string) error {
+func (loggingService *Logging) ReportActivity(causerType string, causerID uint, subjectType string, subjectID uint, logTitle string) error {
 
 	logName := loggingService.loggingDatastore.FindLogByTitle(logTitle)
 	if logName.Title == "" {
