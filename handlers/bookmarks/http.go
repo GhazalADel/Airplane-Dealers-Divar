@@ -82,7 +82,6 @@ func (b BookmarkssHandler) AddBookmark(c echo.Context) error {
 	}
 
 	// ------ Report Log ------
-	println("this line")
 	logsrv := logging_service.GetInstance()
 	err = logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
 	if err != nil {
@@ -121,5 +120,14 @@ func (b BookmarkssHandler) DeleteBookmark(c echo.Context) error {
 	if err_delete != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: err_delete.Error()})
 	}
+
+	// ------ Report Log ------
+	logsrv := logging_service.GetInstance()
+	err = logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK_REMOVE, "")
+	if err != nil {
+		_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK_REMOVE)
+	}
+	// ------ Report Log ------
+
 	return c.JSON(http.StatusOK, "Bookmark Deleted Successfully")
 }

@@ -14,5 +14,5 @@ VALUES
 (10, 'payment_success'),
 (11, 'payment_failed'),
 (12, 'bookmark'),
-(13, 'buy');
+(13, 'remove_bookmark');
 ---------------- Logs ----------------

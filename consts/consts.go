@@ -46,4 +46,5 @@ const (
 	LOG_PAYMENT_SUCCESS string = "payment_success"
 	LOG_PAYMENT_FAILED  string = "payment_failed"
 	LOG_BOOKMARK        string = "bookmark"
+	LOG_BOOKMARK_REMOVE string = "bookmark_remove"
 )
