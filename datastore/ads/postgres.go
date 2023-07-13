@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
 	"fmt"
@@ -128,4 +129,51 @@ func (a AdDatastorer) CreateAd(ad *models.Ad) (models.Ad, error) {
 		return models.Ad{}, fmt.Errorf("Admin Ad Creation Failed")
 	}
 	return *tmp_ad, nil
+}
+
+func (a AdDatastorer) UpdateStatus(id int, status consts.AdStatus) (models.Ad, error) {
+	var ads models.Ad
+	result := a.db.Where("id = ?", id).First(&ads)
+	if result.Error != nil {
+		return models.Ad{}, fmt.Errorf("couldn't retrive ads from database")
+	}
+
+	ads.Status = string(status)
+
+	if status == consts.ACTIVE {
+		// Dirty code
+		var expertAd models.ExpertAds
+		var repairReq models.RepairRequest
+		ReportCheck := a.db.Where("ads_id = ?", id).First(&expertAd).Error
+		RepairCheck := a.db.Where("ads_id = ?", id).First(&repairReq).Error
+
+		if ads.ExpertCheck && ReportCheck != nil {
+			expertAd := models.ExpertAds{
+				Status: consts.WAIT_FOR_PAYMENT_STATUS,
+				UserID: ads.UserID,
+				AdsID:  ads.ID,
+			}
+			if a.db.Create(&expertAd).Error != nil {
+				return models.Ad{}, fmt.Errorf("ExpertAd creation faild")
+			}
+		}
+
+		if ads.RepairCheck && RepairCheck != nil {
+			repairReq := models.RepairRequest{
+				Status: consts.WAIT_FOR_PAYMENT_STATUS,
+				UserID: ads.UserID,
+				AdsID:  ads.ID,
+			}
+			if a.db.Create(&repairReq).Error != nil {
+				return models.Ad{}, fmt.Errorf("ExpertAd creation faild")
+			}
+		}
+	}
+
+	result = a.db.Save(&ads)
+	if result.Error != nil {
+		return models.Ad{}, fmt.Errorf("couldn't retrive ads from database")
+	}
+
+	return ads, nil
 }

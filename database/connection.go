@@ -36,7 +36,7 @@ func Connect() error {
 	}
 
 	dbConn = db
-	//initializeDatabase()
+	initializeDatabase()
 	return nil
 }
 
