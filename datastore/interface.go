@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
 	"context"
@@ -10,7 +11,7 @@ import (
 
 type (
 	Ad interface {
-		// Create(models.Ad) (models.Ad, error)
+		UpdateStatus(id int, status consts.AdStatus) (models.Ad, error)
 		Get(id int, userRole string) ([]models.Ad, error)
 		ListFilterByColumn(f *filter.AdsFilter) ([]models.Ad, error)
 		ListFilterSort(f *filter.Filter) ([]models.Ad, error)

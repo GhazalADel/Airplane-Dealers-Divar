@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/ads": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieves ads from database and accept query params.",
                 "consumes": [
                     "application/json"
@@ -34,9 +39,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "List of ads.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -71,7 +85,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "Create an ad",
                 "parameters": [
@@ -122,6 +136,11 @@ const docTemplate = `{
         },
         "/ads/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieves an ad based on the provided ID",
                 "consumes": [
                     "application/json"
@@ -130,10 +149,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "Get ad by ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Ad ID",
@@ -164,6 +190,7 @@ const docTemplate = `{
                 }
             }
         },
+        "/ads/{id}/status": {
         "/bookmarks/add/{id}": {
             "put": {
                 "security": [
@@ -171,6 +198,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "description": "Update the status of an ad",
                 "description": "add bookmark using given ad id",
                 "consumes": [
                     "application/json"
@@ -179,6 +207,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
+                    "Ads"
+                ],
+                "summary": "Update ad status",
                     "bookmarks"
                 ],
                 "summary": "add bookmark",
@@ -196,6 +227,20 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "status object",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateAdsStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully",
                     }
                 ],
                 "responses": {
@@ -267,6 +312,22 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
+                    "400": {
+                        "description": "Invalid parameter id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not update ads status",
+                        "schema": {
+                            "type": "string"
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -1204,6 +1265,17 @@ const docTemplate = `{
                 }
             }
         },
+        "consts.AdStatus": {
+            "type": "string",
+            "enum": [
+                "Inactive",
+                "Active"
+            ],
+            "x-enum-varnames": [
+                "INACTIVE",
+                "ACTIVE"
+            ]
+
         "bookmarks.ErrorAddAd": {
             "type": "object",
             "properties": {
@@ -1214,6 +1286,7 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+
         },
         "consts.Status": {
             "type": "string",
@@ -1574,6 +1647,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.UpdateAdsStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/consts.AdStatus"
+                }
+            }
+        },
         "models.UpdateExpertCheckRequest": {
             "type": "object",
             "properties": {
@@ -1590,35 +1671,6 @@ const docTemplate = `{
             "properties": {
                 "status": {
                     "$ref": "#/definitions/consts.Status"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "bookmarks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Bookmarks"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         }
