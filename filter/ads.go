@@ -8,12 +8,12 @@ import (
 type AdsFilter struct {
 	Base Filter
 
-	PlaneAge      uint
-	Price         int64
-	FlyTime       uint64
-	CategoryID    uint
-	AirplaneModel string
-	Status        string
+	PlaneAge      uint   `json:"plane_age"`
+	Price         int64  `json:"price"`
+	FlyTime       uint64 `json:"fly_time"`
+	CategoryID    uint   `json:"category_id"`
+	AirplaneModel string `json:"airplane_model"`
+	Status        string `json:"status"`
 }
 
 func NewAdsFilter(v url.Values) *AdsFilter {

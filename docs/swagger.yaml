@@ -59,6 +59,13 @@ definitions:
       responsecode:
         type: integer
     type: object
+  bookmarks.ErrorAddAd:
+    properties:
+      message:
+        type: string
+      responsecode:
+        type: integer
+    type: object
   consts.AdStatus:
     enum:
     - Inactive
@@ -67,13 +74,6 @@ definitions:
     x-enum-varnames:
     - INACTIVE
     - ACTIVE
-  bookmarks.ErrorAddAd:
-    properties:
-      message:
-        type: string
-      responsecode:
-        type: integer
-    type: object
   consts.Status:
     enum:
     - Wait for payment status
@@ -88,6 +88,26 @@ definitions:
     - MATIN_PENDING_STATUS
     - IN_PROGRESS_STATUS
     - DONE_STATUS
+  filter.Filter:
+    properties:
+      disable_paging:
+        type: boolean
+      offset:
+        type: integer
+      page:
+        type: integer
+      search:
+        type: boolean
+      size:
+        type: integer
+      sort:
+        additionalProperties:
+          type: string
+        type: object
+      userRole:
+        description: '0: airlines, 1: Experts, 2: Admins, 3: Matin'
+        type: string
+    type: object
   handlers.ErrorResponseRegisterLogin:
     properties:
       message:
@@ -176,8 +196,6 @@ definitions:
         type: string
       subject:
         type: string
-      user:
-        $ref: '#/definitions/models.User'
       userID:
         type: integer
     type: object
@@ -207,17 +225,6 @@ definitions:
         type: string
       subject:
         type: string
-      userID:
-        type: integer
-    type: object
-  models.Bookmarks:
-    properties:
-      ads:
-        $ref: '#/definitions/models.Ad'
-      adsID:
-        type: integer
-      user:
-        $ref: '#/definitions/models.User'
       userID:
         type: integer
     type: object
@@ -344,29 +351,48 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieves ads from database and accept query params.
+      description: Retrieves ads from the database and accepts query parameters for
+        filtering and sorting.
       parameters:
       - description: User Token
         in: header
         name: Authorization
         required: true
         type: string
+      - in: query
+        name: airplane_model
+        type: string
+      - in: query
+        name: category_id
+        type: integer
+      - in: query
+        name: fly_time
+        type: integer
+      - in: query
+        name: plane_age
+        type: integer
+      - in: query
+        name: price
+        type: integer
+      - in: query
+        name: status
+        type: string
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved ads
           schema:
             items:
               $ref: '#/definitions/models.Ad'
             type: array
         "500":
-          description: Could not retrieve ads
+          description: 'Internal Server Error: Failed to retrieve ads'
           schema:
             type: string
       security:
       - ApiKeyAuth: []
-      summary: List of ads.
+      summary: List ads
       tags:
       - Ads
   /ads/{id}:
