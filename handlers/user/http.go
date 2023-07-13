@@ -84,9 +84,7 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 	//role
 	role := string(consts.ROLE_AIRLINE)
 	if r, ok := jsonBody["role"]; ok {
-		if r.(string) != string(consts.ROLE_ADMIN) && r.(string) != (consts.ROLE_EXPERT) {
-			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid Role"})
-		} else {
+		if r.(string) == string(consts.ROLE_ADMIN) || r.(string) == (consts.ROLE_EXPERT) {
 			role = r.(string)
 		}
 	}
