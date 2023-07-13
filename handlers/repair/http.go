@@ -29,6 +29,7 @@ func NewRepairHandler(repairDS datastore.Repair, userDS datastore.User) *RepairH
 // @Tags repair
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "Ad ID"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 204 {object} models.ErrorResponse
@@ -109,6 +110,7 @@ func (e *RepairHandler) GetRepairRequestByAd(c echo.Context) error {
 // @Summary retrieve repair check request for repair or user
 // @Description retrieve repair check request for repair or user
 // @Tags repair
+// @Param Authorization header string true "User Token"
 // @Param requestID path int true "ad ID"
 // @Success 200 {object} models.GetRepairRequestResponse
 // @Failure 204 {object} models.ErrorResponse
@@ -150,6 +152,7 @@ func (e *RepairHandler) GetRepairRequest(c echo.Context) error {
 // @Summary ListRepairRequest retrieves all repair requests for an repair
 // @Description ListRepairRequest retrieves all repair requests for an repair
 // @Tags repair
+// @Param Authorization header string true "User Token"
 // @Param user_id query int false "User ID"
 // @Param ads_id query int false "Ad ID"
 // @Param from_date query string false "From date"
@@ -234,6 +237,7 @@ func (e *RepairHandler) GetAllRepairRequest(c echo.Context) error {
 // @Tags repair
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param repairRequestID path int true "repair request ID"
 // @Param repairCheckRequest body models.UpdateRepairRequest true "repair object"
 // @Success 200 {object} models.RepairRequestResponse
@@ -286,6 +290,7 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 // @Summary delete repair request for user
 // @Description delete repair request for user
 // @Tags repair
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 204 {object} models.ErrorResponse

@@ -164,7 +164,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -191,7 +191,6 @@ const docTemplate = `{
             }
         },
         "/ads/{id}/status": {
-        "/bookmarks/add/{id}": {
             "put": {
                 "security": [
                     {
@@ -199,7 +198,6 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Update the status of an ad",
-                "description": "add bookmark using given ad id",
                 "consumes": [
                     "application/json"
                 ],
@@ -210,9 +208,6 @@ const docTemplate = `{
                     "Ads"
                 ],
                 "summary": "Update ad status",
-                    "bookmarks"
-                ],
-                "summary": "add bookmark",
                 "parameters": [
                     {
                         "type": "string",
@@ -241,6 +236,63 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not update ads status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookmarks/add/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "add bookmark using given ad id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmarks"
+                ],
+                "summary": "add bookmark",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -312,22 +364,6 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Invalid parameter id",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Could not update ads status",
-                        "schema": {
-                            "type": "string"
                     "403": {
                         "description": "Forbidden",
                         "schema": {
@@ -410,6 +446,13 @@ const docTemplate = `{
                 "summary": "retrieve expert check request by ad for expert or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "adID",
@@ -451,6 +494,13 @@ const docTemplate = `{
                 ],
                 "summary": "delete expert check request for expert or user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ad ID",
@@ -502,6 +552,13 @@ const docTemplate = `{
                 "summary": "Request to expert check",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "adID",
@@ -551,6 +608,13 @@ const docTemplate = `{
                 ],
                 "summary": "Update expert check request",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "expert request ID",
@@ -605,6 +669,13 @@ const docTemplate = `{
                 "summary": "retrieve expert check request for expert or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "request ID",
                         "name": "requestID",
@@ -648,6 +719,13 @@ const docTemplate = `{
                 ],
                 "summary": "ListExpertRequest retrieves all expert requests for an expert",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "User ID",
@@ -1265,17 +1343,6 @@ const docTemplate = `{
                 }
             }
         },
-        "consts.AdStatus": {
-            "type": "string",
-            "enum": [
-                "Inactive",
-                "Active"
-            ],
-            "x-enum-varnames": [
-                "INACTIVE",
-                "ACTIVE"
-            ]
-
         "bookmarks.ErrorAddAd": {
             "type": "object",
             "properties": {
@@ -1286,7 +1353,17 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-
+        },
+        "consts.AdStatus": {
+            "type": "string",
+            "enum": [
+                "Inactive",
+                "Active"
+            ],
+            "x-enum-varnames": [
+                "INACTIVE",
+                "ACTIVE"
+            ]
         },
         "consts.Status": {
             "type": "string",
@@ -1440,9 +1517,6 @@ const docTemplate = `{
                 "subject": {
                     "type": "string"
                 },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
                 "userID": {
                     "type": "integer"
                 }
@@ -1486,23 +1560,6 @@ const docTemplate = `{
                 },
                 "subject": {
                     "type": "string"
-                },
-                "userID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Bookmarks": {
-            "type": "object",
-            "properties": {
-                "ads": {
-                    "$ref": "#/definitions/models.Ad"
-                },
-                "adsID": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
                 },
                 "userID": {
                     "type": "integer"

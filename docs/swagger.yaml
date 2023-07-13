@@ -59,6 +59,13 @@ definitions:
       responsecode:
         type: integer
     type: object
+  bookmarks.ErrorAddAd:
+    properties:
+      message:
+        type: string
+      responsecode:
+        type: integer
+    type: object
   consts.AdStatus:
     enum:
     - Inactive
@@ -67,13 +74,6 @@ definitions:
     x-enum-varnames:
     - INACTIVE
     - ACTIVE
-  bookmarks.ErrorAddAd:
-    properties:
-      message:
-        type: string
-      responsecode:
-        type: integer
-    type: object
   consts.Status:
     enum:
     - Wait for payment status
@@ -176,8 +176,6 @@ definitions:
         type: string
       subject:
         type: string
-      user:
-        $ref: '#/definitions/models.User'
       userID:
         type: integer
     type: object
@@ -207,17 +205,6 @@ definitions:
         type: string
       subject:
         type: string
-      userID:
-        type: integer
-    type: object
-  models.Bookmarks:
-    properties:
-      ads:
-        $ref: '#/definitions/models.Ad'
-      adsID:
-        type: integer
-      user:
-        $ref: '#/definitions/models.User'
       userID:
         type: integer
     type: object
@@ -381,7 +368,7 @@ paths:
         required: true
         type: string
       - description: Ad ID
-        in: query
+        in: path
         name: id
         required: true
         type: integer
@@ -609,6 +596,11 @@ paths:
     delete:
       description: delete expert check request for expert or user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ad ID
         in: path
         name: adID
@@ -637,6 +629,11 @@ paths:
     get:
       description: retrieve expert check request by ad for expert or user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ad ID
         in: path
         name: adID
@@ -668,6 +665,11 @@ paths:
       - application/json
       description: Request to expert check
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Ad ID
         in: path
         name: adID
@@ -701,6 +703,11 @@ paths:
       - application/json
       description: Update expert check request
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: expert request ID
         in: path
         name: expertRequestID
@@ -738,6 +745,11 @@ paths:
     get:
       description: retrieve expert check request for expert or user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: request ID
         in: path
         name: requestID
@@ -767,6 +779,11 @@ paths:
     get:
       description: ListExpertRequest retrieves all expert requests for an expert
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User ID
         in: query
         name: user_id

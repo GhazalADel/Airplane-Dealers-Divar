@@ -214,7 +214,7 @@ func (a AdsHandler) Status(c echo.Context) error {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "User Token"
-// @Param id query int true "Ad ID"
+// @Param id path int true "Ad ID"
 // @Success 200 {object} models.Ad
 // @Failure 400 {string} string "Invalid parameter id"
 // @Failure 500 {string} string "Could not retrieve ads"
@@ -222,6 +222,7 @@ func (a AdsHandler) Status(c echo.Context) error {
 func (a AdsHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	index, err := strconv.Atoi(id)
+	fmt.Println("--THIS--", err)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "invalid parameter id")
 	}
