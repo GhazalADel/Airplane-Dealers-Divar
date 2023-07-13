@@ -187,6 +187,19 @@ func (a AdsHandler) Status(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, "could not update ads status")
 		}
+		// ____ Report Log ____
+		logService := logging_service.GetInstance()
+		logName := consts.LOG_ADMIN_APPROVE
+		if status.Status == consts.INACTIVE {
+			logName = consts.LOG_ADMIN_REJECT
+		}
+		if logService != (*logging_service.Logging)(nil) {
+			err = logService.ReportActivity(userRole, c.Get("user").(models.User).ID, "Ads", uint(index), logName, "")
+			if err != nil {
+				_ = fmt.Errorf("cannot log activity %v", logName)
+			}
+		}
+		// ____ Report Log ____
 		return c.JSON(http.StatusOK, "Updated successfuly")
 	} else {
 		return c.JSON(http.StatusNotFound, "Not Found")
