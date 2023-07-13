@@ -56,3 +56,14 @@ type RepairRequestResponse struct {
 	Status    string    `json:"status"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+
+type ActivityLogResponse struct {
+	ID          uint      `json:"ID"`
+	CreatedAt   time.Time `json:"LoggedAt"`
+	CauserType  string    `json:"CauserType"`
+	CauserID    uint      `json:"CauserID"`
+	SubjectType string    `json:"SubjectType"`
+	SubjectID   uint      `json:"SubjectId"`
+	LogName     string    `json:"LogName"`
+	Description string    `json:"Description"`
+}

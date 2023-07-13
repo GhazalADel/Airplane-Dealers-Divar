@@ -101,4 +101,11 @@ type (
 		AddBookmark(userID, adID int) (models.BookmarksResponse, error)
 		DeleteBookmark(userID, adID int) error
 	}
+
+	Logging interface {
+		AddNewLogName(id uint, title string) error
+		FindLogByTitle(title string) models.LogName
+		AddActivity(al models.ActivityLog) error
+		GetAdsActivityByID(id int) ([]models.ActivityLog, error)
+	}
 )
