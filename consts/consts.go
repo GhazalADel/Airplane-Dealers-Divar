@@ -31,3 +31,19 @@ const (
 	ROLE_ADMIN          = "Admin"
 	ROLE_AIRLINE        = "Airline"
 )
+
+// Logs
+const (
+	LOG_CREATE_AD       string = "create_ads"
+	LOG_ADMIN_WAIT      string = "send_to_admin"
+	LOG_ADMIN_APPROVE   string = "admin_approved"
+	LOG_ADMIN_REJECT    string = "admin_reject"
+	LOG_REPAIR_REQUEST  string = "repair_request"
+	LOG_REPAIR_RESULT   string = "repair_result"
+	LOG_EXPERT_REQUEST  string = "expert_request"
+	LOG_EXPERT_RESULT   string = "expert_result"
+	LOG_PAYMENT         string = "payment"
+	LOG_PAYMENT_SUCCESS string = "payment_success"
+	LOG_PAYMENT_FAILED  string = "payment_failed"
+	LOG_BOOKMARK        string = "bookmark"
+)

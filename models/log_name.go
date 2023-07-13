@@ -19,7 +19,6 @@ log list:
 	10. payment_success
 	11. payment_failed
 	12. bookmark
-	13. buy
 */
 
 func (LogName) TableName() string {
@@ -40,7 +39,6 @@ func LogsList() []LogName {
 		{ID: 10, Title: "payment_success"},
 		{ID: 11, Title: "payment_failed"},
 		{ID: 12, Title: "bookmark"},
-		{ID: 13, Title: "buy"},
 	}
 	return logs
 }
