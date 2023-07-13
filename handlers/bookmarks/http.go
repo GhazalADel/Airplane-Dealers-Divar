@@ -5,6 +5,7 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
 	logging_service "Airplane-Divar/service/logging"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -79,9 +80,16 @@ func (b BookmarkssHandler) AddBookmark(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: err.Error()})
 	}
-	// Report Log
+
+	// ------ Report Log ------
+	println("this line")
 	logsrv := logging_service.GetInstance()
-	logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK)
+	err = logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
+	if err != nil {
+		_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK)
+	}
+	// ------ Report Log ------
+
 	return c.JSON(http.StatusOK, bookmark)
 }
 
