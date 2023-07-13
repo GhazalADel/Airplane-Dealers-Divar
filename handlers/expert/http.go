@@ -5,6 +5,8 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/datastore/expert"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -63,6 +65,16 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 	resp := models.SuccessResponse{
 		Success: true,
 	}
+
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(adID), consts.LOG_EXPERT_REQUEST, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_EXPERT_REQUEST)
+		}
+	}
+	// ____ Report Log ____
 
 	return c.JSON(201, resp)
 }
@@ -209,6 +221,16 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 		Report:    expertAd.Report,
 		CreatedAt: expertAd.CreatedAt,
 	}
+
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", expertAd.AdsID, consts.LOG_EXPERT_RESULT, expertAd.Report)
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_EXPERT_RESULT)
+		}
+	}
+	// ____ Report Log ____
 
 	return c.JSON(http.StatusOK, resp)
 }

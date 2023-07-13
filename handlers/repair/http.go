@@ -5,6 +5,8 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/datastore/repair"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -62,12 +64,23 @@ func (e *RepairHandler) RequestToRepairCheck(c echo.Context) error {
 		Success: true,
 	}
 
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(adID), consts.LOG_REPAIR_REQUEST, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_REPAIR_REQUEST)
+		}
+	}
+	// ____ Report Log ____
+
 	return c.JSON(201, resp)
 }
 
 // @Summary retrieve repair check request by ad for repair or user
 // @Description retrieve repair check request by ad for repair or user
 // @Tags repair
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.GetRepairRequestResponse
 // @Success 200 {object} models.MessageResponse
@@ -283,6 +296,16 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 		Status:    string(repairRequest.Status),
 		CreatedAt: repairRequest.CreatedAt,
 	}
+
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", repairRequest.AdsID, consts.LOG_REPAIR_RESULT, string(repairRequest.Status))
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_REPAIR_RESULT)
+		}
+	}
+	// ____ Report Log ____
 
 	return c.JSON(http.StatusOK, resp)
 }
