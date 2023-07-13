@@ -1501,6 +1501,9 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
+                "role": {
+                    "type": "string"
+                },
                 "username": {
                     "type": "string"
                 }
