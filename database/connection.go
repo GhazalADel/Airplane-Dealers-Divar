@@ -35,6 +35,7 @@ func Connect() error {
 
 func GetConnection() (*gorm.DB, error) {
 	if dbConn == nil {
+		
 		err := Connect()
 		if err != nil {
 			return nil, errors.New("database connection is not initialized")

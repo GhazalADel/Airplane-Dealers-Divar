@@ -3,11 +3,13 @@ package server
 import (
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
-	"Airplane-Divar/datastore/payment"
 	"Airplane-Divar/datastore/user"
 	"Airplane-Divar/handlers"
 	adsHandler "Airplane-Divar/handlers/ads"
 	"log"
+
+	bookmarkDatastore "Airplane-Divar/datastore/bookmarks"
+	bookmarksHanlder "Airplane-Divar/handlers/bookmarks"
 
 	"github.com/labstack/echo/v4"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -44,9 +46,12 @@ func StartServer() {
 	userRoutes(e, userHandler)
 
 	// Payment
-	paymentDatastore := payment.New(db)
-	paymentHandler := handlers.NewPaymentHandler(paymentDatastore)
-	paymentRoutes(e, paymentHandler)
+	paymentRoutes(e, db)
+
+	// Bookmarks
+	bmDatastore := bookmarkDatastore.New(db)
+	bmHandlers := bookmarksHanlder.New(bmDatastore)
+	bookmarksRoutes(e, bmHandlers)
 
 	log.Fatal(e.Start(":8080"))
 }

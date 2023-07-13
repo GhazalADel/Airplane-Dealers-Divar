@@ -98,7 +98,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "Ad details",
-                        "name": "body",
+                        "name": "AdRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -111,6 +111,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/ads.AdResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/ads.ErrorAddAd"
                         }
                     },
                     "422": {
@@ -185,6 +191,7 @@ const docTemplate = `{
             }
         },
         "/ads/{id}/status": {
+        "/bookmarks/add/{id}": {
             "put": {
                 "security": [
                     {
@@ -192,6 +199,7 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Update the status of an ad",
+                "description": "add bookmark using given ad id",
                 "consumes": [
                     "application/json"
                 ],
@@ -202,6 +210,9 @@ const docTemplate = `{
                     "Ads"
                 ],
                 "summary": "Update ad status",
+                    "bookmarks"
+                ],
+                "summary": "add bookmark",
                 "parameters": [
                     {
                         "type": "string",
@@ -230,6 +241,73 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Updated successfully",
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BookmarksResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookmarks/delete/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete existing bookmark using id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmarks"
+                ],
+                "summary": "delete existing bookmark",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookmark Deleted Successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -250,6 +328,74 @@ const docTemplate = `{
                         "description": "Could not update ads status",
                         "schema": {
                             "type": "string"
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookmarks/list": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieves all bookmarks of this user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bookmarks"
+                ],
+                "summary": "bookmarks list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AdResponse"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/bookmarks.ErrorAddAd"
                         }
                     }
                 }
@@ -891,7 +1037,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.AmountFee"
+                            "$ref": "#/definitions/handlers.PaymentRequest"
                         }
                     }
                 ],
@@ -1129,6 +1275,18 @@ const docTemplate = `{
                 "INACTIVE",
                 "ACTIVE"
             ]
+
+        "bookmarks.ErrorAddAd": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "responsecode": {
+                    "type": "integer"
+                }
+            }
+
         },
         "consts.Status": {
             "type": "string",
@@ -1146,14 +1304,6 @@ const docTemplate = `{
                 "IN_PROGRESS_STATUS",
                 "DONE_STATUS"
             ]
-        },
-        "handlers.AmountFee": {
-            "type": "object",
-            "properties": {
-                "fee": {
-                    "type": "integer"
-                }
-            }
         },
         "handlers.ErrorResponseRegisterLogin": {
             "type": "object",
@@ -1174,6 +1324,24 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.PaymentRequest": {
+            "type": "object",
+            "required": [
+                "adID",
+                "transactionType"
+            ],
+            "properties": {
+                "adID": {
+                    "type": "integer"
+                },
+                "transactionType": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -1271,6 +1439,81 @@ const docTemplate = `{
                 },
                 "subject": {
                     "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.AdResponse": {
+            "type": "object",
+            "properties": {
+                "airplaneModel": {
+                    "type": "string"
+                },
+                "categoryID": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "expertCheck": {
+                    "type": "boolean"
+                },
+                "flyTime": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "planeAge": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "repairCheck": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Bookmarks": {
+            "type": "object",
+            "properties": {
+                "ads": {
+                    "$ref": "#/definitions/models.Ad"
+                },
+                "adsID": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "userID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BookmarksResponse": {
+            "type": "object",
+            "properties": {
+                "adsID": {
+                    "type": "integer"
                 },
                 "userID": {
                     "type": "integer"

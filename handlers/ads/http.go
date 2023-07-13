@@ -62,9 +62,10 @@ type ErrorAddAd struct {
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "User Token"
-// @Param body body AdRequest true "Ad details"
+// @Param AdRequest body AdRequest true "Ad details"
 // @Success 200 {object} AdResponse
 // @Failure 422 {object} ErrorAddAd
+// @Failure 403 {object} ErrorAddAd
 // @Failure 500 {object} ErrorAddAd
 // @Router /ads/add [post]
 func (a AdsHandler) AddAdHandler(c echo.Context) error {
@@ -81,12 +82,10 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
-	//check user role
-	user := c.Get("user")
-	user = user.(models.User)
-	role := string(user.(models.User).Role)
-	if role != "Airline" {
-		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Airlines Can Add an ad!"})
+
+	user := c.Get("user").(models.User)
+	if user.Role != consts.ROLE_AIRLINE {
+		return c.JSON(http.StatusForbidden, models.Response{ResponseCode: 403, Message: "Airlines Can Add an ad!"})
 	}
 
 	//validate and initialize categoryID in ad object
@@ -112,7 +111,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 
 	//set user id
 
-	id := uint(user.(models.User).ID)
+	id := user.ID
 	ad.UserID = id
 
 	ad.Status = string(consts.INACTIVE)
@@ -122,7 +121,23 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: "Ad Cration Failed"})
 	}
-	return c.JSON(http.StatusOK, createdAd)
+	adRes := models.AdResponse{
+		ID:            createdAd.ID,
+		UserID:        createdAd.UserID,
+		Image:         createdAd.Image,
+		Description:   createdAd.Description,
+		Subject:       createdAd.Subject,
+		Price:         createdAd.Price,
+		CategoryID:    createdAd.CategoryID,
+		Status:        createdAd.Status,
+		FlyTime:       createdAd.FlyTime,
+		AirplaneModel: createdAd.AirplaneModel,
+		RepairCheck:   createdAd.RepairCheck,
+		ExpertCheck:   createdAd.ExpertCheck,
+		PlaneAge:      createdAd.PlaneAge,
+	}
+
+	return c.JSON(http.StatusOK, adRes)
 }
 
 // Status updates the status of an ad.
