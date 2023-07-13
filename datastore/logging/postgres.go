@@ -39,21 +39,12 @@ func (logDL *LoggingStore) AddNewLogName(id uint, title string) error {
 	return nil
 }
 
-func (logDL *LoggingStore) AddActivity(al models.ActivityLog) error {
+func (logDL *LoggingStore) AddActivity(alog models.ActivityLog) error {
 	var result *gorm.DB
 	var logname models.LogName
-	actvtlog := models.ActivityLog{
-		SubjectType: al.SubjectType,
-		SubjectID:   al.SubjectID,
-		CauserType:  al.CauserType,
-		CauserID:    al.CauserID,
-		Log:         al.Log,
-		LogID:       al.LogID,
-		Description: al.Description,
-	}
 
 	// Check for Valid Log Title
-	result = logDL.db.Where("id = ?", al.LogID).Find(&logname)
+	result = logDL.db.Where("id = ?", alog.LogID).Find(&logname)
 	if result.Error != nil {
 		return fmt.Errorf("database error: get log_name from database")
 	} else if result.RowsAffected == 0 {
@@ -61,7 +52,7 @@ func (logDL *LoggingStore) AddActivity(al models.ActivityLog) error {
 	}
 
 	// Inserting Activity log
-	result = logDL.db.Create(actvtlog)
+	result = logDL.db.Create(&alog)
 	if result.Error != nil {
 		return fmt.Errorf("database error: insert new activity log to database")
 	}
