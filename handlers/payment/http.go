@@ -295,12 +295,19 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 		if log_status_temp == -1 {
 			for _, v := range transactionIds {
 				err = logService.ReportActivity("", 0, "Transaction", v, consts.LOG_PAYMENT_FAILED, "")
+				if err != nil {
+					_ = fmt.Errorf("cannot log activity %v", consts.LOG_PAYMENT_FAILED)
+				}
 			}
 		} else if log_status_temp == 1 {
 			for _, v := range transactionIds {
 				err = logService.ReportActivity("", 0, "Transaction", v, consts.LOG_PAYMENT_SUCCESS, "")
+				if err != nil {
+					_ = fmt.Errorf("cannot log activity %v", consts.LOG_PAYMENT_SUCCESS)
+				}
 			}
 		}
+
 	}(log_status_temp, transactionsIDS)
 	// ____ Report Log ----
 
@@ -383,5 +390,6 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 		Updates(
 			map[string]interface{}{"status": "Failed"},
 		)
+	log_status_temp = -1
 	return c.JSON(http.StatusBadRequest, "Failed Payment")
 }
