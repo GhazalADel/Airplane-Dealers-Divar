@@ -187,6 +187,7 @@ func (a AdsHandler) Status(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, "could not update ads status")
 		}
+
 		// ____ Report Log ____
 		logService := logging_service.GetInstance()
 		logName := consts.LOG_ADMIN_APPROVE
@@ -200,6 +201,7 @@ func (a AdsHandler) Status(c echo.Context) error {
 			}
 		}
 		// ____ Report Log ____
+
 		return c.JSON(http.StatusOK, "Updated successfuly")
 	} else {
 		return c.JSON(http.StatusNotFound, "Not Found")
@@ -241,7 +243,7 @@ func (a AdsHandler) Get(c echo.Context) error {
 		if err != nil {
 			_ = fmt.Errorf("could not retrieve ads activity: %v", err)
 		}
-		fmt.Printf("---- Ads Logs ---- \n Ads %v Activity Logs: \n %v \n ---- Ads Logs ---- \n", index, adsLogs)
+		fmt.Printf("---- Ads Logs ---- \n Ads %v Activity Logs: \n %v \n ---- Ads Logs ---- \n", index, string(adsLogs))
 	}
 	// ____ Get Logs of Ads ____
 

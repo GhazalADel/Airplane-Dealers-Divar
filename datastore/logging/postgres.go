@@ -66,8 +66,8 @@ func (logDL *LoggingStore) GetAdsActivityByID(id int) ([]models.ActivityLog, err
 	var activityResult []models.ActivityLog
 
 	dbResult = logDL.db.
-		Where("SubjectType = ? AND SubjectID = ? ", "Ads", id).
-		Order("CreatedAt").
+		Where("subject_type = ? AND subject_id = ? ", "Ads", id).
+		Order("created_at").
 		Find(&activityResult)
 
 	if dbResult.Error != nil {
@@ -86,4 +86,16 @@ func (logDL *LoggingStore) FindLogByTitle(title string) models.LogName {
 		return models.LogName{}
 	}
 	return logName
+}
+
+func (logDL *LoggingStore) GetLogNameByID(id uint) string {
+
+	var logName models.LogName
+	err := logDL.db.Where("ID = ?", id).Find(&logName).Error
+
+	if err != nil {
+		return ""
+	}
+	return logName.Title
+
 }

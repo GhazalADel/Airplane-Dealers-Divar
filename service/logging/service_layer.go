@@ -28,8 +28,8 @@ func GetInstance() service.Logging {
 }
 
 func excludeLogIds(logID uint) bool {
-	// no need for payment - bookmark - buy logs
-	excludeLogId := []uint{9, 10, 11, 12, 13}
+	// no need for payment logs
+	excludeLogId := []uint{9, 10, 11}
 
 	for _, lid := range excludeLogId {
 		if logID == lid {
@@ -50,7 +50,6 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 
 	for _, v := range adsLogs {
 		if !excludeLogIds(v.LogID) {
-
 			logResp := models.ActivityLogResponse{
 				ID:          v.ID,
 				CreatedAt:   v.CreatedAt,
@@ -58,7 +57,7 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 				CauserID:    v.CauserID,
 				SubjectType: v.SubjectType,
 				SubjectID:   v.SubjectID,
-				LogName:     v.Log.Title,
+				LogName:     loggingService.loggingDatastore.GetLogNameByID(v.LogID),
 				Description: v.Description,
 			}
 
@@ -67,7 +66,7 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 		}
 	}
 
-	return json.Marshal(resp)
+	return json.MarshalIndent(resp, "", "	")
 }
 
 func (loggingService *Logging) ReportActivity(causerType string, causerID uint, subjectType string, subjectID uint, logTitle string, description string) error {
