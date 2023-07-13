@@ -5,8 +5,10 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
 	"Airplane-Divar/utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -137,6 +139,14 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		PlaneAge:      createdAd.PlaneAge,
 	}
 
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	err = logService.ReportActivity(user.Role, user.ID, "Ads", createdAd.ID, consts.LOG_CREATE_AD, "")
+	if err != nil {
+		_ = fmt.Errorf("cannot log activity %v", consts.LOG_CREATE_AD)
+	}
+	// ____ Report Log ____
+
 	return c.JSON(http.StatusOK, adRes)
 }
 
@@ -164,6 +174,15 @@ func (a AdsHandler) Get(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, "could not retrieve ads")
 	}
+
+	// ____ Get Logs of Ads ____
+	logService := logging_service.GetInstance()
+	adsLogs, err := logService.GetAdsActivity(index)
+	if err != nil {
+		_ = fmt.Errorf("could not retrieve ads activity: %v", err)
+	}
+	fmt.Printf("---- Ads Logs ---- \n Ads %v Activity Logs: \n %v \n ---- Ads Logs ---- \n", index, adsLogs)
+	// ____ Get Logs of Ads ____
 
 	return c.JSON(http.StatusOK, resp)
 }
