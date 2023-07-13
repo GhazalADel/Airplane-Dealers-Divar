@@ -5,6 +5,7 @@ import (
 	database "Airplane-Divar/database"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -241,6 +242,14 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 	var response RequestResponse
 	response.PaymentUrl = fmt.Sprintf("%s%s", zarinpalGateURL, result.Data.Authority)
 
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(requestBody.AdID), consts.LOG_PAYMENT, fmt.Sprintf("Total Price: %v", total_price))
+	if err != nil {
+		_ = fmt.Errorf("cannot report activity log %v", consts.LOG_PAYMENT)
+	}
+	// ____ Report Log ____
+
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -278,12 +287,30 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 		transactionsIDS = append(transactionsIDS, t.ID)
 		totoalAmount += t.Amount
 	}
+
+	// ---- Report Log ----
+	var log_status_temp int = 0
+	defer func(logStatus int, transactionIds []uint) {
+		logService := logging_service.GetInstance()
+		if log_status_temp == -1 {
+			for _, v := range transactionIds {
+				err = logService.ReportActivity("", 0, "Transaction", v, consts.LOG_PAYMENT_FAILED, "")
+			}
+		} else if log_status_temp == 1 {
+			for _, v := range transactionIds {
+				err = logService.ReportActivity("", 0, "Transaction", v, consts.LOG_PAYMENT_SUCCESS, "")
+			}
+		}
+	}(log_status_temp, transactionsIDS)
+	// ____ Report Log ----
+
 	if status == "NOK" {
 		db.Table("transactions").
 			Where("id IN ?", transactionsIDS).
 			Updates(
 				map[string]interface{}{"status": "Failed"},
 			)
+		log_status_temp = -1
 		return c.JSON(http.StatusBadRequest, "Failed Payment")
 	}
 
@@ -341,7 +368,7 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 								map[string]interface{}{"status": statusService},
 							)
 					}
-
+					log_status_temp = 1
 					return c.JSON(http.StatusOK, "Successful Payment")
 				} else if code == float64(101) {
 					return c.JSON(http.StatusOK, "Transaction had verified")
