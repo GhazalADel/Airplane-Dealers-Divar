@@ -25,13 +25,28 @@ func (a UserStore) Get(id int) ([]models.User, error) {
 }
 
 // this function used to create an account and insert it into database
-func (a UserStore) Create(username string, password string) (string, models.User, error) {
+func (a UserStore) Create(username string, password string, role string) (string, models.User, error) {
 	msg := "OK"
 	// Instantiating Account Object
 	var user models.User
 	user.Username = username
-	user.Role = consts.ROLE_AIRLINE
+	user.Role = role
 	user.Token = ""
+
+	if user.Role != consts.ROLE_ADMIN && user.Role != consts.ROLE_AIRLINE && user.Role != consts.ROLE_EXPERT && user.Role != consts.ROLE_MATIN {
+		msg = "User Creation Faield: Unknown Role"
+		return msg, models.User{}, errors.New("")
+	}
+
+	// if user.Role == consts.ROLE_MATIN {
+	// 	msg = "User Creation Faield: You can't create Matin Role"
+	// 	return msg, models.User{}, errors.New("")
+	// }
+
+	// if user.Role == consts.ROLE_ADMIN && password != "Admin123" {
+	// 	msg = "User Creation Faield: You can't create Admin Role"
+	// 	return msg, models.User{}, errors.New("")
+	// }
 
 	//hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -41,7 +56,7 @@ func (a UserStore) Create(username string, password string) (string, models.User
 	}
 	user.Password = string(hash)
 
-	//insert account into database
+	//insert user into database
 	createdUser := a.db.Create(&user)
 	if createdUser.Error != nil {
 		msg = "Failed to Create Account"
@@ -50,11 +65,21 @@ func (a UserStore) Create(username string, password string) (string, models.User
 
 	//generate token
 	var token *jwt.Token
-	token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    user.ID,
-		"exp":   time.Now().Add(time.Hour).Unix(),
-		"admin": false,
-	})
+	if user.Role == consts.ROLE_ADMIN {
+		user.IsActive = true
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"id":    user.ID,
+			"exp":   time.Now().Add(time.Hour).Unix(),
+			"admin": true,
+		})
+	} else {
+		token = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"id":    user.ID,
+			"exp":   time.Now().Add(time.Hour).Unix(),
+			"admin": false,
+		})
+	}
+
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
 		msg = "Failed To Create Token"

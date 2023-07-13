@@ -5,8 +5,8 @@ import (
 	adsDatastore "Airplane-Divar/datastore/ads"
 	"Airplane-Divar/datastore/logging"
 	"Airplane-Divar/datastore/user"
-	"Airplane-Divar/handlers"
 	adsHandler "Airplane-Divar/handlers/ads"
+	userHandler "Airplane-Divar/handlers/user"
 	logging_service "Airplane-Divar/service/logging"
 	"log"
 
@@ -47,7 +47,7 @@ func StartServer() {
 
 	// User
 	userDatastore := user.New(db)
-	userHandler := handlers.NewUserHandler(userDatastore)
+	userHandler := userHandler.NewUserHandler(userDatastore)
 	userRoutes(e, userHandler)
 
 	// Payment

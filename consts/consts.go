@@ -33,10 +33,10 @@ const PAGE_SIZE int = 10
 
 // User roles
 const (
-	ROLE_MATIN   string = "Matin"
-	ROLE_EXPERT         = "Expert"
-	ROLE_ADMIN          = "Admin"
-	ROLE_AIRLINE        = "Airline"
+	ROLE_MATIN   = "Matin"
+	ROLE_EXPERT  = "Expert"
+	ROLE_ADMIN   = "Admin"
+	ROLE_AIRLINE = "Airline"
 )
 
 // Logs

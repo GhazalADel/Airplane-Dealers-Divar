@@ -13,6 +13,7 @@ type (
 		App  `yaml:"app"`
 		HTTP `yaml:"http"`
 		PG
+		VCode `yaml:"vcode"`
 	}
 
 	App struct {
@@ -34,6 +35,12 @@ type (
 		PASSWORD string `env:"POSTGRES_PASSWORD"`
 		SSLMODE  string `env:"POSTGRES_SSLMODE"`
 		TIMEZONE string `env:"POSTGRES_TIMEZONE"`
+	}
+
+	//VCode -.
+	VCode struct {
+		ADMIN_CODE  string `env:"ADMIN_CODE"`
+		EXPERT_CODE string `env:"EXPERT_CODE"`
 	}
 )
 

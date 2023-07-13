@@ -250,16 +250,17 @@ func (a AdsHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-// List retrieves all ads.
-// @Summary List of ads.
-// @Description Retrieves ads from database and accept query params.
+// ListAds retrieves a list of ads.
+// @Summary List ads
+// @Description Retrieves ads from the database and accepts query parameters for filtering and sorting.
 // @Tags Ads
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
 // @Param Authorization header string true "User Token"
-// @Success 200 {object} []models.Ad
-// @Failure 500 {string} string "Could not retrieve ads"
+// @Param filter query filter.AdsFilter true "Query parameters for filtering ads"
+// @Success 200 {object} []models.Ad "Successfully retrieved ads"
+// @Failure 500 {string} string "Internal Server Error: Failed to retrieve ads"
 // @Router /ads [get]
 func (a AdsHandler) List(c echo.Context) error {
 	filter := filter.NewAdsFilter(c.QueryParams())

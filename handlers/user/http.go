@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"Airplane-Divar/config"
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
 	"Airplane-Divar/utils"
@@ -30,6 +32,7 @@ type UserCreateRequest struct {
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 type BudgetAmountResponse struct {
 	Amount int `json:"amount"`
@@ -63,7 +66,7 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 	}
 
 	//check json format
-	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password")
+	jsonFormatValidationMsg, jsonFormatErr := utils.ValidateJsonFormat(jsonBody, "username", "password", "role")
 	if jsonFormatErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
@@ -74,8 +77,37 @@ func (a UserHandler) RegisterHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userUniqueMsg})
 	}
 
+	conf, _ := config.NewConfig()
+	admin_code := conf.VCode.ADMIN_CODE
+	expert_code := conf.VCode.EXPERT_CODE
+
+	//role
+	role := string(consts.ROLE_AIRLINE)
+	if r, ok := jsonBody["role"]; ok {
+		if r.(string) != string(consts.ROLE_ADMIN) && r.(string) != (consts.ROLE_EXPERT) {
+			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Invalid Role"})
+		} else {
+			role = r.(string)
+		}
+	}
+	if role == string(consts.ROLE_EXPERT) || role == string(consts.ROLE_ADMIN) {
+		if code, ok := jsonBody["code"]; !ok {
+			return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "You have to enter code!"})
+		} else {
+			if role == string(consts.ROLE_EXPERT) {
+				if code.(string) != expert_code {
+					return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "WRONG code"})
+				}
+			} else {
+				if code.(string) != admin_code {
+					return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "WRONG code"})
+				}
+			}
+		}
+	}
+
 	//create user
-	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string))
+	userCreationMsg, user, userCreationErr := a.data_user.Create(jsonBody["username"].(string), jsonBody["password"].(string), role)
 	if userCreationErr != nil {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: userCreationMsg})
 	}

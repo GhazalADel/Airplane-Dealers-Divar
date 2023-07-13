@@ -31,7 +31,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieves ads from database and accept query params.",
+                "description": "Retrieves ads from the database and accepts query parameters for filtering and sorting.",
                 "consumes": [
                     "application/json"
                 ],
@@ -41,7 +41,7 @@ const docTemplate = `{
                 "tags": [
                     "Ads"
                 ],
-                "summary": "List of ads.",
+                "summary": "List ads",
                 "parameters": [
                     {
                         "type": "string",
@@ -49,11 +49,41 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "airplane_model",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "category_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "fly_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "plane_age",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "status",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully retrieved ads",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -62,7 +92,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Could not retrieve ads",
+                        "description": "Internal Server Error: Failed to retrieve ads",
                         "schema": {
                             "type": "string"
                         }
@@ -1423,6 +1453,36 @@ const docTemplate = `{
                 "IN_PROGRESS_STATUS",
                 "DONE_STATUS"
             ]
+        },
+        "filter.Filter": {
+            "type": "object",
+            "properties": {
+                "disable_paging": {
+                    "type": "boolean"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "search": {
+                    "type": "boolean"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "sort": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "userRole": {
+                    "description": "0: airlines, 1: Experts, 2: Admins, 3: Matin",
+                    "type": "string"
+                }
+            }
         },
         "handlers.ErrorResponseRegisterLogin": {
             "type": "object",
