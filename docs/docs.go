@@ -1182,6 +1182,13 @@ const docTemplate = `{
                 "summary": "Add budget request",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Payment request details",
                         "name": "body",
                         "in": "body",
@@ -1233,6 +1240,13 @@ const docTemplate = `{
                 ],
                 "summary": "Verify budget payment and add budget",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Payment verify details",
                         "name": "body",
@@ -1501,9 +1515,6 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "role": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
                 }
@@ -1539,6 +1550,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 },
                 "username": {

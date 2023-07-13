@@ -101,6 +101,7 @@ func NewPaymentHandler(
 // @Tags payment
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param body body PaymentRequest true "Payment request details"
 // @Success 200 {object} RequestResponse
 // @Failure 400 {object} models.ErrorResponse
@@ -260,6 +261,7 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 // @Tags payment
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param body body VerifyResponse true "Payment verify details"
 // @Success 200 {string} string
 // @Failure 400 {string} models.ErrorResponse

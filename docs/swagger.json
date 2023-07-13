@@ -1175,6 +1175,13 @@
                 "summary": "Add budget request",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Payment request details",
                         "name": "body",
                         "in": "body",
@@ -1226,6 +1233,13 @@
                 ],
                 "summary": "Verify budget payment and add budget",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Payment verify details",
                         "name": "body",
@@ -1494,9 +1508,6 @@
                 "password": {
                     "type": "string"
                 },
-                "role": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
                 }
@@ -1532,6 +1543,9 @@
             "type": "object",
             "properties": {
                 "password": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 },
                 "username": {
