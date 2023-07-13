@@ -141,9 +141,11 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 
 	// ____ Report Log ____
 	logService := logging_service.GetInstance()
-	err = logService.ReportActivity(user.Role, user.ID, "Ads", createdAd.ID, consts.LOG_CREATE_AD, "")
-	if err != nil {
-		_ = fmt.Errorf("cannot log activity %v", consts.LOG_CREATE_AD)
+	if logService != nil {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", createdAd.ID, consts.LOG_CREATE_AD, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_CREATE_AD)
+		}
 	}
 	// ____ Report Log ____
 
@@ -177,11 +179,13 @@ func (a AdsHandler) Get(c echo.Context) error {
 
 	// ____ Get Logs of Ads ____
 	logService := logging_service.GetInstance()
-	adsLogs, err := logService.GetAdsActivity(index)
-	if err != nil {
-		_ = fmt.Errorf("could not retrieve ads activity: %v", err)
+	if logService != nil {
+		adsLogs, err := logService.GetAdsActivity(index)
+		if err != nil {
+			_ = fmt.Errorf("could not retrieve ads activity: %v", err)
+		}
+		fmt.Printf("---- Ads Logs ---- \n Ads %v Activity Logs: \n %v \n ---- Ads Logs ---- \n", index, adsLogs)
 	}
-	fmt.Printf("---- Ads Logs ---- \n Ads %v Activity Logs: \n %v \n ---- Ads Logs ---- \n", index, adsLogs)
 	// ____ Get Logs of Ads ____
 
 	return c.JSON(http.StatusOK, resp)

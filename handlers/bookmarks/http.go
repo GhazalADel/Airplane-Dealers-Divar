@@ -82,10 +82,12 @@ func (b BookmarkssHandler) AddBookmark(c echo.Context) error {
 	}
 
 	// ------ Report Log ------
-	logsrv := logging_service.GetInstance()
-	err = logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
-	if err != nil {
-		_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK)
+	logService := logging_service.GetInstance()
+	if logService != nil {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK)
+		}
 	}
 	// ------ Report Log ------
 
@@ -122,10 +124,12 @@ func (b BookmarkssHandler) DeleteBookmark(c echo.Context) error {
 	}
 
 	// ------ Report Log ------
-	logsrv := logging_service.GetInstance()
-	err = logsrv.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK_REMOVE, "")
-	if err != nil {
-		_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK_REMOVE)
+	logService := logging_service.GetInstance()
+	if logService != nil {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK_REMOVE, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK_REMOVE)
+		}
 	}
 	// ------ Report Log ------
 
