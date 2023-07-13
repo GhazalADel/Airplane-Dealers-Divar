@@ -53,6 +53,7 @@ func TestAdsHandler_Get(t *testing.T) {
 
 		e := echo.New()
 		c := e.NewContext(req, w)
+		c.Set("user", mockUserData[0])
 
 		c.SetParamNames("id")
 		c.SetParamValues(v.id)
@@ -115,6 +116,7 @@ func TestAdsHandler_ListFilter(t *testing.T) {
 
 		e := echo.New()
 		c := e.NewContext(req, w)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		a.List(c)
@@ -179,6 +181,7 @@ func TestAdsHandler_ListFilterSort(t *testing.T) {
 
 		e := echo.New()
 		c := e.NewContext(req, w)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		a.List(c)
@@ -213,6 +216,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err := a.AddAdHandler(c)
@@ -247,6 +251,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
@@ -281,6 +286,7 @@ func TestAdHandler_AddAd(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		c := e.NewContext(req, rec)
+		c.Set("user", mockUserData[0])
 
 		a := New(mockDatastore{})
 		err = a.AddAdHandler(c)
