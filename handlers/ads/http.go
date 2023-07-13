@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
@@ -56,9 +57,11 @@ type ErrorAddAd struct {
 // Create a new ad by an airline.
 // @Summary Create an ad
 // @Description Create new ad by given properties
-// @Tags ads
+// @Tags Ads
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "User Token"
 // @Param body body AdRequest true "Ad details"
 // @Success 200 {object} AdResponse
 // @Failure 422 {object} ErrorAddAd
@@ -82,7 +85,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	user := c.Get("user")
 	user = user.(models.User)
 	role := string(user.(models.User).Role)
-	if role != "airline" {
+	if role != "Airline" {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: "Airlines Can Add an ad!"})
 	}
 
@@ -112,7 +115,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	id := uint(user.(models.User).ID)
 	ad.UserID = id
 
-	ad.Status = string(utils.INACTIVE)
+	ad.Status = string(consts.INACTIVE)
 
 	//Create Ad
 	createdAd, err := a.datastore.CreateAd(&ad)
@@ -122,12 +125,56 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, createdAd)
 }
 
+// Status updates the status of an ad.
+//
+// This endpoint is used to update the status of an ad based on the provided ad ID.
+//
+// @Summary Update ad status
+// @Description Update the status of an ad
+// @Tags Ads
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "User Token"
+// @Param id path integer true "Ad ID"
+// @Param status body models.UpdateAdsStatusRequest true "status object"
+// @Success 200 {string} string "Updated successfully"
+// @Failure 400 {string} string "Invalid parameter id"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Could not update ads status"
+// @Router /ads/{id}/status [put]
+func (a AdsHandler) Status(c echo.Context) error {
+	userRole := c.Get("user").(models.User).Role
+	if userRole == "Admin" {
+		id := c.Param("id")
+		index, err := strconv.Atoi(id)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, "invalid parameter id")
+		}
+
+		var status models.UpdateAdsStatusRequest
+		if err := c.Bind(&status); err != nil {
+			return c.JSON(http.StatusBadRequest, err.Error())
+		}
+
+		_, err = a.datastore.UpdateStatus(index, status.Status)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, "could not update ads status")
+		}
+		return c.JSON(http.StatusOK, "Updated successfuly")
+	} else {
+		return c.JSON(http.StatusNotFound, "Not Found")
+	}
+}
+
 // Get retrieves an ad by ID.
 // @Summary Get ad by ID
 // @Description Retrieves an ad based on the provided ID
-// @Tags ads
+// @Tags Ads
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "User Token"
 // @Param id query int true "Ad ID"
 // @Success 200 {object} models.Ad
 // @Failure 400 {string} string "Invalid parameter id"
@@ -153,9 +200,11 @@ func (a AdsHandler) Get(c echo.Context) error {
 // List retrieves all ads.
 // @Summary List of ads.
 // @Description Retrieves ads from database and accept query params.
-// @Tags ads
+// @Tags Ads
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "User Token"
 // @Success 200 {object} []models.Ad
 // @Failure 500 {string} string "Could not retrieve ads"
 // @Router /ads [get]

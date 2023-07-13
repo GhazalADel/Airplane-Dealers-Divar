@@ -1,6 +1,5 @@
 package models
 
-
 type Ad struct {
 	ID            uint   `gorm:"primaryKey"`
 	UserID        uint   `gorm:"not null"`
@@ -15,7 +14,6 @@ type Ad struct {
 	RepairCheck   bool   `gorm:"type:boolean"`
 	ExpertCheck   bool   `gorm:"type:boolean"`
 	PlaneAge      uint   `gorm:"type:uint"`
-	User          User
 	Category      Category
 }
 

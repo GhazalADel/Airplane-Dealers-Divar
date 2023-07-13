@@ -59,6 +59,14 @@ definitions:
       responsecode:
         type: integer
     type: object
+  consts.AdStatus:
+    enum:
+    - Inactive
+    - Active
+    type: string
+    x-enum-varnames:
+    - INACTIVE
+    - ACTIVE
   consts.Status:
     enum:
     - Wait for payment status
@@ -154,19 +162,6 @@ definitions:
         type: string
       subject:
         type: string
-      user:
-        $ref: '#/definitions/models.User'
-      userID:
-        type: integer
-    type: object
-  models.Bookmarks:
-    properties:
-      ads:
-        $ref: '#/definitions/models.Ad'
-      adsID:
-        type: integer
-      user:
-        $ref: '#/definitions/models.User'
       userID:
         type: integer
     type: object
@@ -252,6 +247,11 @@ definitions:
       success:
         type: boolean
     type: object
+  models.UpdateAdsStatusRequest:
+    properties:
+      status:
+        $ref: '#/definitions/consts.AdStatus'
+    type: object
   models.UpdateExpertCheckRequest:
     properties:
       report:
@@ -263,25 +263,6 @@ definitions:
     properties:
       status:
         $ref: '#/definitions/consts.Status'
-    type: object
-  models.User:
-    properties:
-      bookmarks:
-        items:
-          $ref: '#/definitions/models.Bookmarks'
-        type: array
-      id:
-        type: integer
-      isActive:
-        type: boolean
-      password:
-        type: string
-      role:
-        type: string
-      token:
-        type: string
-      username:
-        type: string
     type: object
 host: localhost:8080
 info:
@@ -301,6 +282,12 @@ paths:
       consumes:
       - application/json
       description: Retrieves ads from database and accept query params.
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -314,15 +301,22 @@ paths:
           description: Could not retrieve ads
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: List of ads.
       tags:
-      - ads
+      - Ads
   /ads/{id}:
     get:
       consumes:
       - application/json
       description: Retrieves an ad based on the provided ID
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Ad ID
         in: query
         name: id
@@ -343,15 +337,68 @@ paths:
           description: Could not retrieve ads
           schema:
             type: string
+      security:
+      - ApiKeyAuth: []
       summary: Get ad by ID
       tags:
-      - ads
+      - Ads
+  /ads/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of an ad
+      parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Ad ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: status object
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateAdsStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid parameter id
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Could not update ads status
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Update ad status
+      tags:
+      - Ads
   /ads/add:
     post:
       consumes:
       - application/json
       description: Create new ad by given properties
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Ad details
         in: body
         name: body
@@ -373,9 +420,11 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/ads.ErrorAddAd'
+      security:
+      - ApiKeyAuth: []
       summary: Create an ad
       tags:
-      - ads
+      - Ads
   /expert/ads/{adID}:
     delete:
       description: delete expert check request for expert or user

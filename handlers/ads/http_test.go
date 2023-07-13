@@ -1,9 +1,9 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -810,7 +810,7 @@ var (
 			Subject:       "Example Ad 1",
 			Price:         1000,
 			CategoryID:    2,
-			Status:        string(utils.INACTIVE),
+			Status:        string(consts.INACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "XYZ123",
 			RepairCheck:   true,
@@ -825,7 +825,7 @@ var (
 			Subject:       "Example Ad 2",
 			Price:         2000,
 			CategoryID:    1,
-			Status:        string(utils.INACTIVE),
+			Status:        string(consts.INACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "ABC456",
 			RepairCheck:   true,
@@ -900,7 +900,17 @@ func (m mockDatastore) GetCategoryByName(name string) (models.Category, error) {
 func (m mockDatastore) CreateAd(a *models.Ad) (models.Ad, error) {
 	ex_size := len(m.ads_data)
 	a.ID = uint(ex_size) + 1
-	a.Status = string(utils.INACTIVE)
+	a.Status = string(consts.INACTIVE)
 	m.ads_data = append(m.ads_data, *a)
 	return *a, nil
+}
+
+func (m mockDatastore) UpdateStatus(id int, status consts.AdStatus) (models.Ad, error) {
+	s := mockAdData[id].Status
+	if s == string(consts.ACTIVE) {
+		mockAdData[id].Status = "Active"
+	} else {
+		mockAdData[id].Status = "Inactive"
+	}
+	return mockAdData[id], nil
 }

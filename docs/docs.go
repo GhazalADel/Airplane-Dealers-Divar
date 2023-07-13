@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/ads": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieves ads from database and accept query params.",
                 "consumes": [
                     "application/json"
@@ -34,9 +39,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "List of ads.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -58,6 +72,11 @@ const docTemplate = `{
         },
         "/ads/add": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create new ad by given properties",
                 "consumes": [
                     "application/json"
@@ -66,10 +85,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "Create an ad",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Ad details",
                         "name": "body",
@@ -104,6 +130,11 @@ const docTemplate = `{
         },
         "/ads/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieves an ad based on the provided ID",
                 "consumes": [
                     "application/json"
@@ -112,10 +143,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ads"
+                    "Ads"
                 ],
                 "summary": "Get ad by ID",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Ad ID",
@@ -139,6 +177,77 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Could not retrieve ads",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ads/{id}/status": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update the status of an ad",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ads"
+                ],
+                "summary": "Update ad status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ad ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "status object",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateAdsStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameter id",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not update ads status",
                         "schema": {
                             "type": "string"
                         }
@@ -1010,6 +1119,17 @@ const docTemplate = `{
                 }
             }
         },
+        "consts.AdStatus": {
+            "type": "string",
+            "enum": [
+                "Inactive",
+                "Active"
+            ],
+            "x-enum-varnames": [
+                "INACTIVE",
+                "ACTIVE"
+            ]
+        },
         "consts.Status": {
             "type": "string",
             "enum": [
@@ -1152,26 +1272,6 @@ const docTemplate = `{
                 "subject": {
                     "type": "string"
                 },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "userID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.Bookmarks": {
-            "type": "object",
-            "properties": {
-                "ads": {
-                    "$ref": "#/definitions/models.Ad"
-                },
-                "adsID": {
-                    "type": "integer"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
                 "userID": {
                     "type": "integer"
                 }
@@ -1304,6 +1404,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.UpdateAdsStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/consts.AdStatus"
+                }
+            }
+        },
         "models.UpdateExpertCheckRequest": {
             "type": "object",
             "properties": {
@@ -1320,35 +1428,6 @@ const docTemplate = `{
             "properties": {
                 "status": {
                     "$ref": "#/definitions/consts.Status"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "bookmarks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Bookmarks"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "isActive": {
-                    "type": "boolean"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         }

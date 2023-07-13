@@ -1,10 +1,10 @@
 package ads
 
 import (
+	"Airplane-Divar/consts"
 	database "Airplane-Divar/database"
 	"Airplane-Divar/filter"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"fmt"
 	"reflect"
 	"testing"
@@ -34,6 +34,7 @@ func TestDatastore(t *testing.T) {
 	testAdStorer_ListFilterSort(t, a)
 	testAdStorer_GetCategoryByName(t, a)
 	testAdStorer_CreateAd(t, a)
+	testAdStorer_UpdateStatus(t, a)
 }
 
 func testAdStorer_Get(t *testing.T, db AdDatastorer) {
@@ -43,11 +44,11 @@ func testAdStorer_Get(t *testing.T, db AdDatastorer) {
 		resp     []models.Ad
 	}{
 		{0, "Airline", []models.Ad{
-			{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-			{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-			// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+			{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
+			{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.Category{}},
+			// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 		}},
-		{1, "Airline", []models.Ad{{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}}}},
+		{1, "Airline", []models.Ad{{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}}}},
 	}
 
 	for i, v := range testcases {
@@ -76,7 +77,7 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 				},
 				PlaneAge: 7,
 			},
-			[]models.Ad{{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}}},
+			[]models.Ad{{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.Category{}}},
 		},
 		{
 			filter.AdsFilter{
@@ -88,9 +89,9 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 				CategoryID: 1,
 			},
 			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
+				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3,  models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 			},
 		},
 		{
@@ -104,9 +105,9 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 				Price:      1000,
 			},
 			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
+				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3,  models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 			},
 		},
 		{
@@ -120,9 +121,9 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 				FlyTime:    1000,
 			},
 			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
+				//{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3,  models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 			},
 		},
 		{
@@ -134,9 +135,9 @@ func testAdStorer_ListFilterByColumn(t *testing.T, db AdDatastorer) {
 				},
 			},
 			[]models.Ad{
-				// {1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				// {1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5,  models.Category{}},
+				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 			},
 		},
 	}
@@ -167,9 +168,9 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 				},
 			},
 			[]models.Ad{
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
-				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
+				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
+				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.Category{}},
+				// {3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7,  models.Category{}},
 			},
 		},
 		{
@@ -182,9 +183,9 @@ func testAdStorer_ListFilterSort(t *testing.T, db AdDatastorer) {
 				},
 			},
 			[]models.Ad{
-				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.User{}, models.Category{}},
-				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.User{}, models.Category{}},
-				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.User{}, models.Category{}},
+				{3, 1, "example3.jpg", "This is example ad 3.", "Example Ad 3", 3000, 1, "Inactive", 1000, "DEF789", false, false, 7, models.Category{}},
+				{2, 1, "example2.jpg", "This is example ad 2.", "Example Ad 2", 2000, 2, "Active", 1000, "ABC456", true, true, 3, models.Category{}},
+				{1, 1, "example1.jpg", "This is example ad 1.", "Example Ad 1", 1000, 1, "Active", 1000, "XYZ123", true, false, 5, models.Category{}},
 			},
 		},
 		{
@@ -262,7 +263,7 @@ func testAdStorer_CreateAd(t *testing.T, db AdDatastorer) {
 			CategoryID:    1,
 			FlyTime:       50,
 			AirplaneModel: "Good Model2",
-			Status:        string(utils.INACTIVE),
+			Status:        string(consts.INACTIVE),
 			RepairCheck:   true,
 			ExpertCheck:   false,
 			PlaneAge:      3,
@@ -277,7 +278,7 @@ func testAdStorer_CreateAd(t *testing.T, db AdDatastorer) {
 				CategoryID:    1,
 				FlyTime:       50,
 				AirplaneModel: "Good Model2",
-				Status:        string(utils.INACTIVE),
+				Status:        string(consts.INACTIVE),
 				RepairCheck:   true,
 				ExpertCheck:   false,
 				PlaneAge:      3,
@@ -292,6 +293,55 @@ func testAdStorer_CreateAd(t *testing.T, db AdDatastorer) {
 			t.Errorf("[CreateAdminAd() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.res)
 		} else {
 			fmt.Println("[CreateAdminAd() TEST", i+1, "]Pass.")
+		}
+	}
+}
+
+func testAdStorer_UpdateStatus(t *testing.T, db AdDatastorer) {
+	testcases := []struct {
+		id     int
+		status consts.AdStatus
+		resp   models.Ad
+	}{
+		{3, consts.ACTIVE, models.Ad{
+			ID:            3,
+			UserID:        1,
+			Image:         "example3.jpg",
+			Description:   "This is example ad 3.",
+			Subject:       "Example Ad 3",
+			Price:         3000,
+			CategoryID:    1,
+			Status:        "Active",
+			FlyTime:       1000,
+			AirplaneModel: "DEF789",
+			RepairCheck:   false,
+			ExpertCheck:   false,
+			PlaneAge:      7,
+		}},
+		{1, consts.INACTIVE, models.Ad{
+			ID:            1,
+			UserID:        1,
+			Image:         "example1.jpg",
+			Description:   "This is example ad 1.",
+			Subject:       "Example Ad 1",
+			Price:         1000,
+			CategoryID:    1,
+			Status:        "Inactive",
+			FlyTime:       1000,
+			AirplaneModel: "XYZ123",
+			RepairCheck:   true,
+			ExpertCheck:   false,
+			PlaneAge:      5,
+		}},
+	}
+
+	for i, v := range testcases {
+		resp, _ := db.UpdateStatus(v.id, v.status)
+
+		if !reflect.DeepEqual(resp, v.resp) {
+			t.Errorf("[UpdateStatus() TEST%d]Failed. Got %v\tExpected %v\n", i+1, resp, v.resp)
+		} else {
+			fmt.Println("[UpdateStatus() TEST", i+1, "]Pass.")
 		}
 	}
 }

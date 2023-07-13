@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/models"
 	"errors"
 	"fmt"
 	"math"
 	"net/mail"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -179,4 +181,12 @@ func ValidateNationalID(id string) bool {
 	s = s % 11
 
 	return (s < 2 && c == s) || (s >= 2 && c == (11-s))
+}
+
+func ValidateAdsStatus(v url.Values) consts.AdStatus {
+	value := v.Get(string(consts.ACTIVE))
+	if strings.ToLower(value) == "true" {
+		return consts.ACTIVE
+	}
+	return consts.INACTIVE
 }
