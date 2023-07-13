@@ -83,7 +83,9 @@ func (b BookmarkssHandler) AddBookmark(c echo.Context) error {
 
 	// ------ Report Log ------
 	logService := logging_service.GetInstance()
-	if logService != nil {
+	fmt.Printf("--report-- %v", logService)
+	if logService != (*logging_service.Logging)(nil) {
+		fmt.Println("INSIDE")
 		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
 		if err != nil {
 			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK)
@@ -125,7 +127,7 @@ func (b BookmarkssHandler) DeleteBookmark(c echo.Context) error {
 
 	// ------ Report Log ------
 	logService := logging_service.GetInstance()
-	if logService != nil {
+	if logService != (*logging_service.Logging)(nil) {
 		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK_REMOVE, "")
 		if err != nil {
 			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK_REMOVE)

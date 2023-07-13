@@ -84,7 +84,6 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, models.Response{ResponseCode: 422, Message: jsonFormatValidationMsg})
 	}
 
-
 	user := c.Get("user").(models.User)
 	if user.Role != consts.ROLE_AIRLINE {
 		return c.JSON(http.StatusForbidden, models.Response{ResponseCode: 403, Message: "Airlines Can Add an ad!"})
@@ -141,7 +140,7 @@ func (a AdsHandler) AddAdHandler(c echo.Context) error {
 
 	// ____ Report Log ____
 	logService := logging_service.GetInstance()
-	if logService != nil {
+	if logService != (*logging_service.Logging)(nil) {
 		err = logService.ReportActivity(user.Role, user.ID, "Ads", createdAd.ID, consts.LOG_CREATE_AD, "")
 		if err != nil {
 			_ = fmt.Errorf("cannot log activity %v", consts.LOG_CREATE_AD)
@@ -223,7 +222,7 @@ func (a AdsHandler) Get(c echo.Context) error {
 
 	// ____ Get Logs of Ads ____
 	logService := logging_service.GetInstance()
-	if logService != nil {
+	if logService != (*logging_service.Logging)(nil) {
 		adsLogs, err := logService.GetAdsActivity(index)
 		if err != nil {
 			_ = fmt.Errorf("could not retrieve ads activity: %v", err)

@@ -292,7 +292,7 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 	var log_status_temp int = 0
 	defer func(logStatus int, transactionIds []uint) {
 		logService := logging_service.GetInstance()
-		if logService != nil {
+		if logService != (*logging_service.Logging)(nil) {
 			if log_status_temp == -1 {
 				for _, v := range transactionIds {
 					err = logService.ReportActivity("", 0, "Transaction", v, consts.LOG_PAYMENT_FAILED, "")
