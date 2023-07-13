@@ -769,6 +769,13 @@
                 "summary": "retrieve repair check request by ad for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "adID",
@@ -804,6 +811,13 @@
                 ],
                 "summary": "delete repair request for user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ad ID",
@@ -855,6 +869,13 @@
                 "summary": "Request to repair check",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "adID",
@@ -904,6 +925,13 @@
                 ],
                 "summary": "Update repair request",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "repair request ID",
@@ -958,6 +986,13 @@
                 "summary": "retrieve repair check request for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "requestID",
@@ -1001,6 +1036,13 @@
                 ],
                 "summary": "ListRepairRequest retrieves all repair requests for an repair",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "User ID",

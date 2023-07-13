@@ -816,6 +816,11 @@ paths:
     delete:
       description: delete repair request for user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ad ID
         in: path
         name: adID
@@ -844,6 +849,11 @@ paths:
     get:
       description: retrieve repair check request by ad for repair or user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ad ID
         in: path
         name: adID
@@ -871,6 +881,11 @@ paths:
       - application/json
       description: Request to repair check
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Ad ID
         in: path
         name: adID
@@ -904,6 +919,11 @@ paths:
       - application/json
       description: Update repair request
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: repair request ID
         in: path
         name: repairRequestID
@@ -941,6 +961,11 @@ paths:
     get:
       description: retrieve repair check request for repair or user
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: ad ID
         in: path
         name: requestID
@@ -970,6 +995,11 @@ paths:
     get:
       description: ListRepairRequest retrieves all repair requests for an repair
       parameters:
+      - description: User Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: User ID
         in: query
         name: user_id

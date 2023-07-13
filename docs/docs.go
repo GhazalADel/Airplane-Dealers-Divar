@@ -776,6 +776,13 @@ const docTemplate = `{
                 "summary": "retrieve repair check request by ad for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "adID",
@@ -811,6 +818,13 @@ const docTemplate = `{
                 ],
                 "summary": "delete repair request for user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ad ID",
@@ -862,6 +876,13 @@ const docTemplate = `{
                 "summary": "Request to repair check",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "adID",
@@ -911,6 +932,13 @@ const docTemplate = `{
                 ],
                 "summary": "Update repair request",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "repair request ID",
@@ -965,6 +993,13 @@ const docTemplate = `{
                 "summary": "retrieve repair check request for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "requestID",
@@ -1008,6 +1043,13 @@ const docTemplate = `{
                 ],
                 "summary": "ListRepairRequest retrieves all repair requests for an repair",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "User ID",
