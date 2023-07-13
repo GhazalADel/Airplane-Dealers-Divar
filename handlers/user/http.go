@@ -28,11 +28,11 @@ type ErrorResponseRegisterLogin struct {
 type UserCreateRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Role     string `json:"role"`
 }
 type BudgetAmountResponse struct {
 	Amount int `json:"amount"`
