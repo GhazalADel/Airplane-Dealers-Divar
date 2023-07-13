@@ -18,11 +18,11 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//User Doesn't have Token
 		if tokenString == "" {
-			return echo.ErrConflict
+			return echo.ErrUnauthorized
 		}
 
 		//Parse Token
-		token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 
 			//Wrong Algorithm
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -31,6 +31,10 @@ func IsLoggedIn(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(os.Getenv("SECRET")), nil
 
 		})
+
+		if err != nil {
+			return echo.ErrUnauthorized
+		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 
