@@ -194,7 +194,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -476,6 +476,13 @@ const docTemplate = `{
                 "summary": "retrieve expert check request by ad for expert or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "adID",
@@ -517,6 +524,13 @@ const docTemplate = `{
                 ],
                 "summary": "delete expert check request for expert or user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ad ID",
@@ -568,6 +582,13 @@ const docTemplate = `{
                 "summary": "Request to expert check",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "adID",
@@ -617,6 +638,13 @@ const docTemplate = `{
                 ],
                 "summary": "Update expert check request",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "expert request ID",
@@ -671,6 +699,13 @@ const docTemplate = `{
                 "summary": "retrieve expert check request for expert or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "request ID",
                         "name": "requestID",
@@ -714,6 +749,13 @@ const docTemplate = `{
                 ],
                 "summary": "ListExpertRequest retrieves all expert requests for an expert",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "User ID",
@@ -764,6 +806,13 @@ const docTemplate = `{
                 "summary": "retrieve repair check request by ad for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "adID",
@@ -799,6 +848,13 @@ const docTemplate = `{
                 ],
                 "summary": "delete repair request for user",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "ad ID",
@@ -850,6 +906,13 @@ const docTemplate = `{
                 "summary": "Request to repair check",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Ad ID",
                         "name": "adID",
@@ -899,6 +962,13 @@ const docTemplate = `{
                 ],
                 "summary": "Update repair request",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "repair request ID",
@@ -953,6 +1023,13 @@ const docTemplate = `{
                 "summary": "retrieve repair check request for repair or user",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "ad ID",
                         "name": "requestID",
@@ -996,6 +1073,13 @@ const docTemplate = `{
                 ],
                 "summary": "ListRepairRequest retrieves all repair requests for an repair",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "User ID",
@@ -1098,6 +1182,13 @@ const docTemplate = `{
                 "summary": "Add budget request",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Payment request details",
                         "name": "body",
                         "in": "body",
@@ -1149,6 +1240,13 @@ const docTemplate = `{
                 ],
                 "summary": "Verify budget payment and add budget",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Payment verify details",
                         "name": "body",

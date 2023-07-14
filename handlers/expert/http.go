@@ -5,6 +5,8 @@ import (
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/datastore/expert"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,6 +31,7 @@ func NewExpertHandler(expertDS datastore.Expert, userDS datastore.User) *ExpertH
 // @Tags expert
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "Ad ID"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 204 {object} models.ErrorResponse
@@ -63,12 +66,23 @@ func (e *ExpertHandler) RequestToExpertCheck(c echo.Context) error {
 		Success: true,
 	}
 
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(adID), consts.LOG_EXPERT_REQUEST, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_EXPERT_REQUEST)
+		}
+	}
+	// ____ Report Log ____
+
 	return c.JSON(201, resp)
 }
 
 // @Summary ListExpertRequest retrieves all expert requests for an expert
 // @Description ListExpertRequest retrieves all expert requests for an expert
 // @Tags expert
+// @Param Authorization header string true "User Token"
 // @Param user_id query int false "User ID"
 // @Param ads_id query int false "Ad ID"
 // @Param from_date query string false "From date"
@@ -161,6 +175,7 @@ func (e *ExpertHandler) GetAllExpertRequest(c echo.Context) error {
 // @Tags expert
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "User Token"
 // @Param expertRequestID path int true "expert request ID"
 // @Param expertCheckRequest body models.UpdateExpertCheckRequest true "Expert check object"
 // @Success 200 {object} models.ExpertRequestResponse
@@ -207,12 +222,23 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 		CreatedAt: expertAd.CreatedAt,
 	}
 
+	// ____ Report Log ____
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", expertAd.AdsID, consts.LOG_EXPERT_RESULT, expertAd.Report)
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_EXPERT_RESULT)
+		}
+	}
+	// ____ Report Log ____
+
 	return c.JSON(http.StatusOK, resp)
 }
 
 // @Summary retrieve expert check request by ad for expert or user
 // @Description retrieve expert check request by ad for expert or user
 // @Tags expert
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.GetExpertRequestResponse
 // @Failure 204 {object} models.ErrorResponse
@@ -257,6 +283,7 @@ func (e *ExpertHandler) GetExpertRequestByAd(c echo.Context) error {
 // @Summary retrieve expert check request for expert or user
 // @Description retrieve expert check request for expert or user
 // @Tags expert
+// @Param Authorization header string true "User Token"
 // @Param requestID path int true "request ID"
 // @Success 200 {object} models.GetExpertRequestResponse
 // @Failure 204 {object} models.ErrorResponse
@@ -301,6 +328,7 @@ func (e *ExpertHandler) GetExpertRequest(c echo.Context) error {
 // @Summary delete expert check request for expert or user
 // @Description delete expert check request for expert or user
 // @Tags expert
+// @Param Authorization header string true "User Token"
 // @Param adID path int true "ad ID"
 // @Success 200 {object} models.SuccessResponse
 // @Failure 204 {object} models.ErrorResponse

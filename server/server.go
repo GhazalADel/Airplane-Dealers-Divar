@@ -3,9 +3,11 @@ package server
 import (
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
+	"Airplane-Divar/datastore/logging"
 	"Airplane-Divar/datastore/user"
 	adsHandler "Airplane-Divar/handlers/ads"
 	userHandler "Airplane-Divar/handlers/user"
+	logging_service "Airplane-Divar/service/logging"
 	"log"
 
 	bookmarkDatastore "Airplane-Divar/datastore/bookmarks"
@@ -26,6 +28,9 @@ func StartServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//Loggin Service
+	logDatastore := logging.New(db)
+	logging_service.Initialize(logDatastore)
 
 	// Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

@@ -116,5 +116,6 @@ type (
 		FindLogByTitle(title string) models.LogName
 		AddActivity(al models.ActivityLog) error
 		GetAdsActivityByID(id int) ([]models.ActivityLog, error)
+		GetLogNameByID(id uint) string
 	}
 )

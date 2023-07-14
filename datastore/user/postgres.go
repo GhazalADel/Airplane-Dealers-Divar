@@ -34,7 +34,7 @@ func (a UserStore) Create(username string, password string, role string) (string
 	user.Token = ""
 
 	if user.Role != consts.ROLE_ADMIN && user.Role != consts.ROLE_AIRLINE && user.Role != consts.ROLE_EXPERT && user.Role != consts.ROLE_MATIN {
-		msg = "User Creation Faield: Unknown Role"
+		msg = "User Creation Failed: Unknown Role"
 		return msg, models.User{}, errors.New("")
 	}
 

@@ -4,6 +4,8 @@ import (
 	"Airplane-Divar/consts"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
+	logging_service "Airplane-Divar/service/logging"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -78,6 +80,19 @@ func (b BookmarkssHandler) AddBookmark(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: err.Error()})
 	}
+
+	// ------ Report Log ------
+	logService := logging_service.GetInstance()
+	fmt.Printf("--report-- %v", logService)
+	if logService != (*logging_service.Logging)(nil) {
+		fmt.Println("INSIDE")
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK)
+		}
+	}
+	// ------ Report Log ------
+
 	return c.JSON(http.StatusOK, bookmark)
 }
 
@@ -109,5 +124,16 @@ func (b BookmarkssHandler) DeleteBookmark(c echo.Context) error {
 	if err_delete != nil {
 		return c.JSON(http.StatusInternalServerError, models.Response{ResponseCode: 500, Message: err_delete.Error()})
 	}
+
+	// ------ Report Log ------
+	logService := logging_service.GetInstance()
+	if logService != (*logging_service.Logging)(nil) {
+		err = logService.ReportActivity(user.Role, user.ID, "Ads", uint(ad_id_int), consts.LOG_BOOKMARK_REMOVE, "")
+		if err != nil {
+			_ = fmt.Errorf("cannot log activity %v", consts.LOG_BOOKMARK_REMOVE)
+		}
+	}
+	// ------ Report Log ------
+
 	return c.JSON(http.StatusOK, "Bookmark Deleted Successfully")
 }
