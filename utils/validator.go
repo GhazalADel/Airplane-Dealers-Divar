@@ -101,7 +101,7 @@ func ValidateAd(jsonBody map[string]interface{}, cat models.Category) (string, m
 			return msg, models.Ad{}, errors.New("")
 		}
 	} else {
-		ad.Image = ""
+		ad.Image = "https://snipboard.io/d5viVR.jpg"
 	}
 
 	if _, ok := jsonBody["Subject"]; ok {
