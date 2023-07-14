@@ -32,7 +32,7 @@ func (e RepairStorer) GetByAd(
 	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	} else if user.Role == consts.ROLE_MATIN {
-		query.Where("status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
+		query.Where("repair_request.status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
 	}
 	result := query.First(&repairRequest)
 
@@ -47,12 +47,12 @@ func (e RepairStorer) Get(
 	var repairRequest models.RepairRequest
 	query := e.db.WithContext(ctx).
 		Joins("Ads", e.db.Select("Ads.subject")).
-		Where("repair_request.id = ?", repairRequest)
+		Where("repair_request.id = ?", requestID)
 
 	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
 	} else if user.Role == consts.ROLE_MATIN {
-		query.Where("status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
+		query.Where("repair_request.status != ?", consts.WAIT_FOR_PAYMENT_STATUS)
 	}
 	result := query.First(&repairRequest)
 
@@ -155,6 +155,14 @@ func (e RepairStorer) UpdateByUser(
 			return tmpRepairRequest, errors.New("not allowed")
 		}
 		updatedMap["status"] = body.Status
+	}
+
+	var repairRequest models.RepairRequest
+	err := e.db.WithContext(ctx).First(&repairRequest, repairRequestID).Error
+	if err != nil {
+		return repairRequest, errors.New("repair request does not exist")
+	} else if repairRequest.Status == consts.DONE_STATUS && repairRequest.Status != body.Status {
+		return repairRequest, errors.New("you can't change the status")
 	}
 
 	result := e.db.WithContext(ctx).

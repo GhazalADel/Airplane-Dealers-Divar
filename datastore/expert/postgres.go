@@ -6,6 +6,7 @@ import (
 	"Airplane-Divar/utils"
 	"context"
 	"errors"
+	"log"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -31,7 +32,7 @@ func (e ExpertStorer) GetByAd(
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
-			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?",
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND expert_ads.status != ?",
 			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
@@ -54,7 +55,7 @@ func (e ExpertStorer) Get(
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
-			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?",
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND expert_ads.status != ?",
 			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
@@ -149,6 +150,12 @@ func (e ExpertStorer) UpdateByExpert(
 	tmpExpertAd := models.ExpertAds{}
 	updatedMap := make(map[string]interface{})
 
+	if body.Report != "" {
+		updatedMap["report"] = body.Report
+		updatedMap["status"] = consts.DONE_STATUS
+		updatedMap["expert_id"] = user.ID
+	}
+
 	if body.Status != "" {
 		updatedMap["status"] = body.Status
 		if body.Status == consts.EXPERT_PENDING_STATUS {
@@ -159,10 +166,18 @@ func (e ExpertStorer) UpdateByExpert(
 			updatedMap["expert_id"] = user.ID
 		}
 	}
-	if body.Report != "" {
-		updatedMap["report"] = body.Report
-		updatedMap["status"] = consts.DONE_STATUS
-		updatedMap["expert_id"] = user.ID
+
+	if body.Status != consts.DONE_STATUS {
+		updatedMap["report"] = nil
+	}
+
+	var expertAd models.ExpertAds
+	err := e.db.WithContext(ctx).First(&expertAd, expertAdID).Error
+	if err != nil {
+		log.Println(err)
+		return expertAd, errors.New("expert check request does not exist")
+	} else if expertAd.Status == consts.DONE_STATUS && expertAd.Status != body.Status {
+		return expertAd, errors.New("you can't change the status")
 	}
 
 	result := e.db.WithContext(ctx).
