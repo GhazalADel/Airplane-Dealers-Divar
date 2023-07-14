@@ -12,15 +12,24 @@ type Logging struct {
 	loggingDatastore datastore.Logging
 }
 
-func New(loggingDataStorer datastore.Logging) service.Logging {
-	return &Logging{
-		loggingDatastore: loggingDataStorer,
+var logService *Logging
+
+func Initialize(loggingDataStorer datastore.Logging) {
+	if logService == nil {
+		logService = &Logging{
+			loggingDatastore: loggingDataStorer,
+		}
 	}
 }
 
+func GetInstance() service.Logging {
+
+	return logService
+}
+
 func excludeLogIds(logID uint) bool {
-	// no need for payment - bookmark - buy logs
-	excludeLogId := []uint{9, 10, 11, 12, 13}
+	// no need for payment logs
+	excludeLogId := []uint{9, 10, 11}
 
 	for _, lid := range excludeLogId {
 		if logID == lid {
@@ -41,7 +50,6 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 
 	for _, v := range adsLogs {
 		if !excludeLogIds(v.LogID) {
-
 			logResp := models.ActivityLogResponse{
 				ID:          v.ID,
 				CreatedAt:   v.CreatedAt,
@@ -49,7 +57,7 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 				CauserID:    v.CauserID,
 				SubjectType: v.SubjectType,
 				SubjectID:   v.SubjectID,
-				LogName:     v.Log.Title,
+				LogName:     loggingService.loggingDatastore.GetLogNameByID(v.LogID),
 				Description: v.Description,
 			}
 
@@ -58,10 +66,10 @@ func (loggingService *Logging) GetAdsActivity(ID int) ([]byte, error) {
 		}
 	}
 
-	return json.Marshal(resp)
+	return json.MarshalIndent(resp, "", "	")
 }
 
-func (loggingService *Logging) ReportActivity(causerType string, causerID int, subjectType string, subjectID int, logTitle string) error {
+func (loggingService *Logging) ReportActivity(causerType string, causerID uint, subjectType string, subjectID uint, logTitle string, description string) error {
 
 	logName := loggingService.loggingDatastore.FindLogByTitle(logTitle)
 	if logName.Title == "" {
@@ -75,6 +83,7 @@ func (loggingService *Logging) ReportActivity(causerType string, causerID int, s
 		SubjectID:   uint(subjectID),
 		Log:         logName,
 		LogID:       logName.ID,
+		Description: description,
 	}
 
 	return loggingService.loggingDatastore.AddActivity(alog)

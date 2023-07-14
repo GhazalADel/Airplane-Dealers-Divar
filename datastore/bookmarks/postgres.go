@@ -1,8 +1,8 @@
 package bookmarks
 
 import (
+	"Airplane-Divar/consts"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"errors"
 	"fmt"
 
@@ -72,7 +72,7 @@ func (b BookmarkDatastorer) AddBookmark(userID, adID int) (models.BookmarksRespo
 		return models.BookmarksResponse{}, fmt.Errorf("Invalid AdID")
 	}
 
-	if ad.Status != string(utils.ACTIVE) {
+	if ad.Status != string(consts.ACTIVE) {
 		return models.BookmarksResponse{}, fmt.Errorf("You can't bookmark this ad")
 	}
 
