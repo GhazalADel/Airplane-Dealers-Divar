@@ -1,5 +1,52 @@
 # Airplane-Dealers-Divar
+Airplane Dealers Divar is a cutting-edge advertising platform designed to facilitate the buying and selling of airplanes by airlines. This platform serves as a centralized hub where airlines can showcase their available aircraft for potential buyers, providing a seamless and efficient process for aircraft transactions. The project is developed using the Go programming language, leveraging its robustness and concurrency features to deliver a high-performance and scalable solution.
 
+
+## Features
+
+- User registration and login
+- Payment gateway creation and verification
+- Ads
+  - Ads Bookmarks
+  - Repair Request
+  - Expert Check Request
+  - Ads Filtering
+ - Diffrent User Roles (Matin <<Super User>>, Admin, Expert, Airline)
+ - Admin Panel for managing users, configurations, and Ads
+
+## Setup
+
+1. Clone the repository to your local machine:
+
+```bash
+git clone https://github.com/zereshk-quera/Airplane-Dealers-Divar.git
+```
+
+2. Navigate into the project directory:
+
+```bash
+cd Airplane-Dealers-Divar
+```
+
+3. Install the required dependencies:
+
+```bash
+go mod download
+```
+
+4. Run the project:
+
+```bash
+go run .
+```
+
+The server will start running at `localhost:8080`.
+
+5. Access the Swagger API documentation:
+
+Swagger URL: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
+
+The Swagger URL provides access to the Swagger API documentation for the Airplane-Dealers-Divar Project.
 
 ## Swagger
 start using swagger [echo-swagger man page](https://github.com/swaggo/echo-swagger)
