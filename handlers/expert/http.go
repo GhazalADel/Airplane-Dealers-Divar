@@ -203,7 +203,7 @@ func (e *ExpertHandler) UpdateCheckExpert(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	expertAd, err := e.ExpertDatastore.Update(ctx, expertRequestID, user, updatedExpertCheck)
+	expertAd, err := e.ExpertDatastore.UpdateByExpert(ctx, expertRequestID, user, updatedExpertCheck)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 	} else if expertAd.ID == 0 {

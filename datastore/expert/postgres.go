@@ -6,6 +6,7 @@ import (
 	"Airplane-Divar/utils"
 	"context"
 	"errors"
+	"log"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -25,11 +26,13 @@ func (e ExpertStorer) GetByAd(
 	user models.User,
 ) (models.ExpertAds, error) {
 	var expertAd models.ExpertAds
-	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.ads_id = ?", adID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("expert_ads.ads_id = ?", adID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
-			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?", 
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND expert_ads.status != ?",
 			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
@@ -46,11 +49,13 @@ func (e ExpertStorer) Get(
 	user models.User,
 ) (models.ExpertAds, error) {
 	var expertAd models.ExpertAds
-	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.id = ?", requestID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("expert_ads.id = ?", requestID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
-			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?",
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND expert_ads.status != ?",
 			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
@@ -130,10 +135,26 @@ func (e ExpertStorer) GetAllExpertRequests(
 }
 
 func (e ExpertStorer) Update(
+	ctx context.Context, expertAdID int, upadtedColumn map[string]interface{},
+) error {
+	err := e.db.Model(&models.ExpertAds{}).
+		Where("id = ?", expertAdID).
+		Updates(upadtedColumn).Error
+
+	return err
+}
+
+func (e ExpertStorer) UpdateByExpert(
 	ctx context.Context, expertAdID int, user models.User, body models.UpdateExpertCheckRequest,
 ) (models.ExpertAds, error) {
 	tmpExpertAd := models.ExpertAds{}
 	updatedMap := make(map[string]interface{})
+
+	if body.Report != "" {
+		updatedMap["report"] = body.Report
+		updatedMap["status"] = consts.DONE_STATUS
+		updatedMap["expert_id"] = user.ID
+	}
 
 	if body.Status != "" {
 		updatedMap["status"] = body.Status
@@ -145,10 +166,18 @@ func (e ExpertStorer) Update(
 			updatedMap["expert_id"] = user.ID
 		}
 	}
-	if body.Report != "" {
-		updatedMap["report"] = body.Report
-		updatedMap["status"] = consts.DONE_STATUS
-		updatedMap["expert_id"] = user.ID
+
+	if body.Status != consts.DONE_STATUS {
+		updatedMap["report"] = nil
+	}
+
+	var expertAd models.ExpertAds
+	err := e.db.WithContext(ctx).First(&expertAd, expertAdID).Error
+	if err != nil {
+		log.Println(err)
+		return expertAd, errors.New("expert check request does not exist")
+	} else if expertAd.Status == consts.DONE_STATUS && expertAd.Status != body.Status {
+		return expertAd, errors.New("you can't change the status")
 	}
 
 	result := e.db.WithContext(ctx).

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"Airplane-Divar/consts"
-	database "Airplane-Divar/database"
 	"Airplane-Divar/datastore"
 	"Airplane-Divar/models"
 	logging_service "Airplane-Divar/service/logging"
@@ -269,17 +268,12 @@ func (p PaymentHandler) PaymentRequestHandler(c echo.Context) error {
 // @Failure 500 {string} models.ErrorResponse
 // @Router /users/payment/verify [get]
 func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
-	// Connect To The Datebase
-	db, err := database.GetConnection()
-	if err != nil {
-		return c.JSON(http.StatusBadGateway, models.Response{ResponseCode: 502, Message: "Can't Connect To Database"})
-	}
-
+	ctx := c.Request().Context()
 	authority := c.QueryParam("Authority")
 	status := c.QueryParam("Status")
 
-	var transactions []models.Transaction
-	if err := db.Where(&models.Transaction{Authority: authority}).Find(&transactions).Error; err != nil {
+	transactions, err := p.PaymentDS.FindByAuthority(authority)
+	if err != nil {
 		// Handle the error (e.g., transaction not found)
 		return c.JSON(http.StatusNotFound, models.Response{ResponseCode: 404, Message: "Transaction Not Founded"})
 	}
@@ -315,12 +309,9 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 	// ____ Report Log ----
 
 	if status == "NOK" {
-		db.Table("transactions").
-			Where("id IN ?", transactionsIDS).
-			Updates(
-				map[string]interface{}{"status": "Failed"},
-			)
+		p.PaymentDS.Update("Faield", transactionsIDS)
 		log_status_temp = -1
+
 		return c.JSON(http.StatusBadRequest, "Failed Payment")
 	}
 
@@ -358,25 +349,27 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 		if dataMap, ok := data.(map[string]interface{}); ok {
 			if code, ok := dataMap["code"]; ok {
 				if code == float64(100) {
-					db.Table("transactions").
-						Where("id IN ?", transactionsIDS).
-						Updates(
-							map[string]interface{}{"status": "Failed"},
-						)
+					p.PaymentDS.Update("Successful", transactionsIDS)
 
 					// update service requests status
-					var statusService consts.Status
 					for _, t := range transactions {
 						if t.TransactionType == models.ExpertAds.TableName(models.ExpertAds{}) {
-							statusService = consts.EXPERT_PENDING_STATUS
-						} else if t.TransactionType == models.RepairRequest.TableName(models.RepairRequest{}) {
-							statusService = consts.MATIN_PENDING_STATUS
-						}
-						db.Table(t.TransactionType).
-							Where("id = ?", t.ObjectID).
-							Updates(
-								map[string]interface{}{"status": statusService},
+							err = p.ExpertDS.Update(
+								ctx, int(t.ObjectID),
+								map[string]interface{}{"status": consts.EXPERT_PENDING_STATUS},
 							)
+						} else if t.TransactionType == models.RepairRequest.TableName(models.RepairRequest{}) {
+							err = p.RepairDS.Update(
+								ctx, int(t.ObjectID),
+								map[string]interface{}{"status": consts.MATIN_PENDING_STATUS},
+							)
+						}
+						if err != nil {
+							return c.JSON(http.StatusInternalServerError, models.Response{
+								ResponseCode: http.StatusInternalServerError,
+								Message:      "Failed to update status",
+							})
+						}
 					}
 					log_status_temp = 1
 					return c.JSON(http.StatusOK, "Successful Payment")
@@ -388,11 +381,8 @@ func (p PaymentHandler) PaymentVerifyHandler(c echo.Context) error {
 
 	}
 
-	db.Table("transactions").
-		Where("id IN ?", transactionsIDS).
-		Updates(
-			map[string]interface{}{"status": "Failed"},
-		)
+	p.PaymentDS.Update("Faield", transactionsIDS)
 	log_status_temp = -1
+
 	return c.JSON(http.StatusBadRequest, "Failed Payment")
 }
