@@ -3,7 +3,6 @@ package bookmarks
 import (
 	"Airplane-Divar/consts"
 	"Airplane-Divar/models"
-	"Airplane-Divar/utils"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -309,7 +308,7 @@ var (
 			Subject:       "Example Ad 1",
 			Price:         1000,
 			CategoryID:    2,
-			Status:        string(utils.ACTIVE),
+			Status:        string(consts.ACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "XYZ123",
 			RepairCheck:   true,
@@ -324,7 +323,7 @@ var (
 			Subject:       "Example Ad 2",
 			Price:         2000,
 			CategoryID:    1,
-			Status:        string(utils.ACTIVE),
+			Status:        string(consts.ACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "ABC456",
 			RepairCheck:   true,
@@ -339,7 +338,7 @@ var (
 			Subject:       "Example Ad 3",
 			Price:         3000,
 			CategoryID:    1,
-			Status:        string(utils.INACTIVE),
+			Status:        string(consts.INACTIVE),
 			FlyTime:       1000,
 			AirplaneModel: "ABC456",
 			RepairCheck:   true,
@@ -417,7 +416,7 @@ func (m mockDatastore) AddBookmark(userID, adID int) (models.BookmarksResponse, 
 	isActive := true
 	for _, v := range mockAdData {
 		if v.ID == uint(adID) {
-			if v.Status != string(utils.ACTIVE) {
+			if v.Status != string(consts.ACTIVE) {
 				isActive = false
 				break
 			}

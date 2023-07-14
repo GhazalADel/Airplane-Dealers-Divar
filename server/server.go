@@ -4,7 +4,6 @@ import (
 	database "Airplane-Divar/database"
 	adsDatastore "Airplane-Divar/datastore/ads"
 	"Airplane-Divar/datastore/user"
-	"Airplane-Divar/handlers"
 	adsHandler "Airplane-Divar/handlers/ads"
 	userHandler "Airplane-Divar/handlers/user"
 	"log"

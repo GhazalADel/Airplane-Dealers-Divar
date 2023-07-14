@@ -40,6 +40,23 @@ func (p PaymentStore) Create(
 	return "okay", nil
 }
 
+func (p PaymentStore) Update(status string, idList []uint) error {
+	err := p.db.Table("transactions").
+		Where("id IN ?", idList).
+		Updates(
+			map[string]interface{}{"status": status},
+		).Error
+
+	return err
+}
+
+func (p PaymentStore) FindByAuthority(authority string) ([]models.Transaction, error) {
+	var transactions []models.Transaction
+	result := p.db.Where(&models.Transaction{Authority: authority}).Find(&transactions)
+
+	return transactions, result.Error
+}
+
 func (p PaymentStore) GetPriceByServices(ctx context.Context, services []string) (map[string]float64, error) {
 	var prices []models.Configuration
 	result := make(map[string]float64)

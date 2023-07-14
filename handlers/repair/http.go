@@ -261,7 +261,7 @@ func (e *RepairHandler) UpdateRepairRequest(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	repairRequest, err := e.RepairDatastore.Update(
+	repairRequest, err := e.RepairDatastore.UpdateByUser(
 		ctx, repairRequestID, user, updatedRepairRequest,
 	)
 	if err != nil {

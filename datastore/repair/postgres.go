@@ -25,7 +25,9 @@ func (e RepairStorer) GetByAd(
 	user models.User,
 ) (models.RepairRequest, error) {
 	var repairRequest models.RepairRequest
-	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.ads_id = ?", adID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("repair_request.ads_id = ?", adID)
 
 	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
@@ -43,7 +45,9 @@ func (e RepairStorer) Get(
 	user models.User,
 ) (models.RepairRequest, error) {
 	var repairRequest models.RepairRequest
-	query := e.db.WithContext(ctx).Joins("Ads").Where("repair_request.id = ?", requestID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("repair_request.id = ?", repairRequest)
 
 	if user.Role == consts.ROLE_AIRLINE { // is airline
 		query.Where(&models.Ad{UserID: user.ID})
@@ -126,6 +130,16 @@ func (e RepairStorer) GetAllRepairRequests(
 }
 
 func (e RepairStorer) Update(
+	ctx context.Context, repairRequestID int, upadtedColumn map[string]interface{},
+) error {
+	err := e.db.Model(&models.RepairRequest{}).
+		Where("id = ?", repairRequestID).
+		Updates(upadtedColumn).Error
+
+	return err
+}
+
+func (e RepairStorer) UpdateByUser(
 	ctx context.Context, repairRequestID int,
 	user models.User, body models.UpdateRepairRequest,
 ) (models.RepairRequest, error) {

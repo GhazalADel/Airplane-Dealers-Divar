@@ -25,11 +25,13 @@ func (e ExpertStorer) GetByAd(
 	user models.User,
 ) (models.ExpertAds, error) {
 	var expertAd models.ExpertAds
-	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.ads_id = ?", adID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("expert_ads.ads_id = ?", adID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
-			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?", 
+			"(expert_ads.expert_id = ? OR expert_ads.expert_id IS NULL) AND status != ?",
 			user.ID, consts.WAIT_FOR_PAYMENT_STATUS,
 		)
 	} else if user.Role == consts.ROLE_AIRLINE { // is advertiser
@@ -46,7 +48,9 @@ func (e ExpertStorer) Get(
 	user models.User,
 ) (models.ExpertAds, error) {
 	var expertAd models.ExpertAds
-	query := e.db.WithContext(ctx).Joins("Ads").Where("expert_ads.id = ?", requestID)
+	query := e.db.WithContext(ctx).
+		Joins("Ads", e.db.Select("Ads.subject")).
+		Where("expert_ads.id = ?", requestID)
 
 	if user.Role == consts.ROLE_EXPERT { // is_expert
 		query.Where(
@@ -130,6 +134,16 @@ func (e ExpertStorer) GetAllExpertRequests(
 }
 
 func (e ExpertStorer) Update(
+	ctx context.Context, expertAdID int, upadtedColumn map[string]interface{},
+) error {
+	err := e.db.Model(&models.ExpertAds{}).
+		Where("id = ?", expertAdID).
+		Updates(upadtedColumn).Error
+
+	return err
+}
+
+func (e ExpertStorer) UpdateByExpert(
 	ctx context.Context, expertAdID int, user models.User, body models.UpdateExpertCheckRequest,
 ) (models.ExpertAds, error) {
 	tmpExpertAd := models.ExpertAds{}

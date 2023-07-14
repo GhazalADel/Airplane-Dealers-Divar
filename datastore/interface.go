@@ -39,6 +39,9 @@ type (
 			user models.User,
 		) (models.ExpertAds, error)
 		Update(
+			ctx context.Context, expertAdID int, upadtedColumn map[string]interface{},
+		) error
+		UpdateByExpert(
 			ctx context.Context, expertAdID int,
 			user models.User, body models.UpdateExpertCheckRequest,
 		) (models.ExpertAds, error)
@@ -69,6 +72,9 @@ type (
 			page int,
 		) ([]models.RepairRequest, error)
 		Update(
+			ctx context.Context, repairRequestID int, upadtedColumn map[string]interface{},
+		) error
+		UpdateByUser(
 			ctx context.Context, repairRequestID int,
 			user models.User, body models.UpdateRepairRequest,
 		) (models.RepairRequest, error)
@@ -94,6 +100,8 @@ type (
 			transactionType string,
 			objectID uint,
 		) (string, error)
+		Update(status string, idList []uint) error
+		FindByAuthority(authority string) ([]models.Transaction, error)
 		GetPriceByServices(ctx context.Context, services []string) (map[string]float64, error)
 		GetTotalPriceByServices(prices map[string]float64) float64
 	}
