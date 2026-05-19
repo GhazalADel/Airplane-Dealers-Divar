@@ -1,81 +1,92 @@
-# Airplane-Dealers-Divar
-Airplane Dealers Divar is a cutting-edge advertising platform designed to facilitate the buying and selling of airplanes by airlines. This platform serves as a centralized hub where airlines can showcase their available aircraft for potential buyers, providing a seamless and efficient process for aircraft transactions. The project is developed using the Go programming language, leveraging its robustness and concurrency features to deliver a high-performance and scalable solution.
+# Airplane Dealers Divar
 
+A Divar-like advertising platform for buying and selling airplanes between airlines, built with Go and Echo. Supports role-based access, expert/repair inspection requests, bookmarks, payment, and a full Swagger API.
 
 ## Features
 
-- User registration and login
+**Ads**
+- Post, edit, and manage airplane listings (model, price, flight hours, age, images)
+- Filter ads by category, price, age, and more
+- Bookmark ads
+- Request expert inspection or repair check on an ad
+
+**Users & Roles**
+- Sign up / log in with JWT authentication
+- Roles: `SuperUser (Matin)`, `Admin`, `Expert`, `Airline`
+- Admin panel for managing users, ads, and system config
+
+**Payments**
 - Payment gateway creation and verification
-- Ads
-  - Ads Bookmarks
-  - Repair Request
-  - Expert Check Request
-  - Ads Filtering
- - Diffrent User Roles (Matin <<Super User>>, Admin, Expert, Airline)
- - Admin Panel for managing users, configurations, and Ads
+
+**Other**
+- Activity logging service layer
+- Swagger UI at `/swagger/index.html`
+- Database migrations with `golang-migrate`
+
+## Tech Stack
+- **Go** + **Echo** framework
+- **PostgreSQL** + **GORM**
+- **JWT** authentication
+- **Docker** + **Docker Compose**
+- **Swagger** (swaggo/echo-swagger)
 
 ## Setup
 
-1. Clone the repository to your local machine:
-
+### With Docker (recommended)
 ```bash
-git clone https://github.com/zereshk-quera/Airplane-Dealers-Divar.git
+cp .env.example .env       # configure DB credentials and secrets
+docker compose up --build
 ```
+Runs migrations and seeds example data automatically.
 
-2. Navigate into the project directory:
-
+### Without Docker
 ```bash
-cd Airplane-Dealers-Divar
-```
-
-3. Install the required dependencies:
-
-```bash
+cp .env.example .env
 go mod download
+
+# Run migrations
+migrate -path database/migrations -database 'postgres://...' up
+
+# Start server
+go run main.go
 ```
 
-4. Run the project:
+Server runs at `http://localhost:8080`  
+Swagger UI: `http://localhost:8080/swagger/index.html`
 
+## Environment Variables
+| Variable | Description |
+|----------|-------------|
+| `POSTGRES_*` | PostgreSQL connection settings |
+| `SECRET` | JWT signing secret |
+| `ADMIN_CODE` | Registration code for admin role |
+| `EXPERT_CODE` | Registration code for expert role |
+
+## API Overview
+| Domain | Endpoints |
+|--------|-----------|
+| Users | Register, login, profile |
+| Ads | CRUD, filter, search |
+| Bookmarks | Add/remove/list saved ads |
+| Expert | Request expert inspection |
+| Repair | Request repair check |
+| Payment | Create and verify payments |
+
+## Running Tests
 ```bash
-go run .
+go test ./...
 ```
 
-The server will start running at `localhost:8080`.
-
-5. Access the Swagger API documentation:
-
-Swagger URL: [http://localhost:8080/swagger/](http://localhost:8080/swagger/)
-
-The Swagger URL provides access to the Swagger API documentation for the Airplane-Dealers-Divar Project.
-
-## Swagger
-start using swagger [echo-swagger man page](https://github.com/swaggo/echo-swagger)
-
-The Swagger UI provides a user-friendly interface to explore the API endpoints, view request/response details, and even test the API by sending requests directly from the Swagger UI.
-
-Open a web browser and navigate to the Swagger UI URL. The default URL is typically http://localhost:8080/swagger/index.html.
-
-## Run Tests
-
-To run tests for your Go project using the `go test` command, follow these steps:
-
-1. Open your project's terminal or command prompt.
-
-2. Navigate to the root directory of your Go project.
-
-3. Run the following command to execute all tests in your project and its subdirectories:
-
-```shell
-   go test ./...
+## Project Structure
 ```
-
-   - The `go test` command is used to run tests in Go.
-   - The `./...` argument instructs Go to run tests in the current directory and all its subdirectories.
-
-4. Go will execute the tests and display the results in the terminal or command prompt. You'll see output indicating which tests passed or failed, along with any error messages or stack traces.
-
-Running tests with `go test ./...` is a convenient way to execute all tests within your project. It recursively traverses the project directory structure, identifying and running tests in each package.
-
-Make sure you have the necessary test files and test functions defined in your project. The test files should have a `_test.go` suffix, and the test functions should start with the word `Test`. For example, a test function could be named `TestMyFunction`.
-
-By running tests regularly, you can ensure the correctness and reliability of your code, identify and fix any issues, and maintain the quality of your Go project.
+├── handlers/       # HTTP handlers per domain
+├── datastore/      # DB layer (PostgreSQL via GORM)
+├── models/         # Data models
+├── server/         # Route registration
+├── service/        # Service layer (logging)
+├── filter/         # Query filtering logic
+├── middlewares/    # JWT auth middleware
+├── database/       # Connection + migrations
+├── config/         # Config loader (.env + YAML)
+└── docs/           # Swagger generated docs
+```
